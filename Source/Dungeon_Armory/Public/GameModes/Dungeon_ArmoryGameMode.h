@@ -14,6 +14,3 @@ class ADungeon_ArmoryGameMode : public AGameModeBase
 public:
 	ADungeon_ArmoryGameMode();
 };
-
-
-

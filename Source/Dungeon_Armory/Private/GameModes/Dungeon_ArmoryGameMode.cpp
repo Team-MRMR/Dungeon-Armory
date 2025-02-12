@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "Dungeon_ArmoryGameMode.h"
-#include "Dungeon_ArmoryCharacter.h"
+#include "GameModes/Dungeon_ArmoryGameMode.h"
+#include "Characters/Dungeon_ArmoryCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 ADungeon_ArmoryGameMode::ADungeon_ArmoryGameMode()
