@@ -2,12 +2,24 @@
 
 
 #include "Characters/Enemy/EnemyBase.h"
+#include "Perception/PawnSensingComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AEnemyBase::AEnemyBase()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bCanEverTick = true;
+
+    // 기본 AI 상태를 Idle로 설정
+    CurrentState = EEnemyState::Idle;
+
+    // PawnSensingComponent 생성
+    PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
+    if (PawnSensingComponent)
+    {
+        PawnSensingComponent->OnSeePawn.AddDynamic(this, &AEnemyBase::OnSeePlayer);
+        PawnSensingComponent->SetPeripheralVisionAngle(60.0f); // 60도 시야각 설정
+    }
 
 }
 
@@ -25,10 +37,28 @@ void AEnemyBase::Tick(float DeltaTime)
 
 }
 
-// Called to bind functionality to input
-void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AEnemyBase::SetEnemyState(EEnemyState NewState)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+    if (CurrentState == NewState)
+    {
+        return;
+    }
 
+    UE_LOG(LogTemp, Warning, TEXT("Enemy state changed from [%d]to: [%d]"),
+        static_cast<int32>(CurrentState), static_cast<int32>(NewState));
+
+    CurrentState = NewState;
 }
 
+void AEnemyBase::OnSeePlayer(APawn* Pawn)
+{
+    if (!Pawn)
+    {
+        return;
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("Player detected!"));
+
+    // Chase 상태로 변경
+    SetEnemyState(EEnemyState::Chase);
+}

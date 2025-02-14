@@ -20,19 +20,39 @@ class DUNGEON_ARMORY_API AEnemyBase : public ACharacter
 {
 	GENERATED_BODY()
 
+
+/***** Variables *****/
+public:	
+	/** AI의 현재 상태 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	EEnemyState CurrentState;
+
+	/** AI가 경로를 순찰할 때 사용할 이동 타겟 포인트 */
+	UPROPERTY(EditInstanceOnly, Category = "AI")
+	TArray<AActor*> PatrolPoints;
+
+	/** 플레이어 감지용 시야 체크 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	class UPawnSensingComponent* PawnSensingComponent;
+
+
+/***** Functions *****/
 public:
 	// Sets default values for this character's properties
 	AEnemyBase();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	/** 상태 변경 함수 */
+	void SetEnemyState(EEnemyState NewState);
+
+	/** 플레이어 감지 함수 */
+	UFUNCTION()
+	void OnSeePlayer(APawn* Pawn);
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
 };
