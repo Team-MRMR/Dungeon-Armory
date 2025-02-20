@@ -2,8 +2,8 @@
 
 
 #include "AI/Tasks/BTTask_Chase.h"
-#include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Actor.h"
 
 UBTTask_Chase::UBTTask_Chase()

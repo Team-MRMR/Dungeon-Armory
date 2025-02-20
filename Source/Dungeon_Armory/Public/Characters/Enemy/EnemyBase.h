@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Sight.h"
+
 #include "EnemyBase.generated.h"
 
 UENUM(BlueprintType)
@@ -35,6 +38,13 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	class UPawnSensingComponent* PawnSensingComponent;
 
+private:
+	// AI 감지 시스템
+	UPROPERTY(VisibleAnywhere, Category = "AI")
+	UAIPerceptionComponent* AIPerception;
+
+	UPROPERTY(VisibleAnywhere, Category = "AI")
+	UAISenseConfig_Sight* SightConfig;
 
 /***** Functions *****/
 public:
@@ -54,5 +64,11 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+
+private:
+	// 감지 처리 함수
+	UFUNCTION()
+	void OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus);
 
 };
