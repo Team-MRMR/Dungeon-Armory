@@ -3,7 +3,7 @@
 
 #include "Characters/Enemy/EnemyAIController.h"
 #include "Characters/Enemy/EnemyBase.h"
-#include "AIController.h"
+
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -41,19 +41,11 @@ void AEnemyAIController::BeginPlay()
 
 }
 
-void AEnemyAIController::SetBlackboardKey(FName KeyName, UObject* Value)
+void AEnemyAIController::SetEnemyState(EEnemyStates NewState)
 {
     if (BlackboardComponent)
     {
-        BlackboardComponent->SetValueAsObject(KeyName, Value);
-    }
-}
-
-void AEnemyAIController::SetBlackboardKeyBool(FName KeyName, bool bValue)
-{
-    if (BlackboardComponent)
-    {
-        BlackboardComponent->SetValueAsBool(KeyName, bValue);
+        BlackboardComponent->SetValueAsEnum(BlackboardKey_EnemyState, static_cast<uint8>(NewState));
     }
 }
 
@@ -83,10 +75,18 @@ void AEnemyAIController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
     }
 
     bool bIsVisible = Stimulus.WasSuccessfullySensed();
-
-    // 블랙보드 값 설정
-    BlackboardComponent->SetValueAsBool("IsAlerted", bIsVisible);
-    BlackboardComponent->SetValueAsObject("Target", bIsVisible ? Actor : nullptr);
+    if (bIsVisible)
+    {
+        // 블랙보드 값 설정
+        SetEnemyState(EEnemyStates::Chase);
+        BlackboardComponent->SetValueAsObject("Target", Actor);
+    }
+    else
+    {
+		// 블랙보드 값 초기화
+        SetEnemyState(EEnemyStates::Return);
+		BlackboardComponent->SetValueAsObject("Target", nullptr);
+    }
 
     UE_LOG(LogTemp, Warning, TEXT("AI Perception: %s detected!"), bIsVisible ? TEXT("Target") : TEXT("None"));
 }

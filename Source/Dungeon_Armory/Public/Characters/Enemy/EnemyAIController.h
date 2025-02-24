@@ -9,9 +9,20 @@
 
 #include "EnemyAIController.generated.h"
 
-/**
- * 
- */
+UENUM(BlueprintType)
+enum class EEnemyStates : uint8
+{
+    Idle    UMETA(DisplayName = "Idle"),
+    Patrol  UMETA(DisplayName = "Patrol"),
+    Chase   UMETA(DisplayName = "Chase"),
+    Return  UMETA(DisplayName = "Return")
+};
+
+// 전방 선언 (헤더 파일에서 포인터 변수만 선언할 경우)
+class UBehaviorTree;
+class UBehaviorTreeComponent;
+class UBlackboardComponent;
+
 UCLASS()
 class DUNGEON_ARMORY_API AEnemyAIController : public AAIController
 {
@@ -19,6 +30,7 @@ class DUNGEON_ARMORY_API AEnemyAIController : public AAIController
 	
 
 /***** Variables *****/
+
 protected:
     // 기본 비헤이비어 트리 에셋
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
@@ -26,11 +38,11 @@ protected:
     
     /** 비헤이비어 트리 컴포넌트 */
     UPROPERTY(VisibleAnywhere, Category = "AI")
-    class UBehaviorTreeComponent* BehaviorTreeComponent;
+    UBehaviorTreeComponent* BehaviorTreeComponent;
 
     /** 블랙보드 컴포넌트 */
     UPROPERTY(VisibleAnywhere, Category = "AI")
-    class UBlackboardComponent* BlackboardComponent;
+    UBlackboardComponent* BlackboardComponent;
 
     // AI 감지 시스템 (수정: AIController에서 관리)
     UPROPERTY(VisibleAnywhere, Category = "AI")
@@ -40,14 +52,17 @@ protected:
     UPROPERTY(VisibleAnywhere, Category = "AI")
     UAISenseConfig_Sight* SightConfig;
 
+    /** 블랙보드에서 Enemy의 상태를 저장하는 키 */
+    UPROPERTY(EditDefaultsOnly, Category = "AI")
+    FName BlackboardKey_EnemyState = "EnemyState";
+
 /***** Functions *****/
 public:
     AEnemyAIController();
 
 public:
-    /** 블랙보드 키 설정 함수 */
-    void SetBlackboardKey(FName KeyName, UObject* Value);
-    void SetBlackboardKeyBool(FName KeyName, bool bValue);
+    /** 블랙보드에 EnemyState 값을 설정하는 함수 */
+    void SetEnemyState(EEnemyStates NewState);
 
 protected:
     virtual void BeginPlay() override;

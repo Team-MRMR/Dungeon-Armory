@@ -7,15 +7,6 @@
 
 #include "EnemyBase.generated.h"
 
-UENUM(BlueprintType)
-enum class EEnemyState : uint8
-{
-	Idle    UMETA(DisplayName = "Idle"),
-	Patrol  UMETA(DisplayName = "Patrol"),
-	Chase   UMETA(DisplayName = "Chase"),
-	Return  UMETA(DisplayName = "Return")
-};
-
 UCLASS()
 class DUNGEON_ARMORY_API AEnemyBase : public ACharacter
 {

@@ -3,6 +3,8 @@
 
 #include "Characters/Enemy/EnemyBase.h"
 
+
+
 // Sets default values
 AEnemyBase::AEnemyBase()
 {
