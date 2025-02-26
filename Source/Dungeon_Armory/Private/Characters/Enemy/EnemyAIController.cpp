@@ -27,8 +27,8 @@ AEnemyAIController::AEnemyAIController()
 
     // 감지 설정 적용
     SightConfig->DetectionByAffiliation.bDetectEnemies = true;
-    SightConfig->DetectionByAffiliation.bDetectFriendlies = false;
     SightConfig->DetectionByAffiliation.bDetectNeutrals = false;
+    SightConfig->DetectionByAffiliation.bDetectFriendlies = false;
 
     AIPerceptionComponent->ConfigureSense(*SightConfig);
     AIPerceptionComponent->SetDominantSense(SightConfig->GetSenseImplementation());
@@ -41,12 +41,32 @@ void AEnemyAIController::BeginPlay()
 
 }
 
-void AEnemyAIController::SetEnemyState(EEnemyStates NewState)
+void AEnemyAIController::Tick(float DeltaTime)
 {
-    if (BlackboardComponent)
+	Super::Tick(DeltaTime);
+
+	UpdateAIState();
+}
+
+void AEnemyAIController::SetEnemyState(EEnemyStates NewEnemyState)
+{
+    if (!BlackboardComponent)
     {
-        BlackboardComponent->SetValueAsEnum(BlackboardKey_EnemyState, static_cast<uint8>(NewState));
+        return;
     }
+
+    BlackboardComponent->SetValueAsEnum(EnemyState, static_cast<uint8>(NewEnemyState));
+}
+
+EEnemyStates AEnemyAIController::GetEnemyState() const
+{
+    if (!BlackboardComponent)
+    {
+        return EEnemyStates::None;
+    }
+
+    int8 enemyState = BlackboardComponent->GetValueAsEnum(EnemyState);
+	return static_cast<EEnemyStates>(enemyState);
 }
 
 void AEnemyAIController::OnPossess(APawn* InPawn)
@@ -62,6 +82,7 @@ void AEnemyAIController::OnPossess(APawn* InPawn)
 
             // 초기 블랙보드 값 설정
             BlackboardComponent->SetValueAsVector("HomeLocation", Enemy->GetActorLocation());
+            SetEnemyState(EEnemyStates::Patrol);
         }
     }
 }
@@ -71,22 +92,53 @@ void AEnemyAIController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
 {
     if (!BlackboardComponent)
     {
-        return; // 블랙보드가 없으면 종료
+        return;
     }
 
-    bool bIsVisible = Stimulus.WasSuccessfullySensed();
-    if (bIsVisible)
+    bDetectedTarget = Stimulus.WasSuccessfullySensed();
+    if (bDetectedTarget)
     {
-        // 블랙보드 값 설정
         SetEnemyState(EEnemyStates::Chase);
         BlackboardComponent->SetValueAsObject("Target", Actor);
     }
     else
     {
-		// 블랙보드 값 초기화
-        SetEnemyState(EEnemyStates::Return);
-		BlackboardComponent->SetValueAsObject("Target", nullptr);
+        BlackboardComponent->SetValueAsObject("Target", nullptr);
+
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("AI Perception: %s detected!"), bIsVisible ? TEXT("Target") : TEXT("None"));
+    UE_LOG(LogTemp, Warning, TEXT("AI Perception: %s detected!"), bDetectedTarget ? TEXT("Target") : TEXT("None"));
+}
+
+void AEnemyAIController::UpdateAIState()
+{
+    if (!BlackboardComponent)
+    {
+        return;
+    }
+
+    if (bDetectedTarget)
+    {
+        SetEnemyState(EEnemyStates::Chase);
+        return;
+    }
+
+    EEnemyStates CurrState = GetEnemyState();
+    switch (CurrState)
+    {
+    case EEnemyStates::Chase:
+        // 적을 감지하지 못했으면 Return으로 변경
+        SetEnemyState(EEnemyStates::Return);
+        break;
+    case EEnemyStates::Return:
+		SetEnemyState(EEnemyStates::Patrol);
+        //// 목표 지점에 도착했으면 Idle 상태로 변경
+        //if (HasReachedHomePosition())
+        //{
+        //    SetEnemyState(EEnemyStates::Idle);
+        //}
+        break;
+    default:
+        break;
+    }
 }

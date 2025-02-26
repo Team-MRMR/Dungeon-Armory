@@ -12,6 +12,8 @@
 UENUM(BlueprintType)
 enum class EEnemyStates : uint8
 {
+	None	UMETA(DisplayName = "None"),
+
     Idle    UMETA(DisplayName = "Idle"),
     Patrol  UMETA(DisplayName = "Patrol"),
     Chase   UMETA(DisplayName = "Chase"),
@@ -52,25 +54,37 @@ protected:
     UPROPERTY(VisibleAnywhere, Category = "AI")
     UAISenseConfig_Sight* SightConfig;
 
+private:
     /** 블랙보드에서 Enemy의 상태를 저장하는 키 */
     UPROPERTY(EditDefaultsOnly, Category = "AI")
-    FName BlackboardKey_EnemyState = "EnemyState";
+    FName EnemyState = "EnemyState";
+
+    // AI 시각 감지 설정
+    UPROPERTY(VisibleAnywhere, Category = "AI")
+    bool bDetectedTarget;
 
 /***** Functions *****/
 public:
     AEnemyAIController();
 
 public:
-    /** 블랙보드에 EnemyState 값을 설정하는 함수 */
-    void SetEnemyState(EEnemyStates NewState);
+    /** 블랙보드의 EnemyState 값에 대한 Getter, Setter */
+    void SetEnemyState(EEnemyStates NewEnemyState);
+	EEnemyStates GetEnemyState() const;
 
 protected:
     virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
 
 	virtual void OnPossess(APawn* InPawn) override;
 
     // 감지 처리 함수
     UFUNCTION()
     void OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus);
+
+private:
+	// AI 상태에 따른 행동 처리 함수
+	void UpdateAIState();
 
 };
