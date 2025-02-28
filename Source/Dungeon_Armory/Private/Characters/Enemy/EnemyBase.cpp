@@ -8,7 +8,7 @@
 // Sets default values
 AEnemyBase::AEnemyBase()
 {
-    PrimaryActorTick.bCanEverTick = true;
+
     
 }
 
@@ -17,12 +17,5 @@ void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-}
-
-// Called every frame
-void AEnemyBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 

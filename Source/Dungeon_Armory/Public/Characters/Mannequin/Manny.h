@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+
 #include "Manny.generated.h"
 
 class USpringArmComponent;
@@ -48,13 +49,13 @@ public:
 	// Sets default values for this character's properties
 	AManny();
 
-
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
 
 protected:
 	// Called when the game starts or when spawned
