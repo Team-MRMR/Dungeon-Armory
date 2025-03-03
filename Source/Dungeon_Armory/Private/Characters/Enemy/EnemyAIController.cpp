@@ -119,8 +119,11 @@ void AEnemyAIController::UpdateAIState()
 
     if (bDetectedTarget)
     {
-        SetEnemyState(EEnemyStates::Chase);
-        return;
+        if (GetEnemyState() != EEnemyStates::Chase)
+        {
+            SetEnemyState(EEnemyStates::Chase);
+            return;
+        }
     }
 
     EEnemyStates CurrState = GetEnemyState();

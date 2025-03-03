@@ -13,30 +13,25 @@ class DUNGEON_ARMORY_API UTeamManagerComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-/*****Variables*****/
-private:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team", meta = (AllowPrivateAccess = "true"))
-	TMap<ETeamType, FTeamRelation> TeamRelationMap;
+/*****Variables*****/  
+private:  
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team", meta = (AllowPrivateAccess = "true"))  
+    TMap<ETeamType, FTeamRelation> TeamRelationMap;
 
 /*****Functions*****/
 public:	
 	// Sets default values for this component's properties
-	UTeamManagerComponent();
+    UTeamManagerComponent();
 
-    // 팀 관계를 설정하는 함수
-    void SetTeamDataMap(ETeamType OwnTeam, FTeamRelation TeamReleation)
-    {
-        TeamRelationMap.FindOrAdd(OwnTeam) = TeamReleation;
-    }
-
+    UFUNCTION(BlueprintCallable, Category = "Team")
     // 팀 관계를 가져오는 함수
-    ERelationType GetTeamDataMap(ETeamType OtherTeam) const
-    {
-        if (const FTeamRelation* TeamRelation = TeamRelationMap.Find(OtherTeam))
-        {
-			return TeamRelation->Relation;
-        }
+    ERelationType GetTeamRelationMap(ETeamType TeamA, ETeamType TeamB) const;
 
-        return ERelationType::None;
-    }
+    UFUNCTION(BlueprintCallable, Category = "Team")
+    // 팀 관계를 설정하는 함수
+    void SetTeamRelationMap(ETeamType TeamA, ETeamType TeamB, ERelationType Releation);
+
+protected:
+    UFUNCTION(BlueprintCallable, Category = "Team")
+    void InitializeTeamRelation();
 };

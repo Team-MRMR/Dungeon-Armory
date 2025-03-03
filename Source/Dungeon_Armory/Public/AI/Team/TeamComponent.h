@@ -5,12 +5,11 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "AI/Team/TeamInfo.h"
-#include "GenericTeamAgentInterface.h"
 
 #include "TeamComponent.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DUNGEON_ARMORY_API UTeamComponent : public UActorComponent, public IGenericTeamAgentInterface
+class DUNGEON_ARMORY_API UTeamComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -19,20 +18,33 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team", meta = (AllowPrivateAccess = "true"))
 	ETeamType TeamType;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team", meta = (AllowPrivateAccess = "true"))
+	TMap<ETeamType, FTeamRelation> TeamRelationMap;
+
 /***** Functions *****/
 public:	
 	// Sets default values for this component's properties
 	UTeamComponent();
 
-    // IGenericTeamAgentInterface 구현 (AI Perception과 호환)
-    virtual FGenericTeamId GetGenericTeamId() const override
-    {
-        return FGenericTeamId(static_cast<uint8>(TeamType));
-    }
+    UFUNCTION(BlueprintCallable, Category = "Team")
+	ETeamType GetTeamType() const { return TeamType; }
 
     UFUNCTION(BlueprintCallable, Category = "Team")
-    ETeamType GetTeamType() const { return TeamType; }
+    void SetTeamType(const ETeamType NewTeamType) { TeamType = NewTeamType; }
 
-    UFUNCTION(BlueprintCallable, Category = "Team")
-    void SetTeamType(ETeamType NewTeamType) { TeamType = NewTeamType; }
+	UFUNCTION(BlueprintCallable, Category = "Team")
+	ERelationType GetRelation(const ETeamType OtherTeamType) const
+	{
+		if (const auto TeamRelation = TeamRelationMap.Find(TeamType))
+		{
+			if (const ERelationType* Relation = TeamRelation->RelationMap.Find(OtherTeamType))
+			{
+				return *Relation;
+			}
+
+			return ERelationType::None;
+		}
+
+		return ERelationType::None;
+	}
 };

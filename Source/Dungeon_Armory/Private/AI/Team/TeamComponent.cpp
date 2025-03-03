@@ -6,6 +6,6 @@
 // Sets default values for this component's properties
 UTeamComponent::UTeamComponent()
 {
-	TeamType = ETeamType::None;
+	TeamType = (ETeamType::None);
 }
 

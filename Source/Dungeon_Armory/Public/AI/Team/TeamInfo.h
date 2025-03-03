@@ -15,6 +15,8 @@ enum class ETeamType : uint8
     NPC      UMETA(DisplayName = "NPC"),
     Mob      UMETA(DisplayName = "Enemy1"),
 
+	Size
+
 };
 
 UENUM(BlueprintType)
@@ -25,6 +27,8 @@ enum class ERelationType : uint8
     Neutral     UMETA(DisplayName = "Neutral"),
     Friendly    UMETA(DisplayName = "Friendly"),
     Hostile     UMETA(DisplayName = "Hostile"),
+
+    Size
 };
 
 USTRUCT(BlueprintType)
@@ -32,6 +36,7 @@ struct FTeamRelation
 {
 	GENERATED_BODY()
 
-	ETeamType OtherTeam;
-	ERelationType Relation;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team", meta = (AllowPrivateAccess = "true"))
+    TMap<ETeamType, ERelationType> RelationMap;
+
 };

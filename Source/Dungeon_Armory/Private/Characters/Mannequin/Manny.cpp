@@ -49,8 +49,40 @@ AManny::AManny()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	// Create AIPerceptionStimuliSourceComponent
+	StimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSourceComponent"));
+	
+	// Create Team Component and 
+	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
+	
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+}
+
+FGenericTeamId AManny::GetGenericTeamId() const
+{
+	return FGenericTeamId(static_cast<uint8>(TeamComponent->GetTeamType()));
+}
+
+void AManny::SetGenericTeamId(const FGenericTeamId& NewTeamID)
+{
+	TeamComponent->SetTeamType(static_cast<ETeamType>(NewTeamID.GetId()));
+}
+
+ETeamAttitude::Type AManny::GetTeamAttitudeTowards(const AActor& Other) const
+{
+	ETeamType OtherTeamType = Other.GetComponentByClass<UTeamComponent>()->GetTeamType();
+
+	switch (TeamComponent->GetRelation(OtherTeamType))
+	{
+	case ERelationType::Friendly:
+		return ETeamAttitude::Friendly;
+	case ERelationType::Hostile:
+		return ETeamAttitude::Hostile;
+	case ERelationType::Neutral:
+	default:
+		return ETeamAttitude::Neutral;
+	}
 }
 
 // Called when the game starts or when spawned

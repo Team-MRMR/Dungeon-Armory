@@ -6,6 +6,8 @@
 #include "AIController.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "GenericTeamAgentInterface.h"
+#include "AI/Team/TeamComponent.h"
 
 #include "EnemyAIController.generated.h"
 
@@ -32,7 +34,6 @@ class DUNGEON_ARMORY_API AEnemyAIController : public AAIController
 	
 
 /***** Variables *****/
-
 protected:
     // 기본 비헤이비어 트리 에셋
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
