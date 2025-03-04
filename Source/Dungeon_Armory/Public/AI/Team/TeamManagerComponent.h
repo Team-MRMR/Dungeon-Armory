@@ -13,10 +13,7 @@ class DUNGEON_ARMORY_API UTeamManagerComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-/*****Variables*****/  
-private:  
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team", meta = (AllowPrivateAccess = "true"))  
-    TMap<ETeamType, FTeamRelation> TeamRelationMap;
+
 
 /*****Functions*****/
 public:	
@@ -31,7 +28,5 @@ public:
     // 팀 관계를 설정하는 함수
     void SetTeamRelationMap(ETeamType TeamA, ETeamType TeamB, ERelationType Releation);
 
-protected:
-    UFUNCTION(BlueprintCallable, Category = "Team")
-    void InitializeTeamRelation();
+
 };

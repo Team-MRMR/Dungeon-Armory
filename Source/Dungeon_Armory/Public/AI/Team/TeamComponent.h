@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "AI/Team/TeamInfo.h"
+#include "Manager/TeamManager.h"
 
 #include "TeamComponent.generated.h"
 
@@ -17,9 +18,6 @@ class DUNGEON_ARMORY_API UTeamComponent : public UActorComponent
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team", meta = (AllowPrivateAccess = "true"))
 	ETeamType TeamType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team", meta = (AllowPrivateAccess = "true"))
-	TMap<ETeamType, FTeamRelation> TeamRelationMap;
 
 /***** Functions *****/
 public:	
@@ -35,7 +33,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Team")
 	ERelationType GetRelation(const ETeamType OtherTeamType) const
 	{
-		if (const auto TeamRelation = TeamRelationMap.Find(TeamType))
+		if (const auto TeamRelation = UTeamManager::GetInstance(GetWorld())->GetTeamRelation(TeamType))
 		{
 			if (const ERelationType* Relation = TeamRelation->RelationMap.Find(OtherTeamType))
 			{
