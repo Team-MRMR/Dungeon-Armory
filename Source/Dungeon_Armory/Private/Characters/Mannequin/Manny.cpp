@@ -14,6 +14,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 
+#include "Manager/TeamManager.h"
+
 // Sets default values
 AManny::AManny()
 {
@@ -71,9 +73,10 @@ void AManny::SetGenericTeamId(const FGenericTeamId& NewTeamID)
 
 ETeamAttitude::Type AManny::GetTeamAttitudeTowards(const AActor& Other) const
 {
+	ETeamType OwnTeamType = TeamComponent->GetTeamType();
 	ETeamType OtherTeamType = Other.GetComponentByClass<UTeamComponent>()->GetTeamType();
 
-	switch (TeamComponent->GetRelation(OtherTeamType))
+    switch (UTeamManager::GetInstance(GetWorld())->GetRelation(OwnTeamType, OtherTeamType))
 	{
 	case ERelationType::Friendly:
 		return ETeamAttitude::Friendly;

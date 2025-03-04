@@ -36,8 +36,12 @@ public:
 	// 팀 관계를 설정하는 함수
 	void SetTeamRelation(ETeamType TeamA, ETeamType TeamB, ERelationType Releation);
 
+	UFUNCTION(BlueprintCallable, Category = "Team")
+	// 팀간의 관계를 가져오는 함수
+	ERelationType GetRelation(ETeamType TeamA, ETeamType TeamB) const;
+
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Team")
-	void InitializeTeamRelation();
+	void InitializeTeamRelationMap();
 
 };

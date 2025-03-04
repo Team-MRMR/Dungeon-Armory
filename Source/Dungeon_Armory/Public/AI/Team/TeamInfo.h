@@ -13,10 +13,9 @@ enum class ETeamType : uint8
 
     Player   UMETA(DisplayName = "Player"),
     NPC      UMETA(DisplayName = "NPC"),
-    Mob      UMETA(DisplayName = "Enemy1"),
+    Mob      UMETA(DisplayName = "Mob"),
 
 	Size
-
 };
 
 UENUM(BlueprintType)

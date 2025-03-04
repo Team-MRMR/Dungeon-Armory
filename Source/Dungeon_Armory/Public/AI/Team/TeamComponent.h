@@ -29,20 +29,4 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Team")
     void SetTeamType(const ETeamType NewTeamType) { TeamType = NewTeamType; }
-
-	UFUNCTION(BlueprintCallable, Category = "Team")
-	ERelationType GetRelation(const ETeamType OtherTeamType) const
-	{
-		if (const auto TeamRelation = UTeamManager::GetInstance(GetWorld())->GetTeamRelation(TeamType))
-		{
-			if (const ERelationType* Relation = TeamRelation->RelationMap.Find(OtherTeamType))
-			{
-				return *Relation;
-			}
-
-			return ERelationType::None;
-		}
-
-		return ERelationType::None;
-	}
 };
