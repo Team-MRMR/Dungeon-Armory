@@ -111,7 +111,7 @@ void AManny::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
-	FGenericTeamId::SetAttitudeSolver(CustomAttitudeSolver);
+	//FGenericTeamId::SetAttitudeSolver(CustomAttitudeSolver);
 
 	//Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))

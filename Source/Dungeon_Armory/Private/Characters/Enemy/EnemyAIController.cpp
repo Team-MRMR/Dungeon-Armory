@@ -7,7 +7,8 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Perception/AIPerceptionStimuliSourceComponent.h"
+
+//#include "Perception/AIPerceptionStimuliSourceComponent.h"
 
 AEnemyAIController::AEnemyAIController()
 {
@@ -69,6 +70,36 @@ EEnemyStates AEnemyAIController::GetEnemyState() const
 	return static_cast<EEnemyStates>(enemyState);
 }
 
+ETeamAttitude::Type AEnemyAIController::GetTeamAttitudeTowards(const AActor& Other) const
+{
+    /*ETeamType OwnTeamType = TeamComponent->GetTeamType();
+    ETeamType OtherTeamType = Other.GetComponentByClass<UTeamComponent>()->GetTeamType();
+
+    switch (UTeamManager::GetInstance()->GetRelation(OwnTeamType, OtherTeamType))
+    {
+    case ERelationType::Friendly:
+        return ETeamAttitude::Friendly;
+    case ERelationType::Hostile:
+        return ETeamAttitude::Hostile;
+    case ERelationType::Neutral:
+    default:
+        return ETeamAttitude::Neutral;
+    }*/
+
+    return ETeamAttitude::Friendly;
+}
+
+FGenericTeamId AEnemyAIController::GetGenericTeamId() const
+{
+    //return FGenericTeamId(static_cast<uint8>(TeamComponent->GetTeamType()));
+	return FGenericTeamId(255);
+}
+
+void AEnemyAIController::SetGenericTeamId(const FGenericTeamId& NewTeamID)
+{
+    //TeamComponent->SetTeamType(static_cast<ETeamType>(NewTeamID.GetId()));
+}
+
 void AEnemyAIController::OnPossess(APawn* InPawn)
 {
     Super::OnPossess(InPawn);
@@ -84,6 +115,11 @@ void AEnemyAIController::OnPossess(APawn* InPawn)
             BlackboardComponent->SetValueAsVector("HomeLocation", Enemy->GetActorLocation());
             SetEnemyState(EEnemyStates::Patrol);
         }
+    }
+
+    if (IGenericTeamAgentInterface* TeamAgent = Cast<IGenericTeamAgentInterface>(InPawn))
+    {
+		SetGenericTeamId(TeamAgent->GetGenericTeamId());
     }
 }
 

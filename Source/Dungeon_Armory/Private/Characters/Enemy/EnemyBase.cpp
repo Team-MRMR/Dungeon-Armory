@@ -62,6 +62,6 @@ void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	FGenericTeamId::SetAttitudeSolver(CustomAttitudeSolver);
+	//FGenericTeamId::SetAttitudeSolver(CustomAttitudeSolver);
 }
 

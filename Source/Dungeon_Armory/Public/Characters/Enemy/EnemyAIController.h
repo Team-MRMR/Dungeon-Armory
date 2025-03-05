@@ -6,7 +6,6 @@
 #include "AIController.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
-#include "GenericTeamAgentInterface.h"
 #include "AI/Team/TeamComponent.h"
 
 #include "EnemyAIController.generated.h"
@@ -72,6 +71,15 @@ public:
     /** 블랙보드의 EnemyState 값에 대한 Getter, Setter */
     void SetEnemyState(EEnemyStates NewEnemyState);
 	EEnemyStates GetEnemyState() const;
+
+    /** Retrieved owner attitude toward given Other object */
+    virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
+
+    /** Retrieve team identifier in form of FGenericTeamId */
+    virtual FGenericTeamId GetGenericTeamId() const override;
+
+    /** Assigns Team Agent to given TeamID */
+    virtual void SetGenericTeamId(const FGenericTeamId& TeamID) override;
 
 protected:
     virtual void BeginPlay() override;
