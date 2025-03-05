@@ -28,7 +28,24 @@ ETeamAttitude::Type AEnemyBase::GetTeamAttitudeTowards(const AActor& Other) cons
 	ETeamType OwnTeamType = TeamComponent->GetTeamType();
 	ETeamType OtherTeamType = Other.GetComponentByClass<UTeamComponent>()->GetTeamType();
 
-	switch (UTeamManager::GetInstance(GetWorld())->GetRelation(OwnTeamType, OtherTeamType))
+	switch (UTeamManager::GetInstance()->GetRelation(OwnTeamType, OtherTeamType))
+	{
+	case ERelationType::Friendly:
+		return ETeamAttitude::Friendly;
+	case ERelationType::Hostile:
+		return ETeamAttitude::Hostile;
+	case ERelationType::Neutral:
+	default:
+		return ETeamAttitude::Neutral;
+	}
+}
+
+ETeamAttitude::Type AEnemyBase::CustomAttitudeSolver(FGenericTeamId TeamA, FGenericTeamId TeamB)
+{
+	ETeamType OwnTeamType = static_cast<ETeamType>(TeamA.GetId());
+	ETeamType OtherTeamType = static_cast<ETeamType>(TeamB.GetId());
+
+	switch (UTeamManager::GetInstance()->GetRelation(OwnTeamType, OtherTeamType))
 	{
 	case ERelationType::Friendly:
 		return ETeamAttitude::Friendly;
@@ -45,5 +62,6 @@ void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	FGenericTeamId::SetAttitudeSolver(CustomAttitudeSolver);
 }
 

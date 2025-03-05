@@ -61,13 +61,6 @@ public:
 	// Sets default values for this character's properties
 	AManny();
 
-public:
-	/** Returns CameraBoom subobject **/
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-
-	/** Returns FollowCamera subobject **/
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-
 	/** IGenericTeamAgentInterface implementation */
 	virtual FGenericTeamId GetGenericTeamId() const override;
 
@@ -77,6 +70,15 @@ public:
 	/** Retrieved owner attitude toward given Other object */
 	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
 
+	// Custom Attitude Solver
+	static ETeamAttitude::Type CustomAttitudeSolver(FGenericTeamId TeamA, FGenericTeamId TeamB);
+
+public:
+	/** Returns CameraBoom subobject **/
+	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
+	/** Returns FollowCamera subobject **/
+	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 protected:
 	// Called when the game starts or when spawned

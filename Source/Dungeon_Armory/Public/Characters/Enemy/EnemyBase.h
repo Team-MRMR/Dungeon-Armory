@@ -40,6 +40,8 @@ public:
 	/** Retrieved owner attitude toward given Other object */
 	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
 
+	static ETeamAttitude::Type CustomAttitudeSolver(FGenericTeamId TeamA, FGenericTeamId TeamB);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

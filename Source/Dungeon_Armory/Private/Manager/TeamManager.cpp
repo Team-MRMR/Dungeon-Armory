@@ -3,20 +3,49 @@
 
 #include "Manager/TeamManager.h"
 
+UTeamManager* UTeamManager::Instance = nullptr;  // 정적 변수 초기화
+
 void UTeamManager::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
+    // 현재 활성화된 월드 찾기
+    for (const FWorldContext& Context : GEngine->GetWorldContexts())
+    {
+        if (Context.World())
+        {
+            if (UGameInstance* GameInstance = Context.World()->GetGameInstance())
+            {
+                Instance = GameInstance->GetSubsystem<UTeamManager>();
+            }
+        }
+    }
+
 	InitializeTeamRelationMap();
 }
 
-UTeamManager* UTeamManager::GetInstance(UObject* WorldContextObject)
+UTeamManager* UTeamManager::GetInstance()
 {
-    if (WorldContextObject)
+    // 이미 캐싱된 인스턴스가 있다면 즉시 반환
+    if (Instance)
     {
-        if (UGameInstance* GameInstance = WorldContextObject->GetWorld()->GetGameInstance())
+        return Instance;
+    }
+
+    // 캐싱된 값이 없다면, 다시 찾고 캐싱
+    if (GEngine)
+    {
+        // 현재 활성화된 월드 찾기
+        for (const FWorldContext& Context : GEngine->GetWorldContexts())
         {
-            return GameInstance->GetSubsystem<UTeamManager>();
+            if (Context.World())
+            {
+                if (UGameInstance* GameInstance = Context.World()->GetGameInstance())
+                {
+                    Instance = GameInstance->GetSubsystem<UTeamManager>();
+                    return Instance;
+                }
+            }
         }
     }
 

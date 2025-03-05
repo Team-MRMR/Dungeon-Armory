@@ -56,7 +56,7 @@ AManny::AManny()
 	
 	// Create Team Component and 
 	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
-	
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -76,7 +76,24 @@ ETeamAttitude::Type AManny::GetTeamAttitudeTowards(const AActor& Other) const
 	ETeamType OwnTeamType = TeamComponent->GetTeamType();
 	ETeamType OtherTeamType = Other.GetComponentByClass<UTeamComponent>()->GetTeamType();
 
-    switch (UTeamManager::GetInstance(GetWorld())->GetRelation(OwnTeamType, OtherTeamType))
+    switch (UTeamManager::GetInstance()->GetRelation(OwnTeamType, OtherTeamType))
+	{
+	case ERelationType::Friendly:
+		return ETeamAttitude::Friendly;
+	case ERelationType::Hostile:
+		return ETeamAttitude::Hostile;
+	case ERelationType::Neutral:
+	default:
+		return ETeamAttitude::Neutral;
+	}
+}
+
+ETeamAttitude::Type AManny::CustomAttitudeSolver(FGenericTeamId TeamA, FGenericTeamId TeamB)
+{
+	ETeamType OwnTeamType = static_cast<ETeamType>(TeamA.GetId());
+	ETeamType OtherTeamType = static_cast<ETeamType>(TeamB.GetId());
+
+	switch (UTeamManager::GetInstance()->GetRelation(OwnTeamType, OtherTeamType))
 	{
 	case ERelationType::Friendly:
 		return ETeamAttitude::Friendly;
@@ -94,6 +111,8 @@ void AManny::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+	FGenericTeamId::SetAttitudeSolver(CustomAttitudeSolver);
+
 	//Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
@@ -102,7 +121,7 @@ void AManny::BeginPlay()
 			Subsystem->AddMappingContext(MappingContext, 0);
 		}
 	}
-	
+
 }
 
 // Called to bind functionality to input
