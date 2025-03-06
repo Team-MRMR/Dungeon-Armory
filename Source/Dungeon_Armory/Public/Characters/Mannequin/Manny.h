@@ -67,12 +67,6 @@ public:
 	/** Assigns Team Agent to given TeamID */
 	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
 
-	/** Retrieved owner attitude toward given Other object */
-	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
-
-	// Custom Attitude Solver
-	static ETeamAttitude::Type CustomAttitudeSolver(FGenericTeamId TeamA, FGenericTeamId TeamB);
-
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

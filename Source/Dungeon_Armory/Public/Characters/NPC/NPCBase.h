@@ -7,10 +7,10 @@
 #include "GenericTeamAgentInterface.h"
 #include "AI/Team/TeamComponent.h"
 
-#include "EnemyBase.generated.h"
+#include "NPCBase.generated.h"
 
 UCLASS()
-class DUNGEON_ARMORY_API AEnemyBase : public ACharacter, public IGenericTeamAgentInterface
+class DUNGEON_ARMORY_API ANPCBase : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -28,7 +28,7 @@ public:
 /***** Functions *****/
 public:
 	// Sets default values for this character's properties
-	AEnemyBase();
+	ANPCBase();
 
 public:
 	/** IGenericTeamAgentInterface implementation */
@@ -36,11 +36,6 @@ public:
 
 	/** Assigns Team Agent to given TeamID */
 	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
-
-	/** Retrieved owner attitude toward given Other object */
-	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
-
-	static ETeamAttitude::Type CustomAttitudeSolver(FGenericTeamId TeamA, FGenericTeamId TeamB);
 
 protected:
 	// Called when the game starts or when spawned

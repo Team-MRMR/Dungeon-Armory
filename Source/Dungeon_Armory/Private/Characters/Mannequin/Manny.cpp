@@ -63,46 +63,12 @@ AManny::AManny()
 
 FGenericTeamId AManny::GetGenericTeamId() const
 {
-	return FGenericTeamId(static_cast<uint8>(TeamComponent->GetTeamType()));
+	return TeamComponent->GetGenericTeamId();
 }
 
 void AManny::SetGenericTeamId(const FGenericTeamId& NewTeamID)
 {
 	TeamComponent->SetTeamType(static_cast<ETeamType>(NewTeamID.GetId()));
-}
-
-ETeamAttitude::Type AManny::GetTeamAttitudeTowards(const AActor& Other) const
-{
-	ETeamType OwnTeamType = TeamComponent->GetTeamType();
-	ETeamType OtherTeamType = Other.GetComponentByClass<UTeamComponent>()->GetTeamType();
-
-    switch (UTeamManager::GetInstance()->GetRelation(OwnTeamType, OtherTeamType))
-	{
-	case ERelationType::Friendly:
-		return ETeamAttitude::Friendly;
-	case ERelationType::Hostile:
-		return ETeamAttitude::Hostile;
-	case ERelationType::Neutral:
-	default:
-		return ETeamAttitude::Neutral;
-	}
-}
-
-ETeamAttitude::Type AManny::CustomAttitudeSolver(FGenericTeamId TeamA, FGenericTeamId TeamB)
-{
-	ETeamType OwnTeamType = static_cast<ETeamType>(TeamA.GetId());
-	ETeamType OtherTeamType = static_cast<ETeamType>(TeamB.GetId());
-
-	switch (UTeamManager::GetInstance()->GetRelation(OwnTeamType, OtherTeamType))
-	{
-	case ERelationType::Friendly:
-		return ETeamAttitude::Friendly;
-	case ERelationType::Hostile:
-		return ETeamAttitude::Hostile;
-	case ERelationType::Neutral:
-	default:
-		return ETeamAttitude::Neutral;
-	}
 }
 
 // Called when the game starts or when spawned

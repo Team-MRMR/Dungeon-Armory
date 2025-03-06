@@ -2,7 +2,7 @@
 
 
 #include "AI/Tasks/BTTask_Idle.h"
-#include "Characters/Enemy/EnemyAIController.h"
+#include "Characters/NPC/NPCAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 UBTTask_Idle::UBTTask_Idle()

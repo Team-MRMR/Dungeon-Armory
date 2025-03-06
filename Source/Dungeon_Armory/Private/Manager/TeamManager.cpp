@@ -43,6 +43,7 @@ UTeamManager* UTeamManager::GetInstance()
                 if (UGameInstance* GameInstance = Context.World()->GetGameInstance())
                 {
                     Instance = GameInstance->GetSubsystem<UTeamManager>();
+					//Instance->Initialze();
                     return Instance;
                 }
             }
@@ -82,5 +83,14 @@ ERelationType UTeamManager::GetRelation(ETeamType TeamA, ETeamType TeamB) const
 void UTeamManager::InitializeTeamRelationMap()
 {
 	TeamRelationMap.Empty();
+
+	SetTeamRelation(ETeamType::Player, ETeamType::Player, ERelationType::Friendly);
+	SetTeamRelation(ETeamType::Player, ETeamType::NPC, ERelationType::Friendly);
+	SetTeamRelation(ETeamType::Player, ETeamType::Mob, ERelationType::Hostile);
+
+	SetTeamRelation(ETeamType::NPC, ETeamType::NPC, ERelationType::Friendly);
+	SetTeamRelation(ETeamType::NPC, ETeamType::Mob, ERelationType::Neutral);
+
+	SetTeamRelation(ETeamType::Mob, ETeamType::Mob, ERelationType::Friendly);
 }
 

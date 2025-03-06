@@ -8,10 +8,10 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "AI/Team/TeamComponent.h"
 
-#include "EnemyAIController.generated.h"
+#include "NPCAIController.generated.h"
 
 UENUM(BlueprintType)
-enum class EEnemyStates : uint8
+enum class ENPCStates : uint8
 {
 	None	UMETA(DisplayName = "None"),
 
@@ -27,7 +27,7 @@ class UBehaviorTreeComponent;
 class UBlackboardComponent;
 
 UCLASS()
-class DUNGEON_ARMORY_API AEnemyAIController : public AAIController
+class DUNGEON_ARMORY_API ANPCAIController : public AAIController
 {
 	GENERATED_BODY()
 	
@@ -54,23 +54,26 @@ protected:
     UPROPERTY(VisibleAnywhere, Category = "AI")
     UAISenseConfig_Sight* SightConfig;
 
+	// 팀 컴포넌트
+	UPROPERTY(VisibleAnywhere, Category = "Team")
+	UTeamComponent* TeamComponent;
+
 private:
-    /** 블랙보드에서 Enemy의 상태를 저장하는 키 */
+    /** 블랙보드에서 NPC의 상태를 저장하는 키 */
     UPROPERTY(EditDefaultsOnly, Category = "AI")
-    FName EnemyState = "EnemyState";
+    FName NPCState = "NPCState";
 
     // AI 시각 감지 설정
     UPROPERTY(VisibleAnywhere, Category = "AI")
     bool bDetectedTarget;
 
+    // AI 시각 감지 설정
+    UPROPERTY(EditDefaultsOnly, Category = "Team")
+	FGenericTeamId TeamId;
+
 /***** Functions *****/
 public:
-    AEnemyAIController();
-
-public:
-    /** 블랙보드의 EnemyState 값에 대한 Getter, Setter */
-    void SetEnemyState(EEnemyStates NewEnemyState);
-	EEnemyStates GetEnemyState() const;
+    ANPCAIController();
 
     /** Retrieved owner attitude toward given Other object */
     virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
@@ -78,8 +81,10 @@ public:
     /** Retrieve team identifier in form of FGenericTeamId */
     virtual FGenericTeamId GetGenericTeamId() const override;
 
-    /** Assigns Team Agent to given TeamID */
-    virtual void SetGenericTeamId(const FGenericTeamId& TeamID) override;
+public:
+    /** 블랙보드의 NPCState 값에 대한 Getter, Setter */
+    void SetNPCState(ENPCStates NewNPCState);
+	ENPCStates GetNPCState() const;
 
 protected:
     virtual void BeginPlay() override;
@@ -88,6 +93,7 @@ protected:
 
 	virtual void OnPossess(APawn* InPawn) override;
 
+protected:
     // 감지 처리 함수
     UFUNCTION()
     void OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus);
