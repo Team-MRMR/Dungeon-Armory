@@ -4,10 +4,6 @@
 #include "Characters/NPC/NPCBase.h"
 #include "Characters/NPC/NPCAIController.h"
 
-#include "Manager/TeamManager.h"
-
-
-
 // Sets default values
 ANPCBase::ANPCBase()
 {

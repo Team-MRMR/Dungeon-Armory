@@ -80,6 +80,8 @@ void ANPCAIController::OnPossess(APawn* InPawn)
 
     if (ANPCBase* NPC = Cast<ANPCBase>(InPawn))
     {
+        // 컨트롤러가 소유한 NPC 가져오기
+        BehaviorTree = NPC->BehaviorTree;
         if (BehaviorTree)
         {
             UseBlackboard(BehaviorTree->BlackboardAsset, BlackboardComponent);
@@ -91,7 +93,7 @@ void ANPCAIController::OnPossess(APawn* InPawn)
         }
 
         // TeamComponent에서 팀 정보를 가져옴
-        if (UTeamComponent* TeamCmp = NPC->FindComponentByClass<UTeamComponent>())
+        if (UTeamComponent* TeamCmp = NPC->TeamComponent)
         {
             TeamComponent = TeamCmp; // 팀 정보를 가져와 저장
         }

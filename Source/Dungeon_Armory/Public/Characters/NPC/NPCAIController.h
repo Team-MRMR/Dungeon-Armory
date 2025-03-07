@@ -13,7 +13,7 @@
 UENUM(BlueprintType)
 enum class ENPCStates : uint8
 {
-	None	UMETA(DisplayName = "None"),
+	None	UMETA(Hidden),
 
     Idle    UMETA(DisplayName = "Idle"),
     Patrol  UMETA(DisplayName = "Patrol"),
@@ -35,15 +35,15 @@ class DUNGEON_ARMORY_API ANPCAIController : public AAIController
 /***** Variables *****/
 protected:
     // 기본 비헤이비어 트리 에셋
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
     UBehaviorTree* BehaviorTree;
-    
+
     /** 비헤이비어 트리 컴포넌트 */
-    UPROPERTY(VisibleAnywhere, Category = "AI")
+    UPROPERTY(VisibleAnywhere, Category = "BehaviorTree")
     UBehaviorTreeComponent* BehaviorTreeComponent;
 
     /** 블랙보드 컴포넌트 */
-    UPROPERTY(VisibleAnywhere, Category = "AI")
+    UPROPERTY(VisibleAnywhere, Category = "BehaviorTree")
     UBlackboardComponent* BlackboardComponent;
 
     // AI 감지 시스템 (수정: AIController에서 관리)
@@ -60,11 +60,11 @@ protected:
 
 private:
     /** 블랙보드에서 NPC의 상태를 저장하는 키 */
-    UPROPERTY(EditDefaultsOnly, Category = "AI")
+    UPROPERTY(EditDefaultsOnly, Category = "BehaviorTree")
     FName NPCState = "NPCState";
 
     // AI 시각 감지 설정
-    UPROPERTY(VisibleAnywhere, Category = "AI")
+    UPROPERTY(VisibleAnywhere, Category = "BehaviorTree")
     bool bDetectedTarget;
 
     // AI 시각 감지 설정

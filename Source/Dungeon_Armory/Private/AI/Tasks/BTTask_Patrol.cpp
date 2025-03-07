@@ -6,14 +6,22 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "NavigationSystem.h"
 
+#include "AITypes.h"                    // FAIRequestID, EPathFollowingRequestResult
+#include "Navigation/PathFollowingComponent.h"  // EPathFollowingResult
+
 UBTTask_Patrol::UBTTask_Patrol()
 {
     NodeName = "Patrol"; // BT에서 보이는 이름
+
+    bNotifyTick = false; // Tick이 필요하지 않음
+    bNotifyTaskFinished = true;
 }
 
-EBTNodeResult::Type UBTTask_Patrol::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UBTTask_Patrol::ExecuteTask(UBehaviorTreeComponent& BehaviorTreeCmp, uint8* NodeMemory)
 {
-    AAIController* AIController = OwnerComp.GetAIOwner();
+    BehaviorTreeComponent = &BehaviorTreeCmp;
+
+    AAIController* AIController = BehaviorTreeCmp.GetAIOwner();
     if (!AIController)
     {
         return EBTNodeResult::Failed;
@@ -25,7 +33,7 @@ EBTNodeResult::Type UBTTask_Patrol::ExecuteTask(UBehaviorTreeComponent& OwnerCom
         return EBTNodeResult::Failed;
     }
 
-    UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
+    UBlackboardComponent* BlackboardComp = BehaviorTreeCmp.GetBlackboardComponent();
     if (!BlackboardComp)
     {
         return EBTNodeResult::Failed;
@@ -43,9 +51,30 @@ EBTNodeResult::Type UBTTask_Patrol::ExecuteTask(UBehaviorTreeComponent& OwnerCom
     if (NavSys->GetRandomPointInNavigableRadius(Origin, 500.0f, PatrolLocation))
     {
         BlackboardComp->SetValueAsVector("PatrolPoint", PatrolLocation.Location);
-        AIController->MoveToLocation(PatrolLocation);
-        return EBTNodeResult::Succeeded;
+
+        FAIRequestID RequestID;
+        EPathFollowingRequestResult::Type Result = AIController->MoveToLocation(PatrolLocation.Location);
+
+        if (Result == EPathFollowingRequestResult::RequestSuccessful)
+        {
+            AIController->ReceiveMoveCompleted.AddDynamic(this, &UBTTask_Patrol::OnMoveCompleted);
+            return EBTNodeResult::InProgress;
+        }
     }
 
     return EBTNodeResult::Failed;
+}
+
+void UBTTask_Patrol::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
+{
+    UE_LOG(LogTemp, Warning, TEXT("Move Completed: %d"), static_cast<int32>(Result));
+
+    if (Result == EPathFollowingResult::Success)
+    {
+        FinishLatentTask(*BehaviorTreeComponent, EBTNodeResult::Succeeded);
+    }
+    else
+    {
+        FinishLatentTask(*BehaviorTreeComponent, EBTNodeResult::Failed);
+    }
 }
