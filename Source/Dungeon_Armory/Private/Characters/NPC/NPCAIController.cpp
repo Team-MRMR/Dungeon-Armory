@@ -4,20 +4,12 @@
 #include "Characters/NPC/NPCAIController.h"
 #include "Characters/NPC/NPCBase.h"
 
-#include "BehaviorTree/BehaviorTree.h"
-#include "BehaviorTree/BehaviorTreeComponent.h"
-#include "BehaviorTree/BlackboardComponent.h"
-
 #include "Manager/TeamManager.h"
 
 //#include "Perception/AIPerceptionStimuliSourceComponent.h"
 
 ANPCAIController::ANPCAIController()
 {
-    // 비헤이비어 트리와 블랙보드 컴포넌트 생성
-    BehaviorTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorTreeComponent"));
-    BlackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComponent"));
-
     // AI 감지 시스템 초기화
     AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
     SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
@@ -61,6 +53,7 @@ FGenericTeamId ANPCAIController::GetGenericTeamId() const
     return FGenericTeamId::NoTeam;
 }
 
+
 void ANPCAIController::BeginPlay()
 {
     Super::BeginPlay();
@@ -71,7 +64,6 @@ void ANPCAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UpdateAIState();
 }
 
 void ANPCAIController::OnPossess(APawn* InPawn)
@@ -80,17 +72,17 @@ void ANPCAIController::OnPossess(APawn* InPawn)
 
     if (ANPCBase* NPC = Cast<ANPCBase>(InPawn))
     {
-        // 컨트롤러가 소유한 NPC 가져오기
-        BehaviorTree = NPC->BehaviorTree;
-        if (BehaviorTree)
-        {
-            UseBlackboard(BehaviorTree->BlackboardAsset, BlackboardComponent);
-            RunBehaviorTree(BehaviorTree);
+        //// 컨트롤러가 소유한 NPC 가져오기
+        //BehaviorTree = NPC->BehaviorTree;
+        //if (BehaviorTree)
+        //{
+        //    UseBlackboard(BehaviorTree->BlackboardAsset, BlackboardComponent);
+        //    RunBehaviorTree(BehaviorTree);
 
-            // 초기 블랙보드 값 설정
-            BlackboardComponent->SetValueAsVector("HomeLocation", NPC->GetActorLocation());
-            SetNPCState(ENPCStates::Patrol);
-        }
+        //    // 초기 블랙보드 값 설정
+        //    BlackboardComponent->SetValueAsVector("HomeLocation", NPC->GetActorLocation());
+        //    SetNPCState(ENPCStates::Patrol);
+        //}
 
         // TeamComponent에서 팀 정보를 가져옴
         if (UTeamComponent* TeamCmp = NPC->TeamComponent)
@@ -103,7 +95,7 @@ void ANPCAIController::OnPossess(APawn* InPawn)
 // 감지 이벤트 처리
 void ANPCAIController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
 {
-    if (!BlackboardComponent)
+    /*if (!BlackboardComponent)
     {
         return;
     }
@@ -120,62 +112,5 @@ void ANPCAIController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
 
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("AI Perception: %s detected!"), bDetectedTarget ? TEXT("Target") : TEXT("None"));
-}
-
-void ANPCAIController::UpdateAIState()
-{
-    if (!BlackboardComponent)
-    {
-        return;
-    }
-
-    if (bDetectedTarget)
-    {
-        if (GetNPCState() != ENPCStates::Chase)
-        {
-            SetNPCState(ENPCStates::Chase);
-            return;
-        }
-    }
-
-    ENPCStates CurrState = GetNPCState();
-    switch (CurrState)
-    {
-    case ENPCStates::Chase:
-        // 적을 감지하지 못했으면 Return으로 변경
-        SetNPCState(ENPCStates::Return);
-        break;
-    case ENPCStates::Return:
-		SetNPCState(ENPCStates::Patrol);
-        //// 목표 지점에 도착했으면 Idle 상태로 변경
-        //if (HasReachedHomePosition())
-        //{
-        //    SetNPCState(ENPCStates::Idle);
-        //}
-        break;
-    default:
-        break;
-    }
-}
-
-void ANPCAIController::SetNPCState(ENPCStates NewNPCState)
-{
-    if (!BlackboardComponent)
-    {
-        return;
-    }
-
-    BlackboardComponent->SetValueAsEnum(NPCState, static_cast<uint8>(NewNPCState));
-}
-
-ENPCStates ANPCAIController::GetNPCState() const
-{
-    if (!BlackboardComponent)
-    {
-        return ENPCStates::None;
-    }
-
-    int8 CurrNPCState = BlackboardComponent->GetValueAsEnum(NPCState);
-	return static_cast<ENPCStates>(CurrNPCState);
+    UE_LOG(LogTemp, Warning, TEXT("AI Perception: %s detected!"), bDetectedTarget ? TEXT("Target") : TEXT("None"));*/
 }

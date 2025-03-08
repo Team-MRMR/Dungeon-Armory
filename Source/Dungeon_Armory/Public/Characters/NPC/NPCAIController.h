@@ -7,24 +7,9 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "AI/Team/TeamComponent.h"
+#include "AI/States/FiniteStateMachine.h"
 
 #include "NPCAIController.generated.h"
-
-UENUM(BlueprintType)
-enum class ENPCStates : uint8
-{
-	None	UMETA(Hidden),
-
-    Idle    UMETA(DisplayName = "Idle"),
-    Patrol  UMETA(DisplayName = "Patrol"),
-    Chase   UMETA(DisplayName = "Chase"),
-    Return  UMETA(DisplayName = "Return")
-};
-
-// 전방 선언 (헤더 파일에서 포인터 변수만 선언할 경우)
-class UBehaviorTree;
-class UBehaviorTreeComponent;
-class UBlackboardComponent;
 
 UCLASS()
 class DUNGEON_ARMORY_API ANPCAIController : public AAIController
@@ -34,18 +19,6 @@ class DUNGEON_ARMORY_API ANPCAIController : public AAIController
 
 /***** Variables *****/
 protected:
-    // 기본 비헤이비어 트리 에셋
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
-    UBehaviorTree* BehaviorTree;
-
-    /** 비헤이비어 트리 컴포넌트 */
-    UPROPERTY(VisibleAnywhere, Category = "BehaviorTree")
-    UBehaviorTreeComponent* BehaviorTreeComponent;
-
-    /** 블랙보드 컴포넌트 */
-    UPROPERTY(VisibleAnywhere, Category = "BehaviorTree")
-    UBlackboardComponent* BlackboardComponent;
-
     // AI 감지 시스템 (수정: AIController에서 관리)
     UPROPERTY(VisibleAnywhere, Category = "AI")
     UAIPerceptionComponent* AIPerceptionComponent;
@@ -81,11 +54,6 @@ public:
     /** Retrieve team identifier in form of FGenericTeamId */
     virtual FGenericTeamId GetGenericTeamId() const override;
 
-public:
-    /** 블랙보드의 NPCState 값에 대한 Getter, Setter */
-    void SetNPCState(ENPCStates NewNPCState);
-	ENPCStates GetNPCState() const;
-
 protected:
     virtual void BeginPlay() override;
 
@@ -97,9 +65,5 @@ protected:
     // 감지 처리 함수
     UFUNCTION()
     void OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus);
-
-private:
-	// AI 상태에 따른 행동 처리 함수
-	void UpdateAIState();
 
 };
