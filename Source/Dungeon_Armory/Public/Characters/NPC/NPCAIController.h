@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "Perception/AIPerceptionComponent.h"
-#include "Perception/AISenseConfig_Sight.h"
-#include "AI/Team/TeamComponent.h"
-#include "AI/States/FiniteStateMachine.h"
 
 #include "NPCAIController.generated.h"
+
+class UAIPerceptionComponent;
+class UAISenseConfig_Sight;
+class UTeamComponent;
 
 UCLASS()
 class DUNGEON_ARMORY_API ANPCAIController : public AAIController
@@ -32,16 +32,8 @@ protected:
 	UTeamComponent* TeamComponent;
 
 private:
-    /** 블랙보드에서 NPC의 상태를 저장하는 키 */
-    UPROPERTY(EditDefaultsOnly, Category = "BehaviorTree")
-    FName NPCState = "NPCState";
-
     // AI 시각 감지 설정
-    UPROPERTY(VisibleAnywhere, Category = "BehaviorTree")
-    bool bDetectedTarget;
-
-    // AI 시각 감지 설정
-    UPROPERTY(EditDefaultsOnly, Category = "Team")
+    UPROPERTY(VisibleAnywhere, Category = "Team")
 	FGenericTeamId TeamId;
 
 /***** Functions *****/

@@ -5,10 +5,6 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 
-#include "BehaviorTree/BehaviorTree.h"
-#include "BehaviorTree/BehaviorTreeComponent.h"
-#include "BehaviorTree/BlackboardComponent.h"
-
 #include "AI/States/IStateMachine.h"
 
 #include "FiniteStateMachine.generated.h"
@@ -25,9 +21,11 @@ enum class ENPCStates : uint8
 };
 
 // 전방 선언 (헤더 파일에서 포인터 변수만 선언할 경우)
+class AAIController;
 class UBehaviorTree;
 class UBehaviorTreeComponent;
 class UBlackboardComponent;
+struct FAIStimulus;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DUNGEON_ARMORY_API UFiniteStateMachine : public UActorComponent, public IStateMachine
@@ -35,46 +33,52 @@ class DUNGEON_ARMORY_API UFiniteStateMachine : public UActorComponent, public IS
 	GENERATED_BODY()
 
 /***** Variables *****/
-protected:
-	// 기본 비헤이비어 트리 에셋
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BehaviorTree", meta = (AllowPrivateAccess = "true"))
+public:
+	/** AI 컨트롤러 참조 */
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	AAIController* AIController;
+
+	/** 비헤이비어 트리 */
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UBehaviorTree* BehaviorTree;
 
 	/** 비헤이비어 트리 컴포넌트 */
-	UPROPERTY(VisibleAnywhere, Category = "BehaviorTree", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "AI")
 	UBehaviorTreeComponent* BehaviorTreeComponent;
 
 	/** 블랙보드 컴포넌트 */
-	UPROPERTY(VisibleAnywhere, Category = "BehaviorTree", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "AI")
 	UBlackboardComponent* BlackboardComponent;
 
 private:
 	/** 블랙보드에서 NPC의 상태를 저장하는 키 */
-	UPROPERTY(EditDefaultsOnly, Category = "BehaviorTree", meta = (AllowPrivateAccess = "true"))
-	FName NPCState = "NPCState";
+	UPROPERTY(EditDefaultsOnly, Category = "Behavior Tree")
+	FName BBKey_NPCState = "NPCState";
 
 	// AI 상태
-	IStatable* CurrState;
+	IStatable* CurrState = nullptr;
 
 /***** Functions *****/
 public:	
 	// Sets default values for this component's properties
 	UFiniteStateMachine();
 
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	virtual void ChangeState(IStatable* Nexttate) override;
-
-	virtual void UpdateState() override;
-
 public:
 	/** 블랙보드의 NPCState 값에 대한 Getter, Setter */
-	void SetNPCState(ENPCStates NewNPCState);
-	ENPCStates GetNPCState() const;
+	ENPCStates GetState() const;
+	void SetState(ENPCStates NewNPCState);
+
+	void OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus) const;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	virtual void ChangeState(IStatable* NextState) override;
+
+	virtual void UpdateState() override;
 
 };

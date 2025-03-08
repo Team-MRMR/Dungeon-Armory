@@ -4,6 +4,11 @@
 #include "Characters/NPC/NPCAIController.h"
 #include "Characters/NPC/NPCBase.h"
 
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Sight.h"
+
+#include "AI/States/FiniteStateMachine.h"
+
 #include "Manager/TeamManager.h"
 
 //#include "Perception/AIPerceptionStimuliSourceComponent.h"
@@ -53,7 +58,6 @@ FGenericTeamId ANPCAIController::GetGenericTeamId() const
     return FGenericTeamId::NoTeam;
 }
 
-
 void ANPCAIController::BeginPlay()
 {
     Super::BeginPlay();
@@ -95,22 +99,5 @@ void ANPCAIController::OnPossess(APawn* InPawn)
 // 감지 이벤트 처리
 void ANPCAIController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
 {
-    /*if (!BlackboardComponent)
-    {
-        return;
-    }
-
-    bDetectedTarget = Stimulus.WasSuccessfullySensed();
-    if (bDetectedTarget)
-    {
-        SetNPCState(ENPCStates::Chase);
-        BlackboardComponent->SetValueAsObject("Target", Actor);
-    }
-    else
-    {
-        BlackboardComponent->SetValueAsObject("Target", nullptr);
-
-    }
-
-    UE_LOG(LogTemp, Warning, TEXT("AI Perception: %s detected!"), bDetectedTarget ? TEXT("Target") : TEXT("None"));*/
+	Cast<ANPCBase>(GetPawn())->FSMComponent->OnTargetPerceived(Actor, Stimulus);
 }

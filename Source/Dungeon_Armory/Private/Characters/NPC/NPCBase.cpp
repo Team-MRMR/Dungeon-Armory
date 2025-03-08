@@ -4,11 +4,16 @@
 #include "Characters/NPC/NPCBase.h"
 #include "Characters/NPC/NPCAIController.h"
 
+#include "AI/States/FiniteStateMachine.h"
+
 // Sets default values
 ANPCBase::ANPCBase()
 {
-	// Create Team Component and 
+	// ÆÀ ÄÄÆ÷³ÍÆ® »ý¼º
 	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
+
+	// FSM ÄÄÆ÷³ÍÆ® »ý¼º
+	FSMComponent = CreateDefaultSubobject<UFiniteStateMachine>(TEXT("FSMComponent"));
 }
 
 FGenericTeamId ANPCBase::GetGenericTeamId() const
