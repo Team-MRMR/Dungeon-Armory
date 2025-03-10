@@ -9,8 +9,6 @@
 
 #include "NPCBase.generated.h"
 
-class UFiniteStateMachine;
-
 UCLASS()
 class DUNGEON_ARMORY_API ANPCBase : public ACharacter, public IGenericTeamAgentInterface
 {
@@ -20,12 +18,8 @@ class DUNGEON_ARMORY_API ANPCBase : public ACharacter, public IGenericTeamAgentI
 /***** Variables *****/
 public:	
 	/** Team Component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
 	UTeamComponent* TeamComponent;
-
-	// FSM 컴포넌트
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
-	UFiniteStateMachine* FSMComponent;
 
 private:
 	/** AI가 경로를 순찰할 때 사용할 이동 타겟 포인트 */

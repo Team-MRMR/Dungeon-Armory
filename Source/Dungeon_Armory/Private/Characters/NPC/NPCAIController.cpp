@@ -7,11 +7,11 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
-#include "AI/States/FiniteStateMachine.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 #include "Manager/TeamManager.h"
-
-//#include "Perception/AIPerceptionStimuliSourceComponent.h"
 
 ANPCAIController::ANPCAIController()
 {
@@ -58,10 +58,47 @@ FGenericTeamId ANPCAIController::GetGenericTeamId() const
     return FGenericTeamId::NoTeam;
 }
 
+ENPCStates ANPCAIController::GetNPCState() const
+{
+    if (BlackboardComponent == nullptr)
+    {
+        return ENPCStates::None;
+    }
+
+    int8 CurrNPCState = BlackboardComponent->GetValueAsEnum(BBKey_NPCState);
+    return static_cast<ENPCStates>(CurrNPCState);
+}
+
+void ANPCAIController::SetNPCState(ENPCStates NewNPCState)
+{
+    if (BlackboardComponent == nullptr)
+    {
+        return;
+    }
+
+    BlackboardComponent->SetValueAsEnum(BBKey_NPCState, static_cast<uint8>(NewNPCState));
+}
+
 void ANPCAIController::BeginPlay()
 {
     Super::BeginPlay();
 
+    // 비헤이비어 트리 실행
+    if (BehaviorTree && BehaviorTree->BlackboardAsset)
+    {
+        // 블랙보드 설정 (AIController에서 관리됨)
+        UseBlackboard(BehaviorTree->BlackboardAsset, BlackboardComponent);
+
+        // 블랙보드 변수 초기화
+        if (BlackboardComponent)
+        {
+            BlackboardComponent->SetValueAsVector("HomeLocation", GetOwner()->GetActorLocation());
+            SetNPCState(ENPCStates::Idle);
+        }
+
+        // 비헤이비어 트리 실행 (이 시점에서 BehaviorTreeComponent가 자동으로 생성됨)
+        RunBehaviorTree(BehaviorTree);
+    }
 }
 
 void ANPCAIController::Tick(float DeltaTime)
@@ -76,18 +113,6 @@ void ANPCAIController::OnPossess(APawn* InPawn)
 
     if (ANPCBase* NPC = Cast<ANPCBase>(InPawn))
     {
-        //// 컨트롤러가 소유한 NPC 가져오기
-        //BehaviorTree = NPC->BehaviorTree;
-        //if (BehaviorTree)
-        //{
-        //    UseBlackboard(BehaviorTree->BlackboardAsset, BlackboardComponent);
-        //    RunBehaviorTree(BehaviorTree);
-
-        //    // 초기 블랙보드 값 설정
-        //    BlackboardComponent->SetValueAsVector("HomeLocation", NPC->GetActorLocation());
-        //    SetNPCState(ENPCStates::Patrol);
-        //}
-
         // TeamComponent에서 팀 정보를 가져옴
         if (UTeamComponent* TeamCmp = NPC->TeamComponent)
         {
@@ -99,5 +124,17 @@ void ANPCAIController::OnPossess(APawn* InPawn)
 // 감지 이벤트 처리
 void ANPCAIController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
 {
-	Cast<ANPCBase>(GetPawn())->FSMComponent->OnTargetPerceived(Actor, Stimulus);
+    if (BlackboardComponent == nullptr)
+    {
+        return;
+    }
+    bool bDetectedTarget = Stimulus.WasSuccessfullySensed();
+    if (bDetectedTarget)
+    {
+        BlackboardComponent->SetValueAsObject("Target", Actor);
+    }
+    else
+    {
+        BlackboardComponent->SetValueAsObject("Target", nullptr);
+    }
 }

@@ -8,26 +8,22 @@
 UBTTask_Idle::UBTTask_Idle()
 {
     NodeName = "Idle"; // 노드 이름 설정
+    ElapsedTime = 0.0f;
 }
 
 EBTNodeResult::Type UBTTask_Idle::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-    //UE_LOG(LogTemp, Log, TEXT("AI Idle 상태"));
+    ElapsedTime = 0.0f;
+	IdleDuration = FMath::FRandRange(1.0f, 5.0f); // 대기 시간 설정
+	UE_LOG(LogTemp, Warning, TEXT("Idle Duration: %f"), IdleDuration);
+    return EBTNodeResult::InProgress; // 대기 시작
+}
 
-    // 일정 시간 대기 후 완료
-    FTimerHandle TimerHandle;
-    FTimerDelegate TimerDelegate;
-    TimerDelegate.BindLambda([&]()
+void UBTTask_Idle::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+    ElapsedTime += DeltaSeconds;
+    if (ElapsedTime >= IdleDuration)
     {
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-    });
-
-    AAIController* AIController = OwnerComp.GetAIOwner();
-    if (AIController)
-    {
-        AIController->GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 2.5f, false);
-        return EBTNodeResult::InProgress;
     }
-
-    return EBTNodeResult::Failed;
 }

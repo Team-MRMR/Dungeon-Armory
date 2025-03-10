@@ -67,7 +67,7 @@ EBTNodeResult::Type UBTTask_Patrol::ExecuteTask(UBehaviorTreeComponent& Behavior
 
 void UBTTask_Patrol::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
 {
-    UE_LOG(LogTemp, Warning, TEXT("Move Completed: %d"), static_cast<int32>(Result));
+    //UE_LOG(LogTemp, Warning, TEXT("Move Completed: %d"), static_cast<int32>(Result));
 
     if (Result == EPathFollowingResult::Success)
     {
