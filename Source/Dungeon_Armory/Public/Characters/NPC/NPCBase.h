@@ -9,37 +9,43 @@
 
 #include "NPCBase.generated.h"
 
+class ANPCPatrolPoint;
+
 UCLASS()
 class DUNGEON_ARMORY_API ANPCBase : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
 
-/***** Variables *****/
+/***** Variables (Team) *****/
 public:	
 	/** Team Component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
 	UTeamComponent* TeamComponent;
 
+/***** Variables (Patrol) *****/
 private:
 	/** AI가 경로를 순찰할 때 사용할 이동 타겟 포인트 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC", meta = (AllowPrivateAccess = "true"))
-	TArray<AActor*> PatrolPoints;
+	UPROPERTY(EditAnywhere, Category = "Patrol", meta = (AllowPrivateAccess = "true"))
+	TArray<ANPCPatrolPoint*> PatrolPoints;
 
-/***** Functions *****/
+	/** 현재 패트롤 포인트 인덱스 */
+	int32 CurrentPatrolIndex = 0;
+
+/***** Functions (Unreal) *****/
 public:
-	// Sets default values for this character's properties
 	ANPCBase();
 
-public:
-	/** IGenericTeamAgentInterface implementation */
-	virtual FGenericTeamId GetGenericTeamId() const override;
-
-	/** Assigns Team Agent to given TeamID */
-	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
-
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+/***** Functions (Team) *****/
+public:
+	virtual FGenericTeamId GetGenericTeamId() const override;
+	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
+
+/***** Functions (Patrol) *****/
+public:
+	UFUNCTION(BlueprintCallable, Category = "Patrol")
+	FVector GetNextPatrolPoint();
 };

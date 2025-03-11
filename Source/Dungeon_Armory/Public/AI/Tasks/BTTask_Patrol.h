@@ -4,31 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
-#include "AITypes.h"
-#include "Navigation/PathFollowingComponent.h"  // EPathFollowingResult
+#include "Navigation/PathFollowingComponent.h"  // EPathFollowingResult Æ÷ÇÔ
 
 #include "BTTask_Patrol.generated.h"
 
-/**
- * 
- */
+class UBehaviorTreeComponent;
+
 UCLASS()
 class DUNGEON_ARMORY_API UBTTask_Patrol : public UBTTask_BlackboardBase
 {
 	GENERATED_BODY()
 
-	/***** Variables *****/
+/***** Variables *****/
 private:
-	UBehaviorTreeComponent* BehaviorTreeComponent;
+	UBehaviorTreeComponent* BehaviorTreeCmpt;
 
-	/***** Functions *****/
+/***** Functions *****/
 public:
 	UBTTask_Patrol();
 
 protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-
-private:
 	UFUNCTION()
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result);
 

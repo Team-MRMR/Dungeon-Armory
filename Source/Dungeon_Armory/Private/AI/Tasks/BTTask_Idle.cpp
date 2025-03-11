@@ -7,6 +7,8 @@
 
 UBTTask_Idle::UBTTask_Idle()
 {
+    bNotifyTick = true;
+
     NodeName = "Idle"; // 노드 이름 설정
     ElapsedTime = 0.0f;
 }
@@ -27,4 +29,5 @@ void UBTTask_Idle::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 		Cast<ANPCAIController>(OwnerComp.GetAIOwner())->SetNPCState(ENPCStates::Patrol); // 상태 변경
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
     }
+    UE_LOG(LogTemp, Warning, TEXT("Elapsed Time: %f / Idle Duration: %f"), ElapsedTime, IdleDuration);
 }
