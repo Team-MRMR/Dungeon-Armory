@@ -69,8 +69,7 @@ protected:
 	FName BBKey_NPCState = "NPCState";
 
 	// AI ป๓ลย
-	ENPCStates CurrState = ENPCStates::None;
-	ENPCStates PrevState = ENPCStates::None;
+	ENPCStates NPCState = ENPCStates::None;
 
 /***** Functions (Unreal) *****/
 public:

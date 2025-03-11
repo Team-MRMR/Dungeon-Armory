@@ -24,6 +24,7 @@ void UBTTask_Idle::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
     ElapsedTime += DeltaSeconds;
     if (ElapsedTime >= IdleDuration)
     {
+		Cast<ANPCAIController>(OwnerComp.GetAIOwner())->SetNPCState(ENPCStates::Patrol); // 상태 변경
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
     }
 }
