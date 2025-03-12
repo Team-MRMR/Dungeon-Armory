@@ -117,7 +117,7 @@ void ANPCAIController::OnPossess(APawn* InPawn)
         if (BlackboardComponent)
         {
             BlackboardComponent->SetValueAsVector("HomeLocation", GetPawn()->GetActorLocation());
-            SetNPCState(ENPCStates::Idle);
+            SetNPCState(ENPCStates::Stay);
 
             // 비헤이비어 트리 실행 (이 시점에서 BehaviorTreeComponent가 자동으로 생성됨)
             bool bSuccess = RunBehaviorTree(BehaviorTree);

@@ -12,7 +12,8 @@ enum class ENPCStates : uint8
 {
 	None	UMETA(Hidden),
 
-	Idle    UMETA(DisplayName = "Idle"),
+	Stay    UMETA(DisplayName = "Stay"),
+	Wait	UMETA(DisplayName = "Wait"),
 	Patrol  UMETA(DisplayName = "Patrol"),
 	Chase   UMETA(DisplayName = "Chase"),
 	Return  UMETA(DisplayName = "Return"),

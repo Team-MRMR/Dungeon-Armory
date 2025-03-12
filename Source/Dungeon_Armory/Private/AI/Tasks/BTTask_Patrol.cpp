@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "AI/Tasks/BTTask_Patrol.h"
-#include "Characters/NPC/NPCAIController.h"
 #include "AIController.h"
 #include "AITypes.h"                            // FAIRequestID, EPathFollowingRequestResult
-#include "NavigationSystem.h"
 #include "Navigation/PathFollowingComponent.h"  // EPathFollowingResult
+#include "NavigationSystem.h"
+#include "Characters/NPC/NPCAIController.h"
 #include "Characters/NPC/NPCBase.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -47,7 +47,7 @@ void UBTTask_Patrol::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResul
         ANPCAIController* NPCAIController = Cast<ANPCAIController>(AIController);
         if (NPCAIController)
         {
-            NPCAIController->SetNPCState(ENPCStates::Idle); // Idle 상태로 변경
+            NPCAIController->SetNPCState(ENPCStates::Stay); // Idle 상태로 변경
         }
     }
 
