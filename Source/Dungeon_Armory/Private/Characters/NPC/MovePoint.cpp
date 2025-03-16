@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Characters/NPC/NPCPatrolPoint.h"
+#include "Characters/NPC/MovePoint.h"
 
 // Sets default values
-ANPCPatrolPoint::ANPCPatrolPoint()
+AMovePoint::AMovePoint()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
@@ -12,14 +12,14 @@ ANPCPatrolPoint::ANPCPatrolPoint()
 }
 
 // Called when the game starts or when spawned
-void ANPCPatrolPoint::BeginPlay()
+void AMovePoint::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	PatrolLocation = GetActorLocation();  // 액터 위치 저장
+	PointLocation = GetActorLocation();  // 액터 위치 저장
 }
 
-FVector ANPCPatrolPoint::GetPatrolLocation() const
+FVector AMovePoint::GetPointLocation() const
 {
-	return PatrolLocation;
+	return PointLocation;
 }

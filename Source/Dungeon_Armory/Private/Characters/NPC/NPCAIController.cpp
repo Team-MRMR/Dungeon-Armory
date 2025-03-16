@@ -85,7 +85,6 @@ void ANPCAIController::BeginPlay()
 {
     Super::BeginPlay();
 
-    
 }
 
 void ANPCAIController::Tick(float DeltaTime)
@@ -104,31 +103,6 @@ void ANPCAIController::OnPossess(APawn* InPawn)
         if (UTeamComponent* TeamCmp = NPC->TeamComponent)
         {
             TeamComponent = TeamCmp; // 팀 정보를 가져와 저장
-        }
-    }
-
-    // 비헤이비어 트리 실행
-    if (BehaviorTree && BehaviorTree->BlackboardAsset)
-    {
-        // 블랙보드 설정 (AIController에서 관리됨)
-        UseBlackboard(BehaviorTree->BlackboardAsset, BlackboardComponent);
-
-        // 블랙보드 변수 초기화
-        if (BlackboardComponent)
-        {
-            BlackboardComponent->SetValueAsVector("HomeLocation", GetPawn()->GetActorLocation());
-            SetNPCState(ENPCStates::Stay);
-
-            // 비헤이비어 트리 실행 (이 시점에서 BehaviorTreeComponent가 자동으로 생성됨)
-            bool bSuccess = RunBehaviorTree(BehaviorTree);
-            if (!bSuccess)
-            {
-                UE_LOG(LogTemp, Error, TEXT("ANPCAIController: RunBehaviorTree FAILED!"));
-            }
-            else
-            {
-                UE_LOG(LogTemp, Warning, TEXT("ANPCAIController: RunBehaviorTree SUCCESS"));
-            }
         }
     }
 }

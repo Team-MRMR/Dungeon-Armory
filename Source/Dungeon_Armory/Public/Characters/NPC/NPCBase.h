@@ -9,7 +9,7 @@
 
 #include "NPCBase.generated.h"
 
-class ANPCPatrolPoint;
+class AMovePoint;
 
 UCLASS()
 class DUNGEON_ARMORY_API ANPCBase : public ACharacter, public IGenericTeamAgentInterface
@@ -25,12 +25,16 @@ public:
 
 /***** Variables (Patrol) *****/
 private:
-	/** AI가 경로를 순찰할 때 사용할 이동 타겟 포인트 */
-	UPROPERTY(EditAnywhere, Category = "Patrol", meta = (AllowPrivateAccess = "true"))
-	TArray<ANPCPatrolPoint*> PatrolPoints;
+	/** AI가 머물러 있는 포인트 */
+	UPROPERTY(EditAnywhere, Category = "Behavior Tree", meta = (AllowPrivateAccess = "true"))
+	AMovePoint* StayPoint;
 
-	/** 현재 패트롤 포인트 인덱스 */
-	int32 CurrentPatrolIndex = 0;
+	/** AI가 경로를 순회할 때 사용할 이동 타겟 포인트 */
+	UPROPERTY(EditAnywhere, Category = "Behavior Tree", meta = (AllowPrivateAccess = "true"))
+	TArray<AMovePoint*> MovePoints;
+
+	/** 현재 무브 포인트 인덱스 */
+	int32 CurrMovepPointIndex = 0;
 
 /***** Functions (Unreal) *****/
 public:
@@ -44,8 +48,8 @@ public:
 	virtual FGenericTeamId GetGenericTeamId() const override;
 	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
 
-/***** Functions (Patrol) *****/
+/***** Functions (Behavior Tree) *****/
 public:
-	UFUNCTION(BlueprintCallable, Category = "Patrol")
-	FVector GetNextPatrolPoint();
+	FVector GetNextMovePoint();
+	FVector GetStayPoint() const;
 };

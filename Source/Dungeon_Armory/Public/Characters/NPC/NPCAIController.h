@@ -12,11 +12,13 @@ enum class ENPCStates : uint8
 {
 	None	UMETA(Hidden),
 
-	Stay    UMETA(DisplayName = "Stay"),
-	Wait	UMETA(DisplayName = "Wait"),
-	Patrol  UMETA(DisplayName = "Patrol"),
-	Chase   UMETA(DisplayName = "Chase"),
-	Return  UMETA(DisplayName = "Return"),
+	Stay			UMETA(DisplayName = "Stay"),			// Idle
+
+	Wait			UMETA(DisplayName = "Wait"),			// Move
+	MoveToPoint		UMETA(DisplayName = "MoveToPoint"),		// Move
+	RoamToPoints	UMETA(DisplayName = "RoamToPoints"),	// Move
+	Chase			UMETA(DisplayName = "Chase"),			// Move
+	Return			UMETA(DisplayName = "Return"),			// Move
 
 	Size    UMETA(Hidden)
 };
@@ -26,6 +28,11 @@ class UAISenseConfig_Sight;
 class UTeamComponent;
 class UBehaviorTreeComponent;
 
+
+/**
+ * Base Class에서 Controller의 기능적 역할을 맡고,
+ * Dervied Class에서는 비헤이비어 트리와 관련된 작업을 실행하는 역할을 수행
+ */
 UCLASS()
 class DUNGEON_ARMORY_API ANPCAIController : public AAIController
 {
@@ -77,13 +84,11 @@ public:
     ANPCAIController();
 
 protected:
-	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
+	virtual void BeginPlay() override;				// Called when the game starts or when spawned
+	virtual void Tick(float DeltaTime) override;	// Called every frame
+	virtual void OnPossess(APawn* InPawn) override;	// Called when the controller possess a Pawn
 
 /***** Functions (AI) *****/
-protected:
-	virtual void OnPossess(APawn* InPawn) override;
-
     // 감지 처리 함수
     UFUNCTION()
     void OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus);
