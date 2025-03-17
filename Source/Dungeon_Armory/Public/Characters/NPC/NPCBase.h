@@ -23,8 +23,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
 	UTeamComponent* TeamComponent;
 
-/***** Variables (Patrol) *****/
-private:
+/***** Variables (Behavior Tree) *****/
+public:
 	/** AI가 머물러 있는 포인트 */
 	UPROPERTY(EditAnywhere, Category = "Behavior Tree", meta = (AllowPrivateAccess = "true"))
 	AMovePoint* StayPoint;

@@ -35,7 +35,7 @@ void AStaticNPCAIController::OnPossess(APawn* InPawn)
         if (BlackboardComponent)
         {
             BlackboardComponent->SetValueAsVector("HomeLocation", GetPawn()->GetActorLocation());
-            SetNPCState(ENPCStates::MoveToPoint);
+            SetNPCState(ENPCStates::Stay);
 
             // 비헤이비어 트리 실행 (이 시점에서 BehaviorTreeComponent가 자동으로 생성됨)
             RunBehaviorTree(BehaviorTree);
@@ -47,18 +47,5 @@ void AStaticNPCAIController::OnPossess(APawn* InPawn)
 
 void AStaticNPCAIController::OnTimeChanged()
 {
-    UE_LOG(LogTemp, Log, TEXT("Static NPC %s received time change event!"), *GetPawn()->GetName());
-
-    if (Blackboard)
-    {
-        ENPCStates NewState = ENPCStates::MoveToPoint;
-        Blackboard->SetValueAsEnum("NPCState", static_cast<uint8>(NewState));
-        UE_LOG(LogTemp, Log, TEXT("Static NPC %s Blackboard State Changed to: %d"), *GetPawn()->GetName(), static_cast<uint8>(NewState));
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("Static NPC %s Blackboard is null!"), *GetPawn()->GetName());
-    }
-
     SetNPCState(ENPCStates::MoveToPoint);
 }

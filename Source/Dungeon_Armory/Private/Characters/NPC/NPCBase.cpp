@@ -38,7 +38,7 @@ FVector ANPCBase::GetNextMovePoint()
 
 FVector ANPCBase::GetStayPoint() const
 {
-	if (MovePoints.Num() == 0)
+	if (!StayPoint)
 	{
 		return GetActorLocation();
 	}

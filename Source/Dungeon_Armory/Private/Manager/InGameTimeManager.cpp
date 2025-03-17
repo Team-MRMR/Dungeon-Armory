@@ -54,7 +54,7 @@ void UInGameTimeManager::UpdateTime()
     CurrInGameTime.AddMinutes(TimeScale);
 	UE_LOG(LogTemp, Log, TEXT("In-Game Time: %d:%.2f"), CurrInGameTime.Hours, CurrInGameTime.Minutes);
 
-    if (CurrInGameTime.Minutes >= 5.0f)
+	if (3.0f <= CurrInGameTime.Minutes /*&& CurrInGameTime.Minutes < 7.0f*/)
     {
         // 시간 변경 이벤트 호출
         OnTimeChanged.Broadcast();

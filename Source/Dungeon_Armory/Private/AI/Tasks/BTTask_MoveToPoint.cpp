@@ -10,6 +10,8 @@
 #include "Characters/NPC/NPCBase.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
+#include "Characters/NPC/MovePoint.h"
+
 
 UBTTask_MoveToPoint::UBTTask_MoveToPoint()
 {
@@ -39,9 +41,9 @@ EBTNodeResult::Type UBTTask_MoveToPoint::ExecuteTask(UBehaviorTreeComponent& Own
     BehaviorTreeCmp = &OwnerComp;
 
     // 이동 명령 실행
-    FVector MovePointLocation = NPC->GetStayPoint();
+    FVector StayPointLocation = NPC->GetStayPoint();
 
-    NPCController->MoveToLocation(MovePointLocation);
+    NPCController->MoveToLocation(StayPointLocation);
     if (!NPCController->ReceiveMoveCompleted.IsAlreadyBound(this, &UBTTask_MoveToPoint::OnMoveCompleted))
     {
         NPCController->ReceiveMoveCompleted.AddDynamic(this, &UBTTask_MoveToPoint::OnMoveCompleted);

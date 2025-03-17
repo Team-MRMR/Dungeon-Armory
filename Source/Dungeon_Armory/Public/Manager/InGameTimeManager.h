@@ -83,7 +83,7 @@ protected:
     FInGameTime CurrInGameTime;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "In-Game Time")
-    float TimeScale = 3.0f; // 1초당 3분이 흐름
+    float TimeScale = 1.0f; // 1초당 3분이 흐름
 
 private:
     float AccumulatedTime = 0.0f;
