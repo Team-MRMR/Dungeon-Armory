@@ -12,6 +12,8 @@ class DUNGEON_ARMORY_API AStaticNPCAIController : public ANPCAIController
 	GENERATED_BODY()
 
 /***** Functions (Unreal) *****/
+public:
+	AStaticNPCAIController();
 
 protected:
 	// Called when the game starts or when spawned
@@ -22,6 +24,6 @@ protected:
 /***** Functions (Behavior Tree) *****/
 private:
 	UFUNCTION()
-	void OnTimeChanged();
+	void OnExitStay();
 	
 };

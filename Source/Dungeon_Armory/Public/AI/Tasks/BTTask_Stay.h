@@ -15,18 +15,17 @@ class DUNGEON_ARMORY_API UBTTask_Stay : public UBTTask_BlackboardBase
 	GENERATED_BODY()
 
 /***** Variables *****/
-private:
-	UBehaviorTreeComponent* BehaviorTreeCmp;
 	
 /***** Functions *****/
 public:
 	UBTTask_Stay();
 
+	UFUNCTION()
+	void WakeRoutine(UBehaviorTreeComponent* BehaviorTreeComponent);
+
 protected:
     /** 태스크 실행 */
     virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
-	UFUNCTION()
-	void OnTimeChanged();
 
 };

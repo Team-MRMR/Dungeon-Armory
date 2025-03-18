@@ -17,7 +17,7 @@ void ADynamicNPCAIController::BeginPlay()
     UInGameTimeManager* TimeManager = UInGameTimeManager::GetInstance();
     if (TimeManager)
     {
-        TimeManager->OnTimeChanged.AddDynamic(this, &ADynamicNPCAIController::OnTimeChanged);
+        TimeManager->OnTimePeriodChanged.AddDynamic(this, &ADynamicNPCAIController::OnTimeChanged);
     }
 }
 

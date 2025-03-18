@@ -70,7 +70,8 @@ public:
     }
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTimeChanged);
+class ANPCAIController;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTimePeriodChanged);
 
 UCLASS()
 class DUNGEON_ARMORY_API UInGameTimeManager : public UManagerBase
@@ -103,7 +104,7 @@ public:
 /***** Functions (In-Game Time) *****/
 public:
     UPROPERTY(BlueprintAssignable, Category = "In-Game Time")
-    FOnTimeChanged OnTimeChanged;
+    FOnTimePeriodChanged OnTimePeriodChanged;
 
     void StartTimer();
     void UpdateTime();

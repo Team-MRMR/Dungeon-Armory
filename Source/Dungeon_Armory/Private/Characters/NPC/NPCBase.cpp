@@ -2,8 +2,10 @@
 
 
 #include "Characters/NPC/NPCBase.h"
-#include "Characters/NPC/NPCAIController.h"
 #include "Characters/NPC/MovePoint.h"
+#include "Characters/NPC/NPCAIController.h"
+
+#include "Manager/InGameTimeManager.h"
 
 // Sets default values
 ANPCBase::ANPCBase()
@@ -12,6 +14,12 @@ ANPCBase::ANPCBase()
 
 	// ÆÀ ÄÄÆ÷³ÍÆ® »ý¼º
 	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
+}
+
+// Called when the game starts or when spawned
+void ANPCBase::BeginPlay()
+{
+	Super::BeginPlay();
 }
 
 FGenericTeamId ANPCBase::GetGenericTeamId() const
@@ -45,11 +53,3 @@ FVector ANPCBase::GetStayPoint() const
 
 	return StayPoint->GetPointLocation();
 }
-
-// Called when the game starts or when spawned
-void ANPCBase::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-

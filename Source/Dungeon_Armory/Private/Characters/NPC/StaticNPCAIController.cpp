@@ -2,12 +2,21 @@
 
 
 #include "Characters/NPC/StaticNPCAIController.h"
+
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "BehaviorTree/BTTaskNode.h"
+
+#include "AI/Tasks/BTTask_Stay.h"
 
 #include "Manager/InGameTimeManager.h"
 
 /***** Base Class *****/
+
+AStaticNPCAIController::AStaticNPCAIController()
+{
+
+}
 
 void AStaticNPCAIController::BeginPlay()
 {
@@ -17,7 +26,11 @@ void AStaticNPCAIController::BeginPlay()
     UInGameTimeManager* TimeManager = UInGameTimeManager::GetInstance();
     if (TimeManager)
     {
-        TimeManager->OnTimeChanged.AddDynamic(this, &AStaticNPCAIController::OnTimeChanged);
+        // 중복 바인딩 방지
+        if (!TimeManager->OnTimePeriodChanged.IsAlreadyBound(this, &AStaticNPCAIController::OnExitStay))
+        {
+            TimeManager->OnTimePeriodChanged.AddDynamic(this, &AStaticNPCAIController::OnExitStay);
+        }
     }
 }
 
@@ -39,13 +52,33 @@ void AStaticNPCAIController::OnPossess(APawn* InPawn)
 
             // 비헤이비어 트리 실행 (이 시점에서 BehaviorTreeComponent가 자동으로 생성됨)
             RunBehaviorTree(BehaviorTree);
+
+            // 내부적으로 생성된 BehaviorTreeComponent를 가져와서 멤버 변수에 할당
+            BehaviorTreeComponent = FindComponentByClass<UBehaviorTreeComponent>();
         }
     }
 }
 
 /***** Derived Class *****/
 
-void AStaticNPCAIController::OnTimeChanged()
+void AStaticNPCAIController::OnExitStay()
 {
-    SetNPCState(ENPCStates::MoveToPoint);
+    if (GetNPCState() != ENPCStates::Stay)
+    {
+        return;
+    }
+
+    if (BehaviorTreeComponent)
+    {
+        const UBTNode* ActiveNode = BehaviorTreeComponent->GetActiveNode();
+        if (ActiveNode)
+        {
+            UBTTask_Stay* StayTask = const_cast<UBTTask_Stay*>(Cast<UBTTask_Stay>(ActiveNode));
+            if (StayTask)
+            {
+                StayTask->WakeRoutine(BehaviorTreeComponent);
+                SetNPCState(ENPCStates::MoveToPoint);
+            }
+        }
+    }
 }

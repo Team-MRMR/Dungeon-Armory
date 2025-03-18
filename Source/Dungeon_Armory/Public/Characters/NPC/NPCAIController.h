@@ -59,11 +59,7 @@ protected:
 	FGenericTeamId TeamId;
 	
 /***** Variables (Behavior Tree) *****/
-protected:
-	/** 비헤이비어 트리 */
-	UPROPERTY(EditDefaultsOnly, Category = "Behavior Tree")
-	UBehaviorTree* BehaviorTree;
-
+public:
 	/** 비헤이비어 트리 컴포넌트 */
 	UPROPERTY(VisibleAnywhere, Category = "Behavior Tree")
 	UBehaviorTreeComponent* BehaviorTreeComponent;
@@ -71,6 +67,11 @@ protected:
 	/** 블랙보드 컴포넌트 */
 	UPROPERTY(VisibleAnywhere, Category = "Behavior Tree")
 	UBlackboardComponent* BlackboardComponent;
+
+protected:
+	/** 비헤이비어 트리 */
+	UPROPERTY(EditDefaultsOnly, Category = "Behavior Tree")
+	UBehaviorTree* BehaviorTree;
 
 	/** 블랙보드에서 NPC의 상태를 저장하는 키 */
 	UPROPERTY(EditDefaultsOnly, Category = "Behavior Tree")
