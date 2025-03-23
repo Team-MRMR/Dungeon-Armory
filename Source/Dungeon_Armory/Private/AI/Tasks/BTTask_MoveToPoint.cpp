@@ -15,7 +15,7 @@
 
 UBTTask_MoveToPoint::UBTTask_MoveToPoint()
 {
-    NodeName = "MoveToPoints"; // BT에서 보이는 이름
+    NodeName = "MoveToPoint"; // BT에서 보이는 이름
 }
 
 EBTNodeResult::Type UBTTask_MoveToPoint::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -38,27 +38,18 @@ EBTNodeResult::Type UBTTask_MoveToPoint::ExecuteTask(UBehaviorTreeComponent& Own
         return EBTNodeResult::Failed;
     }
 
-    BehaviorTreeCmp = &OwnerComp;
-
     // 이동 명령 실행
     FVector StayPointLocation = NPC->GetStayPoint();
-
     NPCController->MoveToLocation(StayPointLocation);
-    if (!NPCController->ReceiveMoveCompleted.IsAlreadyBound(this, &UBTTask_MoveToPoint::OnMoveCompleted))
-    {
-        NPCController->ReceiveMoveCompleted.AddDynamic(this, &UBTTask_MoveToPoint::OnMoveCompleted);
-    }
 
-    return EBTNodeResult::InProgress; // 이동 완료 후 OnMoveCompleted에서 처리
+    // 이동 완료 후 OnMoveToPointCompleted에서 처리, OnMovingCompleted 호출
+
+    return EBTNodeResult::InProgress;
 }
 
-void UBTTask_MoveToPoint::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
+void UBTTask_MoveToPoint::OnMovingCompleted(UBehaviorTreeComponent* BehaviorTreeComp)
 {
-    ANPCAIController* NPCController = Cast<ANPCAIController>(BehaviorTreeCmp->GetAIOwner());
-    if (NPCController)
-    {
-        NPCController->SetNPCState(ENPCStates::Stay); // Stay 상태로 변경
-    }
-
-    FinishLatentTask(*BehaviorTreeCmp, EBTNodeResult::Succeeded);
+    
+	UE_LOG(LogTemp, Log, TEXT("%10s OnMovingCompleted"), *BehaviorTreeComp->GetAIOwner()->GetName());
+    FinishLatentTask(*BehaviorTreeComp, EBTNodeResult::Succeeded);
 }

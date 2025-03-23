@@ -34,27 +34,16 @@ EBTNodeResult::Type UBTTask_RoamToPoints::ExecuteTask(UBehaviorTreeComponent& Ow
         return EBTNodeResult::Failed;
     }
 
-	BehaviorTreeCmp = &OwnerCmp;
-
     // 이동 명령 실행
     FVector MovePointLocation = NPC->GetNextMovePoint();
-
     NPCController->MoveToLocation(MovePointLocation);
-    if (!NPCController->ReceiveMoveCompleted.IsAlreadyBound(this, &UBTTask_RoamToPoints::OnMoveCompleted))
-    {
-        NPCController->ReceiveMoveCompleted.AddDynamic(this, &UBTTask_RoamToPoints::OnMoveCompleted);
-    }
 
-    return EBTNodeResult::InProgress; // 이동 완료 후 OnMoveCompleted에서 처리
+    // 이동 완료 후 OnRoamToPointReached에서 처리, OnRoamingReached 호출
+
+    return EBTNodeResult::InProgress;
 }
 
-void UBTTask_RoamToPoints::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
+void UBTTask_RoamToPoints::OnRoamingReached(UBehaviorTreeComponent* BehaviorTreeComp)
 {
-    ANPCAIController* NPCController = Cast<ANPCAIController>(BehaviorTreeCmp->GetAIOwner());
-    if (NPCController)
-    {
-        NPCController->SetNPCState(ENPCStates::Wait); // Wait 상태로 변경
-    }
-
-    FinishLatentTask(*BehaviorTreeCmp, EBTNodeResult::Succeeded);
+    FinishLatentTask(*BehaviorTreeComp, EBTNodeResult::Succeeded);
 }

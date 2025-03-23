@@ -6,15 +6,12 @@
 #include "Characters/NPC/NPCAIController.h"
 #include "DynamicNPCAIController.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class DUNGEON_ARMORY_API ADynamicNPCAIController : public ANPCAIController
 {
 	GENERATED_BODY()
 
-	/***** Functions (Unreal) *****/
+/***** Functions (Unreal) *****/
 
 protected:
 	// Called when the game starts or when spawned
@@ -22,8 +19,10 @@ protected:
 	// Called when the controller possess a Pawn
 	virtual void OnPossess(APawn* InPawn) override;
 
-	/***** Functions (Behavior Tree) *****/
+/***** Functions (Behavior Tree) *****/
 private:
 	UFUNCTION()
-	void OnTimeChanged();
+	void OnStayCompleted();
+	UFUNCTION()
+	void OnRoamToPointReached(FAIRequestID RequestID, EPathFollowingResult::Type Result);
 };

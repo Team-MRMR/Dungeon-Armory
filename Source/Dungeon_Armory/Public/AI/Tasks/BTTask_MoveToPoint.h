@@ -23,8 +23,9 @@ private:
 public:
 	UBTTask_MoveToPoint();
 
+	UFUNCTION()
+	void OnMovingCompleted(UBehaviorTreeComponent* BehaviorTreeComp);
+
 protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-	UFUNCTION()
-	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result);
 };

@@ -24,6 +24,9 @@ protected:
 /***** Functions (Behavior Tree) *****/
 private:
 	UFUNCTION()
-	void OnExitStay();
+	void OnStayCompleted();
+
+	UFUNCTION()
+	void OnMoveToPointCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result);
 	
 };

@@ -18,8 +18,8 @@ EBTNodeResult::Type UBTTask_Stay::ExecuteTask(UBehaviorTreeComponent& OwnerComp,
 	return EBTNodeResult::InProgress;
 }
 
-// 컨트롤러의 OnExitStay 함수에서 피호출
-void UBTTask_Stay::WakeRoutine(UBehaviorTreeComponent* BehaviorTreeComponent)
+// 컨트롤러의 OnStayCompleted 함수에서 호출
+void UBTTask_Stay::OnStayingCompleted(UBehaviorTreeComponent* BehaviorTreeComponent)
 {
     FinishLatentTask(*BehaviorTreeComponent, EBTNodeResult::Succeeded);
 }

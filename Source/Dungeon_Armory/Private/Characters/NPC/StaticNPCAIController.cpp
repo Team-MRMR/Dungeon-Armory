@@ -8,6 +8,8 @@
 #include "BehaviorTree/BTTaskNode.h"
 
 #include "AI/Tasks/BTTask_Stay.h"
+#include "AI/Tasks/BTTask_MoveToPoint.h"
+#include "AI/Tasks/BTTask_RoamToPoints.h"
 
 #include "Manager/InGameTimeManager.h"
 
@@ -26,12 +28,11 @@ void AStaticNPCAIController::BeginPlay()
     UInGameTimeManager* TimeManager = UInGameTimeManager::GetInstance();
     if (TimeManager)
     {
-        // 중복 바인딩 방지
-        if (!TimeManager->OnTimePeriodChanged.IsAlreadyBound(this, &AStaticNPCAIController::OnExitStay))
-        {
-            TimeManager->OnTimePeriodChanged.AddDynamic(this, &AStaticNPCAIController::OnExitStay);
-        }
+        TimeManager->OnTimePeriodChanged.AddDynamic(this, &AStaticNPCAIController::OnStayCompleted);
     }
+
+    ReceiveMoveCompleted.AddDynamic(this, &AStaticNPCAIController::OnMoveToPointCompleted);
+
 }
 
 void AStaticNPCAIController::OnPossess(APawn* InPawn)
@@ -61,24 +62,50 @@ void AStaticNPCAIController::OnPossess(APawn* InPawn)
 
 /***** Derived Class *****/
 
-void AStaticNPCAIController::OnExitStay()
+void AStaticNPCAIController::OnStayCompleted()
 {
     if (GetNPCState() != ENPCStates::Stay)
     {
         return;
     }
 
-    if (BehaviorTreeComponent)
+    if (!BehaviorTreeComponent)
     {
-        const UBTNode* ActiveNode = BehaviorTreeComponent->GetActiveNode();
-        if (ActiveNode)
+        return;
+    }
+
+    const UBTNode* ActiveNode = BehaviorTreeComponent->GetActiveNode();
+    if (ActiveNode)
+    {
+        UBTTask_Stay* StayTask = const_cast<UBTTask_Stay*>(Cast<UBTTask_Stay>(ActiveNode));
+        if (StayTask)
         {
-            UBTTask_Stay* StayTask = const_cast<UBTTask_Stay*>(Cast<UBTTask_Stay>(ActiveNode));
-            if (StayTask)
-            {
-                StayTask->WakeRoutine(BehaviorTreeComponent);
-                SetNPCState(ENPCStates::MoveToPoint);
-            }
+            StayTask->OnStayingCompleted(BehaviorTreeComponent);
+            SetNPCState(ENPCStates::MoveToPoint);
+        }
+    }
+}
+
+void AStaticNPCAIController::OnMoveToPointCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
+{
+    if (GetNPCState() != ENPCStates::MoveToPoint)
+    {
+        return;
+    }
+
+    if (!BehaviorTreeComponent)
+    {
+        return;
+    }
+
+    const UBTNode* ActiveNode = BehaviorTreeComponent->GetActiveNode();
+    if (ActiveNode)
+    {
+        UBTTask_MoveToPoint* MoveToPointTask = const_cast<UBTTask_MoveToPoint*>(Cast<UBTTask_MoveToPoint>(ActiveNode));
+        if (MoveToPointTask)
+        {
+            MoveToPointTask->OnMovingCompleted(BehaviorTreeComponent);
+            SetNPCState(ENPCStates::Stay);
         }
     }
 }

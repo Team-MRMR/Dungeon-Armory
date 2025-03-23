@@ -5,9 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GenericTeamAgentInterface.h"
-#include "AI/Team/TeamComponent.h"
 
 #include "NPCBase.generated.h"
+
+class UTeamComponent;
 
 class AMovePoint;
 
@@ -16,7 +17,6 @@ class DUNGEON_ARMORY_API ANPCBase : public ACharacter, public IGenericTeamAgentI
 {
 	GENERATED_BODY()
 
-
 /***** Variables (Team) *****/
 public:	
 	/** Team Component */
@@ -24,7 +24,7 @@ public:
 	UTeamComponent* TeamComponent;
 
 /***** Variables (Behavior Tree) *****/
-public:
+private:
 	/** AI가 머물러 있는 포인트 */
 	UPROPERTY(EditAnywhere, Category = "Behavior Tree", meta = (AllowPrivateAccess = "true"))
 	AMovePoint* StayPoint;
@@ -33,8 +33,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Behavior Tree", meta = (AllowPrivateAccess = "true"))
 	TArray<AMovePoint*> MovePoints;
 
-	/** 현재 무브 포인트 인덱스 */
+	/** 현재 이동 지점 인덱스 */
 	int32 CurrMovepPointIndex = 0;
+
 
 /***** Functions (Unreal) *****/
 public:
@@ -42,6 +43,10 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+/***** Function (Movement) *****/
+public:
+	void SetMovementSpeed(float NewSpeed);
 
 /***** Functions (Team) *****/
 public:
