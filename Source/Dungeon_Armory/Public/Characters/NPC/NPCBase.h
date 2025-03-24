@@ -46,6 +46,8 @@ protected:
 
 /***** Function (Movement) *****/
 public:
+	void ResetSpeed();
+	void ApplySpeedModifier(float SpeedMultiplier, float Duration);
 	void SetMovementSpeed(float NewSpeed);
 
 /***** Functions (Team) *****/

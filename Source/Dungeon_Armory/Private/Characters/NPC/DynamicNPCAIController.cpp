@@ -43,6 +43,8 @@ void ADynamicNPCAIController::OnPossess(APawn* InPawn)
         // 블랙보드 변수 초기화
         if (BlackboardComponent)
         {
+			BlackboardComponent->SetValueAsFloat("MovementSpeed", 500.0f);
+
             BlackboardComponent->SetValueAsVector("HomeLocation", GetPawn()->GetActorLocation());
             SetNPCState(ENPCStates::Stay);
 
