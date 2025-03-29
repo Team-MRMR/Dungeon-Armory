@@ -1,7 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Characters/Mannequin/Manny.h"
+#include "Characters/NPC/Interface/NPCInteractionInterface.h"
 
 #include "Components/CapsuleComponent.h"
 
@@ -13,6 +14,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+
+#include "Kismet/KismetSystemLibrary.h"
 
 #include "Manager/TeamManager.h"
 
@@ -93,6 +96,8 @@ void AManny::BeginPlay()
 // Called to bind functionality to input
 void AManny::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 
@@ -105,6 +110,12 @@ void AManny::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AManny::Look);
+
+		// Interact
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AManny::Interact);
+
+		// Test
+		EnhancedInputComponent->BindAction(TestAction, ETriggerEvent::Triggered, this, &AManny::Test);
 	}
 }
 
@@ -142,4 +153,44 @@ void AManny::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AManny::Interact(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Log, TEXT("탐색 중"));
+
+	// 플레이어의 위치와 앞 방향
+	FVector PlayerLocation = GetActorLocation();
+	FRotator PlayerRotation = GetActorRotation();
+	FVector TraceEnd = PlayerLocation + (PlayerRotation.Vector() * 2000.0f); // 2000.0f는 최대 상호작용 거리
+
+	// 라인 트레이스를 통한 충돌 확인
+	FHitResult HitResult;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this); // 자신은 제외
+
+	// 라인 트레이스 수행
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, PlayerLocation, TraceEnd, ECC_Visibility, CollisionParams);
+
+	if (bHit)
+	{
+		AActor* HitActor = HitResult.GetActor();
+
+		// NPC가 라인 트레이스에 맞았을 경우
+		if (HitActor && HitActor->Implements<UNPCInteractionInterface>())
+		{
+			UE_LOG(LogTemp, Log, TEXT("상호작용 시작"));
+
+			INPCInteractionInterface* NPC = Cast<INPCInteractionInterface>(HitActor);
+			if (NPC)
+			{
+				NPC->Interact(this); // NPC와 상호작용
+			}
+		}
+	}
+}
+
+void AManny::Test(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Log, TEXT("Test Action"));
 }
