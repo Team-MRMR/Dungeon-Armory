@@ -64,6 +64,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* TestAction;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = LookAt, meta = (AllowPrivateAccess = "true"))
+	class USceneComponent* SightSource;
+
 /***** Functions *****/
 public:
 	// Sets default values for this character's properties
@@ -98,7 +101,5 @@ protected:
 
 	/** Called for Interactinginput */
 	void Interact(const FInputActionValue& Value);
-
-	/** Called for test input */
-	void Test(const FInputActionValue& Value);
 };
+
