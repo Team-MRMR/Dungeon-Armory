@@ -5,7 +5,7 @@
 #include "AITypes.h"                            // FAIRequestID, EPathFollowingRequestResult
 #include "Navigation/PathFollowingComponent.h"  // EPathFollowingResult
 #include "NavigationSystem.h"
-#include "Characters/NPC/DynamicNPCAIController.h"
+#include "Characters/NPC/NPCAIControllerBase.h"
 #include "Characters/NPC/NPCBase.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -16,7 +16,7 @@ UBTTask_RoamToPoints::UBTTask_RoamToPoints()
 
 EBTNodeResult::Type UBTTask_RoamToPoints::ExecuteTask(UBehaviorTreeComponent& OwnerCmp, uint8* NodeMemory)
 {
-    auto NPCController = Cast<ANPCAIController>(OwnerCmp.GetAIOwner());
+    auto NPCController = Cast<ANPCAIControllerBase>(OwnerCmp.GetAIOwner());
     if (!NPCController)
     {
         return EBTNodeResult::Failed;
