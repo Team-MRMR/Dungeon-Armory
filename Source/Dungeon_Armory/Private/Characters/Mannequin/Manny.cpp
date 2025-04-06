@@ -2,7 +2,6 @@
 
 
 #include "Characters/Mannequin/Manny.h"
-#include "Characters/NPC/Interface/NPCInteractionInterface.h"
 
 #include "Components/CapsuleComponent.h"
 
@@ -14,6 +13,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+
+#include "Core/Interact/InteractionComponent.h"
 
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -64,6 +65,9 @@ AManny::AManny()
 
 	SightSource = CreateDefaultSubobject<USceneComponent>(TEXT("Sight Source"));
 	SightSource->SetupAttachment(RootComponent);
+
+	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
+
 }
 
 FGenericTeamId AManny::GetGenericTeamId() const
@@ -156,49 +160,8 @@ void AManny::Look(const FInputActionValue& Value)
 
 void AManny::Interact(const FInputActionValue& Value)
 {
-	// 플레이어의 위치와 회전 값 가져오기
-	FVector PlayerLocation = SightSource->GetComponentLocation();
-	FRotator PlayerRotation = GetControlRotation(); // 카메라 방향 기준
-
-	// 트레이스 끝 지점 설정 (플레이어가 바라보는 방향으로 2000 유닛 만큼)
-	FVector TraceEnd = PlayerLocation + (PlayerRotation.Vector() * 200.0f);
-
-	// 라인 트레이스 결과를 저장할 변수
-	FHitResult HitResult;
-	FCollisionQueryParams CollisionParams;
-	CollisionParams.AddIgnoredActor(this); // 자기 자신 제외
-
-	// 라인 트레이스 수행
-	bool bHit = GetWorld()->LineTraceSingleByChannel(
-		HitResult,                 // 충돌된 객체 정보
-		PlayerLocation,            // 시작 위치
-		TraceEnd,                  // 끝 위치
-		ECC_Visibility,            // 충돌 채널 (시야 관련)
-		CollisionParams            // 충돌 파라미터
-	);
-
-	// 디버그 라인 시각화 (항상 표시, 지속 시간 2초)
-	DrawDebugLine(GetWorld(), PlayerLocation, TraceEnd, FColor::Red, false, 2.0f, 0, 2.0f);
-
-	// 트레이스가 충돌한 경우
-	if (bHit)
+	if (UInteractionComponent* InteractionComp = FindComponentByClass<UInteractionComponent>())
 	{
-		// 충돌 지점 시각화
-		DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 10.0f, FColor::Green, false, 2.0f);
-		
-		// 충돌한 액터 확인
-		AActor* HitActor = HitResult.GetActor();
-
-		// NPC가 트레이스에 맞았는지 확인
-		if (HitActor && HitActor->FindComponentByClass<UCapsuleComponent>())
-		{
-			UE_LOG(LogTemp, Log, TEXT("NPC와 상호작용 가능"));
-
-			INPCInteractionInterface* NPC = Cast<INPCInteractionInterface>(HitActor);
-			if (NPC)
-			{
-				NPC->Interact(this);
-			}
-		}
+		InteractionComp->TryInteract();
 	}
 }

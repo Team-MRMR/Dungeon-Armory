@@ -67,6 +67,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = LookAt, meta = (AllowPrivateAccess = "true"))
 	class USceneComponent* SightSource;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
+	class UInteractionComponent* InteractionComponent;
+
 /***** Functions *****/
 public:
 	// Sets default values for this character's properties

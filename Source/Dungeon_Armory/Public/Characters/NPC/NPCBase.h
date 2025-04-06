@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GenericTeamAgentInterface.h"
-#include "Characters/NPC/Interface/NPCInteractionInterface.h"
 
 #include "NPCBase.generated.h"
 
@@ -14,7 +13,7 @@ class UTeamComponent;
 class AMovePoint;
 
 UCLASS()
-class DUNGEON_ARMORY_API ANPCBase : public ACharacter, public IGenericTeamAgentInterface, public INPCInteractionInterface
+class DUNGEON_ARMORY_API ANPCBase : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -60,8 +59,4 @@ public:
 public:
 	FVector GetNextMovePoint();
 	FVector GetStayPoint() const;
-
-/***** Functions (Interaction) *****/
-public:
-	virtual void Interact(AActor* Interactor) override;
 };
