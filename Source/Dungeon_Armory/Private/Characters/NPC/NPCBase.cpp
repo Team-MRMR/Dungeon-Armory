@@ -113,21 +113,3 @@ FVector ANPCBase::GetStayPoint() const
 
 	return StayPoint->GetPointLocation();
 }
-
-/*
-* Functions (Interact)
-*/
-
-void ANPCBase::Interact(AActor* Interactor)
-{
-	if (Interactor)
-	{
-		FVector Direction = Interactor->GetActorLocation() - GetActorLocation();
-		Direction.Z = 0; // Yaw 회전만 수행하도록 Z 축 무시
-
-		FRotator NewRotation = Direction.Rotation();
-		SetActorRotation(NewRotation);
-
-		UE_LOG(LogTemp, Log, TEXT("NPC가 플레이어를 바라봅니다."));
-	}
-}
