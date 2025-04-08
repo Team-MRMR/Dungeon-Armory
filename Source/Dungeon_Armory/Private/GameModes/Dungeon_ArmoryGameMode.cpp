@@ -3,6 +3,7 @@
 #include "GameModes/Dungeon_ArmoryGameMode.h"
 #include "Characters/Dungeon_ArmoryCharacter.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Kismet/GameplayStatics.h"
 
 ADungeon_ArmoryGameMode::ADungeon_ArmoryGameMode()
 {
@@ -13,4 +14,10 @@ ADungeon_ArmoryGameMode::ADungeon_ArmoryGameMode()
 
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+}
+
+void ADungeon_ArmoryGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
 }
