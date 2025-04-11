@@ -9,6 +9,8 @@
 
 #include "GenericTeamAgentInterface.h"
 
+#include "ViewMode/ViewModeComponent.h"
+
 #include "Manny.generated.h"
 
 class USpringArmComponent;
@@ -70,6 +72,10 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
 	class UInteractionComponent* InteractionComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "View", meta = (AllowPrivateAccess = "true"))
+	UViewModeComponent* ViewModeComponent;
+
+
 /***** Functions *****/
 public:
 	// Sets default values for this character's properties
@@ -104,5 +110,5 @@ protected:
 
 	/** Called for Interactinginput */
 	void Interact(const FInputActionValue& Value);
-};
 
+};

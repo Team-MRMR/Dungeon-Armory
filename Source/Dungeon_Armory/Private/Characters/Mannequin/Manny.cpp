@@ -68,6 +68,8 @@ AManny::AManny()
 
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
 
+	ViewModeComponent = CreateDefaultSubobject<UViewModeComponent>(TEXT("ViewModeComponent"));
+	ViewModeComponent->RequestViewMode(EViewMode::FPS); // 또는 TPS
 }
 
 FGenericTeamId AManny::GetGenericTeamId() const
