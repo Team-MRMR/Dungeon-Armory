@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Core/Interact/InteractionComponent.h"
+#include "Core/Interact/InteractableComponent.h"
 #include "Core/Interact/Interface/Interactable.h"
 
 // Sets default values for this component's properties
@@ -30,11 +31,12 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UInteractionComponent::TryInteract()
 {
-    if (CurrentTarget && CurrentTarget->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+    if (CurrentTarget)
     {
-        if (IInteractable::Execute_CanInteract(CurrentTarget, GetOwner()))
+        UInteractableComponent* InteractableComp = CurrentTarget->FindComponentByClass<UInteractableComponent>();
+        if (InteractableComp && InteractableComp->CanInteract(GetOwner()))
         {
-            IInteractable::Execute_Interact(CurrentTarget, GetOwner());
+            InteractableComp->Interact(GetOwner());
         }
     }
 }
@@ -62,19 +64,24 @@ void UInteractionComponent::TraceForInteractable()
     if (HitActor == CurrentTarget) return;
 
     // 이전 강조 해제
-    if (CurrentTarget && CurrentTarget->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+    if (CurrentTarget)
     {
-        IInteractable::Execute_DisableOutline(CurrentTarget);
+        UInteractableComponent* PrevInteractable = CurrentTarget->FindComponentByClass<UInteractableComponent>();
+        if (PrevInteractable)
+        {
+            PrevInteractable->DisableOutline();
+        }
     }
 
     CurrentTarget = nullptr;
 
     // 새 대상 설정
-    if (HitActor && HitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+    if (HitActor)
     {
-        if (IInteractable::Execute_CanInteract(HitActor, GetOwner()))
+        UInteractableComponent* NewInteractable = HitActor->FindComponentByClass<UInteractableComponent>();
+        if (NewInteractable && NewInteractable->CanInteract(Owner))
         {
-            IInteractable::Execute_EnableOutline(HitActor);
+            NewInteractable->EnableOutline();
             CurrentTarget = HitActor;
         }
     }
