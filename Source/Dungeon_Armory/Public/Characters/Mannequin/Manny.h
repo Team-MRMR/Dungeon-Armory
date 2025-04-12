@@ -9,8 +9,6 @@
 
 #include "GenericTeamAgentInterface.h"
 
-#include "ViewMode/ViewModeComponent.h"
-
 #include "Manny.generated.h"
 
 class USpringArmComponent;
@@ -73,7 +71,7 @@ private:
 	class UInteractionComponent* InteractionComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "View", meta = (AllowPrivateAccess = "true"))
-	UViewModeComponent* ViewModeComponent;
+	class UViewModeComponent* ViewModeComponent;
 
 
 /***** Functions *****/

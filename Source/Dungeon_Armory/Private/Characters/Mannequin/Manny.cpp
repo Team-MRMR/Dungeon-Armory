@@ -2,6 +2,7 @@
 
 
 #include "Characters/Mannequin/Manny.h"
+#include "Characters/Mannequin/ViewMode/ViewModeComponent.h"
 
 #include "Components/CapsuleComponent.h"
 
@@ -69,17 +70,6 @@ AManny::AManny()
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
 
 	ViewModeComponent = CreateDefaultSubobject<UViewModeComponent>(TEXT("ViewModeComponent"));
-	ViewModeComponent->RequestViewMode(EViewMode::FPS); // 또는 TPS
-}
-
-FGenericTeamId AManny::GetGenericTeamId() const
-{
-	return TeamComponent->GetGenericTeamId();
-}
-
-void AManny::SetGenericTeamId(const FGenericTeamId& NewTeamID)
-{
-	TeamComponent->SetTeamType(static_cast<ETeamType>(NewTeamID.GetId()));
 }
 
 // Called when the game starts or when spawned
@@ -122,6 +112,16 @@ void AManny::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		// Interact
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AManny::Interact);
 	}
+}
+
+FGenericTeamId AManny::GetGenericTeamId() const
+{
+	return TeamComponent->GetGenericTeamId();
+}
+
+void AManny::SetGenericTeamId(const FGenericTeamId& NewTeamID)
+{
+	TeamComponent->SetTeamType(static_cast<ETeamType>(NewTeamID.GetId()));
 }
 
 void AManny::Move(const FInputActionValue& Value)
