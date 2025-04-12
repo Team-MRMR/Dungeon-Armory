@@ -1,13 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-
 #include "ViewModeComponent.generated.h"
 
 UENUM(BlueprintType)
@@ -17,54 +13,48 @@ enum class EViewMode : uint8
     FPS UMETA(DisplayName = "FirstPerson")
 };
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class DUNGEON_ARMORY_API UViewModeComponent : public UActorComponent
 {
-	GENERATED_BODY()
-
-public:	
-	// Sets default values for this component's properties
-	UViewModeComponent();
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-
-/***** View Mode *****/
-
-private:
-	UPROPERTY()
-	USpringArmComponent* SpringArm;
-
-	UPROPERTY()
-	UCameraComponent* Camera;
-
-	UPROPERTY(EditAnywhere, Category = "View Mode")
-	float TPSArmLength = 300.f;
-
-	UPROPERTY(EditAnywhere, Category = "View Mode")
-	float FPSArmLength = 0.f;
-
-	UPROPERTY(EditAnywhere, Category = "View Mode")
-	float InterpSpeed = 5.f;
-
-	EViewMode CurrentViewMode;
-	float TargetArmLength;
-	FRotator TargetRotation;
+    GENERATED_BODY()
 
 public:
-	/** 시점 전환 요청 함수 */
-	void RequestViewMode(EViewMode NewMode);
+    UViewModeComponent();
 
-	/** 현재 시점 조회 */
-	EViewMode GetCurrentViewMode() const { return CurrentViewMode; }
+    virtual void BeginPlay() override;
+    virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+    void SetIndoorState(bool bIndoor);
 
 private:
-	/** 시점 전환 로직 */
-	void ApplyViewMode(EViewMode NewMode);
+    void UpdateViewMode(float DeltaTime);
+    void ApplyCameraTransform(float Alpha);
+    void ApplySpringArmTransform(float Alpha);
+
+private:
+    ACharacter* OwnerCharacter = nullptr;
+    USpringArmComponent* SpringArm = nullptr;
+    UCameraComponent* Camera = nullptr;
+
+    EViewMode CurrentViewMode = EViewMode::TPS;
+    EViewMode TargetViewMode = EViewMode::TPS;
+
+    bool bIsIndoor = false;
+
+    float InterpAlpha = 1.0f;
+
+    UPROPERTY(EditAnywhere, Category = "ViewMode | Interp")
+    float InterpSpeed = 5.0f;
+
+    UPROPERTY(EditAnywhere, Category = "ViewMode | FPS")
+    FVector FPSCameraPosition = FVector(10.0, 0.0f, 0.0f);
+
+    UPROPERTY(EditAnywhere, Category = "ViewMode | TPS")
+    FVector TPSCameraPosition = FVector(50.0f, 40.0f, 50.0f);
+
+    UPROPERTY(EditAnywhere, Category = "ViewMode | FPS")
+    float FPSTargetArmLength = 0.0f;
+
+    UPROPERTY(EditAnywhere, Category = "ViewMode | TPS")
+    float TPSTargetArmLength = 400.0f;
 };

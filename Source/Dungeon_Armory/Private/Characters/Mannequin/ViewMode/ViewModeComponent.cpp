@@ -20,7 +20,13 @@ void UViewModeComponent::BeginPlay()
     if (OwnerCharacter)
     {
         SpringArm = OwnerCharacter->FindComponentByClass<USpringArmComponent>();
+        
         Camera = OwnerCharacter->FindComponentByClass<UCameraComponent>();
+		if (Camera)
+		{
+			// 카메라의 초기 위치를 저장
+			Camera->GetRelativeLocation() = TPSCameraPosition;
+		}
     }
 }
 
@@ -33,30 +39,34 @@ void UViewModeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 void UViewModeComponent::SetIndoorState(bool bIndoor)
 {
-    bIsIndoor = bIndoor;
-    InterpAlpha = 0.0f;
+    EViewMode DesiredMode = bIndoor ? EViewMode::FPS : EViewMode::TPS;
+
+    if (TargetViewMode != DesiredMode)
+    {
+        bIsIndoor = bIndoor;
+        TargetViewMode = DesiredMode;
+        InterpAlpha = 0.0f;
+    }
 }
 
 void UViewModeComponent::UpdateViewMode(float DeltaTime)
 {
-    if (!Camera || !SpringArm)
-        return;
-
-    FVector CurrentCameraPos = Camera->GetRelativeLocation();
-    FVector TargetCameraPos = (bIsIndoor ? FPSCameraPosition : TPSCameraPosition);
-    float CurrentArmLength = SpringArm->TargetArmLength;
-    float TargetArmLength = (bIsIndoor ? FPSTargetArmLength : TPSTargetArmLength);
-
-    bool bNeedsCameraLerp = !CurrentCameraPos.Equals(TargetCameraPos, 1.f);
-    bool bNeedsArmLerp = !FMath::IsNearlyEqual(CurrentArmLength, TargetArmLength, 1.f);
-
-    if (!bNeedsCameraLerp && !bNeedsArmLerp)
-        return;
-
-    if (InterpAlpha == 0.f)
+    if (CurrentViewMode == TargetViewMode)
     {
-        EViewMode NewMode = bIsIndoor ? EViewMode::FPS : EViewMode::TPS;
-        InitializeViewModeSettings(NewMode);
+        // 위치 또는 길이가 일치하지 않으면 다시 보간
+        const float Tolerance = 1.0f;
+        FVector TargetCameraPos = (TargetViewMode == EViewMode::FPS) ? FPSCameraPosition : TPSCameraPosition;
+        float TargetArmLength = (TargetViewMode == EViewMode::FPS) ? FPSTargetArmLength : TPSTargetArmLength;
+
+        bool bNeedCorrection = !Camera->GetRelativeLocation().Equals(TargetCameraPos, Tolerance) ||
+            !FMath::IsNearlyEqual(SpringArm->TargetArmLength, TargetArmLength, Tolerance);
+
+        if (bNeedCorrection)
+        {
+            InterpAlpha = 0.0f;
+        }
+
+        return;
     }
 
     InterpAlpha += DeltaTime * InterpSpeed;
@@ -67,8 +77,8 @@ void UViewModeComponent::UpdateViewMode(float DeltaTime)
 
     if (InterpAlpha >= 1.f)
     {
-        CurrentViewMode = (bIsIndoor ? EViewMode::FPS : EViewMode::TPS);
-        FinalizeViewModeSettings(CurrentViewMode);
+        CurrentViewMode = TargetViewMode;
+        SpringArm->TargetArmLength = (TargetViewMode == EViewMode::FPS) ? FPSTargetArmLength : TPSTargetArmLength;
     }
 }
 
@@ -77,10 +87,10 @@ void UViewModeComponent::ApplyCameraTransform(float Alpha)
     if (!Camera)
         return;
 
-    FVector From = (CurrentViewMode == EViewMode::FPS) ? FPSCameraPosition : TPSCameraPosition;
-    FVector To = (TargetViewMode == EViewMode::FPS) ? FPSCameraPosition : TPSCameraPosition;
+    FVector FromPos = (CurrentViewMode == EViewMode::FPS) ? FPSCameraPosition : TPSCameraPosition;
+    FVector ToPos = (TargetViewMode == EViewMode::FPS) ? FPSCameraPosition : TPSCameraPosition;
 
-    FVector NewCameraPosition = FMath::Lerp(From, To, Alpha);
+    FVector NewCameraPosition = FMath::Lerp(FromPos, ToPos, Alpha);
     Camera->SetRelativeLocation(NewCameraPosition);
 }
 
@@ -94,29 +104,4 @@ void UViewModeComponent::ApplySpringArmTransform(float Alpha)
 
     float NewLength = FMath::Lerp(FromLength, ToLength, Alpha);
     SpringArm->TargetArmLength = NewLength;
-}
-
-void UViewModeComponent::InitializeViewModeSettings(EViewMode Mode)
-{
-    if (!SpringArm || !Camera)
-        return;
-
-    if (Mode == EViewMode::FPS)
-    {
-        SpringArm->bUsePawnControlRotation = false;
-    }
-    else // TPS
-    {
-        SpringArm->bUsePawnControlRotation = true;
-    }
-}
-
-
-void UViewModeComponent::FinalizeViewModeSettings(EViewMode Mode)
-{
-    if (!SpringArm)
-        return;
-
-    float FinalLength = (Mode == EViewMode::FPS) ? FPSTargetArmLength : TPSTargetArmLength;
-    SpringArm->TargetArmLength = FinalLength;
 }

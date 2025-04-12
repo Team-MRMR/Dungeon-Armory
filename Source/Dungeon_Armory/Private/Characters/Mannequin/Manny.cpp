@@ -47,16 +47,24 @@ AManny::AManny()
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 
+	FPSCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
+	FPSCamera->SetupAttachment(RootComponent);
+	FPSCamera->bUsePawnControlRotation = true;
+	FPSCamera->Deactivate(); // FPSCamera는 기본적으로 비활성화
+
 	// Create a camera boom (pulls in towards the player if there is a collision)
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	TPSSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("TPSCameraBoom"));
+	TPSSpringArm->SetupAttachment(RootComponent);
+	TPSSpringArm->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
+	TPSSpringArm->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	TPSSpringArm->bInheritYaw   = true;
+	TPSSpringArm->bInheritPitch = true;
+	TPSSpringArm->bInheritRoll  = true;
 
 	// Create a follow camera
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	TPSCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("TPSCamera"));
+	TPSCamera->SetupAttachment(TPSSpringArm, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	TPSCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	// Create AIPerceptionStimuliSourceComponent
 	StimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSourceComponent"));
