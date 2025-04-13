@@ -50,7 +50,7 @@ private:
     FVector FPSCameraPosition = FVector(10.0, 0.0f, 0.0f);
 
     UPROPERTY(EditAnywhere, Category = "ViewMode | TPS")
-    FVector TPSCameraPosition = FVector(50.0f, 40.0f, 50.0f);
+    FVector TPSCameraPosition = FVector(70.0f, 35.0f, 0.0f);
 
     UPROPERTY(EditAnywhere, Category = "ViewMode | FPS")
     float FPSTargetArmLength = 0.0f;

@@ -24,17 +24,14 @@ class DUNGEON_ARMORY_API AManny : public ACharacter, public IGenericTeamAgentInt
 
 /***** Variables *****/
 private:
-	/** FPS camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FPSCamera;
 
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	USpringArmComponent* TPSSpringArm;
+	USpringArmComponent* CameraSpringArm;
 
 	/** TPS camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* TPSCamera;
+	UCameraComponent* CameraComponent;
 
 	/** AI Perception Stimuli Source */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Perception", meta = (AllowPrivateAccess = "true"))
@@ -91,10 +88,10 @@ public:
 
 public:
 	/** Returns CameraBoom subobject **/
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return TPSSpringArm; }
+	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraSpringArm; }
 
 	/** Returns FollowCamera subobject **/
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return TPSCamera; }
+	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return CameraComponent; }
 
 protected:
 	// Called when the game starts or when spawned

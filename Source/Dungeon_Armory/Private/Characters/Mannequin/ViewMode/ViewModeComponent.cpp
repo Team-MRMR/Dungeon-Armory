@@ -51,34 +51,37 @@ void UViewModeComponent::SetIndoorState(bool bIndoor)
 
 void UViewModeComponent::UpdateViewMode(float DeltaTime)
 {
-    if (CurrentViewMode == TargetViewMode)
+    FVector TargetCameraPos = (TargetViewMode == EViewMode::FPS) ? FPSCameraPosition : TPSCameraPosition;
+    float TargetArmLength = (TargetViewMode == EViewMode::FPS) ? FPSTargetArmLength : TPSTargetArmLength;
+
+    FVector CurrentCameraPos = Camera->GetRelativeLocation();
+    float CurrentArmLength = SpringArm->TargetArmLength;
+
+    bool bViewModeChanged = (CurrentViewMode != TargetViewMode);
+
+    const float Tolerance = 1.0f;
+    bool bNeedCorrection =
+        !CurrentCameraPos.Equals(TargetCameraPos, Tolerance) ||
+        !FMath::IsNearlyEqual(CurrentArmLength, TargetArmLength, Tolerance);
+
+    if (bViewModeChanged || bNeedCorrection)
     {
-        // 위치 또는 길이가 일치하지 않으면 다시 보간
-        const float Tolerance = 1.0f;
-        FVector TargetCameraPos = (TargetViewMode == EViewMode::FPS) ? FPSCameraPosition : TPSCameraPosition;
-        float TargetArmLength = (TargetViewMode == EViewMode::FPS) ? FPSTargetArmLength : TPSTargetArmLength;
+        InterpAlpha += DeltaTime * InterpSpeed;
+        InterpAlpha = FMath::Clamp(InterpAlpha, 0.0f, 1.0f);
 
-        bool bNeedCorrection = !Camera->GetRelativeLocation().Equals(TargetCameraPos, Tolerance) ||
-            !FMath::IsNearlyEqual(SpringArm->TargetArmLength, TargetArmLength, Tolerance);
+        // Lerp 적용 (현재 위치와 목표 위치 사이를 보간)
+        FVector NewCameraPos = FMath::Lerp(CurrentCameraPos, TargetCameraPos, InterpAlpha);
+        float NewArmLength = FMath::Lerp(CurrentArmLength, TargetArmLength, InterpAlpha);
 
-        if (bNeedCorrection)
+        Camera->SetRelativeLocation(NewCameraPos);
+        SpringArm->TargetArmLength = NewArmLength;
+
+        if (InterpAlpha >= 1.0f)
         {
-            InterpAlpha = 0.0f;
+            // 보정 완료
+            CurrentViewMode = TargetViewMode;
+            InterpAlpha = 0.f; // 다음 보간을 위해 초기화
         }
-
-        return;
-    }
-
-    InterpAlpha += DeltaTime * InterpSpeed;
-    InterpAlpha = FMath::Clamp(InterpAlpha, 0.f, 1.f);
-
-    ApplyCameraTransform(InterpAlpha);
-    ApplySpringArmTransform(InterpAlpha);
-
-    if (InterpAlpha >= 1.f)
-    {
-        CurrentViewMode = TargetViewMode;
-        SpringArm->TargetArmLength = (TargetViewMode == EViewMode::FPS) ? FPSTargetArmLength : TPSTargetArmLength;
     }
 }
 
