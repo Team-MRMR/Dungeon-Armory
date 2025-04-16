@@ -2,6 +2,7 @@
 
 
 #include "Characters/Mannequin/Manny.h"
+#include "Characters/Mannequin/ViewMode/ViewModeComponent.h"
 
 #include "Components/CapsuleComponent.h"
 
@@ -47,15 +48,18 @@ AManny::AManny()
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	CameraSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraSpringArm->SetupAttachment(RootComponent);
+	CameraSpringArm->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
+	CameraSpringArm->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	CameraSpringArm->bInheritYaw   = true;
+	CameraSpringArm->bInheritPitch = true;
+	CameraSpringArm->bInheritRoll  = true;
 
 	// Create a follow camera
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	CameraComponent->SetupAttachment(CameraSpringArm, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	CameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	// Create AIPerceptionStimuliSourceComponent
 	StimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSourceComponent"));
@@ -69,17 +73,6 @@ AManny::AManny()
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
 
 	ViewModeComponent = CreateDefaultSubobject<UViewModeComponent>(TEXT("ViewModeComponent"));
-	ViewModeComponent->RequestViewMode(EViewMode::FPS); // 또는 TPS
-}
-
-FGenericTeamId AManny::GetGenericTeamId() const
-{
-	return TeamComponent->GetGenericTeamId();
-}
-
-void AManny::SetGenericTeamId(const FGenericTeamId& NewTeamID)
-{
-	TeamComponent->SetTeamType(static_cast<ETeamType>(NewTeamID.GetId()));
 }
 
 // Called when the game starts or when spawned
@@ -122,6 +115,16 @@ void AManny::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		// Interact
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AManny::Interact);
 	}
+}
+
+FGenericTeamId AManny::GetGenericTeamId() const
+{
+	return TeamComponent->GetGenericTeamId();
+}
+
+void AManny::SetGenericTeamId(const FGenericTeamId& NewTeamID)
+{
+	TeamComponent->SetTeamType(static_cast<ETeamType>(NewTeamID.GetId()));
 }
 
 void AManny::Move(const FInputActionValue& Value)

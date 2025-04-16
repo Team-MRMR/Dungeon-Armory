@@ -1,89 +1,110 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Characters/Mannequin/ViewMode/ViewModeComponent.h"
 
 #include "GameFramework/Character.h"
+
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Kismet/GameplayStatics.h"
-#include "TimerManager.h"
 
-// Sets default values for this component's properties
 UViewModeComponent::UViewModeComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+    PrimaryComponentTick.bCanEverTick = true;
 }
 
-
-// Called when the game starts
 void UViewModeComponent::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
 
-	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
-	if (!OwnerCharacter) 
-		return;
-
-	SpringArm = OwnerCharacter->FindComponentByClass<USpringArmComponent>();
-	Camera = OwnerCharacter->FindComponentByClass<UCameraComponent>();
-
-	if (!SpringArm || !Camera)
-	{
-		UE_LOG(LogTemp, Error, TEXT("ViewModeComponent: SpringArm 또는 CameraComponent가 존재하지 않습니다."));
-		return;
-	}
-
-	CurrentViewMode = EViewMode::TPS;
-	ApplyViewMode(CurrentViewMode); // 초기 시점 설정
+    OwnerCharacter = Cast<ACharacter>(GetOwner());
+    if (OwnerCharacter)
+    {
+        SpringArm = OwnerCharacter->FindComponentByClass<USpringArmComponent>();
+        
+        Camera = OwnerCharacter->FindComponentByClass<UCameraComponent>();
+		if (Camera)
+		{
+			// 카메라의 초기 위치를 저장
+			Camera->GetRelativeLocation() = TPSCameraPosition;
+		}
+    }
 }
 
-
-// Called every frame
 void UViewModeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!SpringArm) return;
-
-	// 카메라 거리 부드럽게 전환
-	float CurrentLength = SpringArm->TargetArmLength;
-	SpringArm->TargetArmLength = FMath::FInterpTo(CurrentLength, TargetArmLength, DeltaTime, InterpSpeed);
-
-	// 카메라 회전 부드럽게 전환
-	FRotator CurrentRot = SpringArm->GetComponentRotation();
-	SpringArm->SetWorldRotation(FMath::RInterpTo(CurrentRot, TargetRotation, DeltaTime, InterpSpeed));
+    UpdateViewMode(DeltaTime);
 }
 
-void UViewModeComponent::RequestViewMode(EViewMode NewMode)
+void UViewModeComponent::SetIndoorState(bool bIndoor)
 {
-	if (NewMode == CurrentViewMode)
-		return;
+    EViewMode DesiredMode = bIndoor ? EViewMode::FPS : EViewMode::TPS;
 
-	CurrentViewMode = NewMode;
-	ApplyViewMode(NewMode);
+    if (TargetViewMode != DesiredMode)
+    {
+        bIsIndoor = bIndoor;
+        TargetViewMode = DesiredMode;
+        InterpAlpha = 0.0f;
+    }
 }
 
-void UViewModeComponent::ApplyViewMode(EViewMode NewMode)
+void UViewModeComponent::UpdateViewMode(float DeltaTime)
 {
-	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
-	if (!OwnerCharacter || !SpringArm)
-		return;
+    FVector TargetCameraPos = (TargetViewMode == EViewMode::FPS) ? FPSCameraPosition : TPSCameraPosition;
+    float TargetArmLength = (TargetViewMode == EViewMode::FPS) ? FPSTargetArmLength : TPSTargetArmLength;
 
-	if (NewMode == EViewMode::FPS)
-	{
-		TargetArmLength = FPSArmLength;
-		SpringArm->bUsePawnControlRotation = true;
-		TargetRotation = OwnerCharacter->GetControlRotation();
-	}
-	else if (NewMode == EViewMode::TPS)
-	{
-		TargetArmLength = TPSArmLength;
-		SpringArm->bUsePawnControlRotation = false;
-		TargetRotation = OwnerCharacter->GetControlRotation(); // TPS 기준 뒤쪽 시야
-	}
+    FVector CurrentCameraPos = Camera->GetRelativeLocation();
+    float CurrentArmLength = SpringArm->TargetArmLength;
+
+    bool bViewModeChanged = (CurrentViewMode != TargetViewMode);
+
+    const float Tolerance = 1.0f;
+    bool bNeedCorrection =
+        !CurrentCameraPos.Equals(TargetCameraPos, Tolerance) ||
+        !FMath::IsNearlyEqual(CurrentArmLength, TargetArmLength, Tolerance);
+
+    if (bViewModeChanged || bNeedCorrection)
+    {
+        InterpAlpha += DeltaTime * InterpSpeed;
+        InterpAlpha = FMath::Clamp(InterpAlpha, 0.0f, 1.0f);
+
+        // Lerp 적용 (현재 위치와 목표 위치 사이를 보간)
+        FVector NewCameraPos = FMath::Lerp(CurrentCameraPos, TargetCameraPos, InterpAlpha);
+        float NewArmLength = FMath::Lerp(CurrentArmLength, TargetArmLength, InterpAlpha);
+
+        Camera->SetRelativeLocation(NewCameraPos);
+        SpringArm->TargetArmLength = NewArmLength;
+
+        if (InterpAlpha >= 1.0f)
+        {
+            // 보정 완료
+            CurrentViewMode = TargetViewMode;
+            InterpAlpha = 0.f; // 다음 보간을 위해 초기화
+        }
+    }
+}
+
+void UViewModeComponent::ApplyCameraTransform(float Alpha)
+{
+    if (!Camera)
+        return;
+
+    FVector FromPos = (CurrentViewMode == EViewMode::FPS) ? FPSCameraPosition : TPSCameraPosition;
+    FVector ToPos = (TargetViewMode == EViewMode::FPS) ? FPSCameraPosition : TPSCameraPosition;
+
+    FVector NewCameraPosition = FMath::Lerp(FromPos, ToPos, Alpha);
+    Camera->SetRelativeLocation(NewCameraPosition);
+}
+
+void UViewModeComponent::ApplySpringArmTransform(float Alpha)
+{
+    if (!SpringArm)
+        return;
+
+    float FromLength = (CurrentViewMode == EViewMode::FPS) ? FPSTargetArmLength : TPSTargetArmLength;
+    float ToLength = (TargetViewMode == EViewMode::FPS) ? FPSTargetArmLength : TPSTargetArmLength;
+
+    float NewLength = FMath::Lerp(FromLength, ToLength, Alpha);
+    SpringArm->TargetArmLength = NewLength;
 }
