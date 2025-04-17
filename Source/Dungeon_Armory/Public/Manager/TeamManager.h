@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 
+#include "Manager/ManagerBase.h"
 #include "GenericTeamAgentInterface.h"
 #include "AI/Team/TeamInfo.h"
 
@@ -14,23 +15,24 @@
  * 
  */
 UCLASS()
-class DUNGEON_ARMORY_API UTeamManager : public UGameInstanceSubsystem
+class DUNGEON_ARMORY_API UTeamManager : public UManagerBase
 {
 	GENERATED_BODY()
 	
-/*****Variables*****/
+/***** Variables *****/
 private:
-	static UTeamManager* Instance;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team", meta = (AllowPrivateAccess = "true"))
 	TMap<ETeamType, FTeamRelation> TeamRelationMap;
 
-/*****Functions*****/
+/***** Functions (Unreal) *****/
 public:
-	void Initialize(FSubsystemCollectionBase& Collection) override;
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
+/***** Functions (ManagerBase) *****/
+public:
 	static UTeamManager* GetInstance();
 
+/***** Functions (Team) *****/
 public:
 	UFUNCTION(BlueprintCallable, Category = "Team")
 	// 팀의 모든 관계 맵을 가져오는 함수
