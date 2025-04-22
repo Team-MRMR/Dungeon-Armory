@@ -45,6 +45,33 @@ void ANPCAIController::OnPossess(APawn* InPawn)
     }
 }
 
+
+
+ENPCStates ANPCAIController::GetNPCState() const
+{
+    if (BlackboardComponent == nullptr)
+    {
+        return ENPCStates::None;
+    }
+
+    int8 CurrNPCState = BlackboardComponent->GetValueAsEnum(BBKey_NPCState);
+    return static_cast<ENPCStates>(CurrNPCState);
+}
+
+void ANPCAIController::SetNPCState(ENPCStates NewNPCState)
+{
+    if (BlackboardComponent == nullptr)
+    {
+        return;
+    }
+
+    BlackboardComponent->SetValueAsEnum(BBKey_NPCState, static_cast<uint8>(NewNPCState));
+}
+
+
+
+
+
 void ANPCAIController::OnStayCompleted()
 {
     if (GetNPCState() != ENPCStates::Stay)

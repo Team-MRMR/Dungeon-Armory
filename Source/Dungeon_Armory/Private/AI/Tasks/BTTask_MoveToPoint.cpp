@@ -6,7 +6,7 @@
 #include "AITypes.h"                            // FAIRequestID, EPathFollowingRequestResult
 #include "Navigation/PathFollowingComponent.h"  // EPathFollowingResult
 #include "NavigationSystem.h"
-#include "Characters/NPC/NPCAIControllerBase.h"
+#include "Characters/Core/AIControllerBase.h"
 #include "Characters/NPC/NPCBase.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -20,7 +20,7 @@ UBTTask_MoveToPoint::UBTTask_MoveToPoint()
 
 EBTNodeResult::Type UBTTask_MoveToPoint::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-    auto NPCController = Cast<ANPCAIControllerBase>(OwnerComp.GetAIOwner());
+    auto NPCController = Cast<AAIControllerBase>(OwnerComp.GetAIOwner());
     if (!NPCController)
     {
         return EBTNodeResult::Failed;
