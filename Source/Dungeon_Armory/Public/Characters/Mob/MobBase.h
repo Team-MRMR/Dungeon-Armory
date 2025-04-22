@@ -3,19 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Characters/NPC/NPCBase.h"
+#include "GameFramework/Character.h"
 #include "MobBase.generated.h"
 
+class UCharacterStatComponent;
 class UTeamComponent;
 
-/**
- * 
- */
 UCLASS()
-class DUNGEON_ARMORY_API AMobBase : public ACharacter, public IGenericTeamAgentInterface
+class DUNGEON_ARMORY_API AMobBase : public ACharacter
 {
 	GENERATED_BODY()
-	
+
 /***** Unreal *****/
 public:
 	AMobBase();
@@ -25,19 +23,10 @@ protected:
 
 /***** Team *****/
 public:
-	/** Team Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
+	UCharacterStatComponent* StatComponent;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
 	UTeamComponent* TeamComponent;
 
-public:
-	virtual FGenericTeamId GetGenericTeamId() const override;
-	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
-
-/***** AI *****/
-
-/***** Movement *****/
-public:
-	void ResetSpeed();
-	void ApplySpeedModifier(float SpeedMultiplier, float Duration);
-	void SetMovementSpeed(float NewSpeed);
 };

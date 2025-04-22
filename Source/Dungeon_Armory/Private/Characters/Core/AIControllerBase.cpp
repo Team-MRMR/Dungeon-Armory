@@ -34,12 +34,18 @@ AAIControllerBase::AAIControllerBase()
     SightConfig->DetectionByAffiliation.bDetectNeutrals = false;
     SightConfig->DetectionByAffiliation.bDetectFriendlies = false;
 
+	// AIPerceptionComponent에 감지 설정 추가
     AIPerceptionComponent->ConfigureSense(*SightConfig);
     AIPerceptionComponent->SetDominantSense(SightConfig->GetSenseImplementation());
     AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AAIControllerBase::OnTargetPerceived);
 
     // 팀 아이디 초기화
+	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
 	TeamId = FGenericTeamId::NoTeam;
+
+	// 비헤이비어 트리 컴포넌트 초기화
+	BehaviorTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorTreeComponent"));
+	BlackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComponent"));
 }
 
 void AAIControllerBase::BeginPlay()

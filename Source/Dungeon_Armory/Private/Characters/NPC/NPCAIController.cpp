@@ -46,7 +46,6 @@ void ANPCAIController::OnPossess(APawn* InPawn)
 }
 
 
-
 ENPCStates ANPCAIController::GetNPCState() const
 {
     if (BlackboardComponent == nullptr)
@@ -67,9 +66,6 @@ void ANPCAIController::SetNPCState(ENPCStates NewNPCState)
 
     BlackboardComponent->SetValueAsEnum(BBKey_NPCState, static_cast<uint8>(NewNPCState));
 }
-
-
-
 
 
 void ANPCAIController::OnStayCompleted()

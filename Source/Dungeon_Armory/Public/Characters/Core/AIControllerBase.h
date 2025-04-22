@@ -7,13 +7,10 @@
 
 #include "AIControllerBase.generated.h"
 
-
-
 class UAIPerceptionComponent;
 class UAISenseConfig_Sight;
 class UTeamComponent;
 class UBehaviorTreeComponent;
-
 
 /**
  * Base Class에서 Controller의 기능적 역할을 맡고,
@@ -80,6 +77,4 @@ protected:
 	/** 블랙보드에서 NPC의 상태를 저장하는 키 */
 	UPROPERTY(EditDefaultsOnly, Category = "Behavior Tree")
 	FName BBKey_NPCState = "NPCState";
-
-
 };

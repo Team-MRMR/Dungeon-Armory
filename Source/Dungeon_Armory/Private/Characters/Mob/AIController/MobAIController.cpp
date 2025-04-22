@@ -3,16 +3,26 @@
 
 #include "Characters/Mob/AIController/MobAIController.h"
 
+#include "AI/Interface/IMovableTask.h"
+
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
+#include "Navigation/PathFollowingComponent.h"
+#include "NavigationSystem.h"
+#include "NavigationPath.h"
+
+
 AMobAIController::AMobAIController()
 {
+    PrimaryActorTick.bCanEverTick = false;
 }
 
 void AMobAIController::BeginPlay()
 {
+    Super::BeginPlay();
+
 }
 
 void AMobAIController::OnPossess(APawn* InPawn)
@@ -30,12 +40,26 @@ void AMobAIController::OnPossess(APawn* InPawn)
         if (BlackboardComponent)
         {
             BlackboardComponent->SetValueAsVector("HomeLocation", GetPawn()->GetActorLocation());
-
-            // 비헤이비어 트리 실행 (이 시점에서 BehaviorTreeComponent가 자동으로 생성됨)
-            RunBehaviorTree(BehaviorTree);
-
-            // 내부적으로 생성된 BehaviorTreeComponent를 가져와서 멤버 변수에 할당
-            BehaviorTreeComponent = FindComponentByClass<UBehaviorTreeComponent>();
         }
+
+        // 비헤이비어 트리 실행 (이 시점에서 BehaviorTreeComponent가 자동으로 생성됨)
+        RunBehaviorTree(BehaviorTree);
+
+        // 내부적으로 생성된 BehaviorTreeComponent를 가져와서 멤버 변수에 할당
+        BehaviorTreeComponent = FindComponentByClass<UBehaviorTreeComponent>();
     }
+}
+
+void AMobAIController::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
+{
+    const UBTNode* ActiveNode = (BehaviorTreeComponent->GetActiveNode());
+    if (ActiveNode)
+	{
+        // IIMovableTask 인터페이스를 사용하여 이동 완료 처리
+        IIMovableTask* MovableTask = const_cast<IIMovableTask*>(Cast<IIMovableTask>(ActiveNode));
+        if (MovableTask)
+        {
+            MovableTask->OnMoveCompleted(BehaviorTreeComponent);
+        }
+	}
 }

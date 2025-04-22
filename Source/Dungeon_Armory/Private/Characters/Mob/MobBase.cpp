@@ -2,48 +2,35 @@
 
 
 #include "Characters/Mob/MobBase.h"
-
-#include "AI/Team/TeamComponent.h"
+#include "Characters/Core/CharacterStatComponent.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 
+#include "AI/Team/TeamComponent.h"
+
+// Sets default values
 AMobBase::AMobBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
+
+	// 컨트롤러 회전 제어 해제
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+
+	// 이동	방향으로 회전하도록 설정
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	// 스탯 컴포넌트 생성
+	StatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("StatComponent"));
 
 	// 팀 컴포넌트 생성
 	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
 }
 
+// Called when the game starts or when spawned
 void AMobBase::BeginPlay()
 {
-}
-
-FGenericTeamId AMobBase::GetGenericTeamId() const
-{
-	return TeamComponent->GetGenericTeamId();
-}
-
-void AMobBase::SetGenericTeamId(const FGenericTeamId& NewTeamID)
-{
-	TeamComponent->SetTeamType(static_cast<ETeamType>(NewTeamID.GetId()));
-}
-
-void AMobBase::ResetSpeed()
-{
-	//SetMovementSpeed(BaseSpeed);
-}
-
-void AMobBase::ApplySpeedModifier(float SpeedMultiplier, float Duration)
-{
-	//float NewSpeed = BaseSpeed * SpeedMultiplier;
-	//SetMovementSpeed(NewSpeed);
-
-	//// 일정 시간이 지나면 원래 속도로 복귀
-	//GetWorldTimerManager().SetTimer(SpeedResetTimer, this, &ANPCCharacter::ResetSpeed, Duration, false);
-}
-
-void AMobBase::SetMovementSpeed(float NewSpeed)
-{
-	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
+	Super::BeginPlay();
+	
 }
