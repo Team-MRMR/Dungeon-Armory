@@ -6,16 +6,6 @@
 #include "Components/ActorComponent.h"
 #include "CharacterStatComponent.generated.h"
 
-UENUM(BlueprintType)
-enum class ECharacterState : uint8
-{
-    Idle,
-    Patrol,
-    Chase,
-    Battle,
-    Dead
-};
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DUNGEON_ARMORY_API UCharacterStatComponent : public UActorComponent
 {
@@ -29,6 +19,11 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+/***** Character *****/
+private:
+    ACharacter* OwnerCharacter;
+
+/***** Stat *****/
 public:
     // --- 스탯 (공통 속성) ---
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
@@ -43,37 +38,22 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
     float Defense = 5.f;
 
-    // --- 이동 속도 상태별 설정 ---
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-    float IdleSpeed = 0.f;
+    float BaseSpeed = 250;
 
+    // --- 이동 속도 변화 계수 ---
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-    float PatrolSpeed = 250.f;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-    float ChaseSpeed = 500.f;
+    float IdleSpeedOffset = 0.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-    float CombatSpeed = 350.f;
+    float PatrolSpeedOffset = 1.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-    float DeadSpeed = 0.f;
+    float ChaseSpeedOffset = 1.f;
 
-public:
-    void ResetSpeed();
-    void ApplySpeedModifier(float SpeedMultiplier, float Duration);
-    void SetMovementSpeed(float NewSpeed);
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    float CombatSpeedOffset = 1.f;
 
-public:
-    // 상태에 따라 속도 반환
-    UFUNCTION(BlueprintCallable, Category = "Stat")
-    float GetSpeedForState(ECharacterState State) const;
-
-    // 체력 관련 함수
-    UFUNCTION(BlueprintCallable, Category = "Stat")
-    void ApplyDamage(float DamageAmount);
-
-    UFUNCTION(BlueprintCallable, Category = "Stat")
-    bool IsDead() const;
-		
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    float DeadSpeedOffset = 0.f;
 };

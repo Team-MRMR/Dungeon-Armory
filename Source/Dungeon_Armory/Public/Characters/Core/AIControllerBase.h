@@ -34,7 +34,7 @@ protected:
 protected:
     // AI 감지 시스템
     UPROPERTY(VisibleAnywhere, Category = "AI")
-    UAIPerceptionComponent* AIPerceptionComponent;
+    UAIPerceptionComponent* AIPerception;
 
     // AI 시각 감지 설정
     UPROPERTY(VisibleAnywhere, Category = "AI")
