@@ -20,9 +20,7 @@ protected:
 
 /***** Variables ******/
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team", meta = (AllowPrivateAccess = "true"))
-	ETeamType TeamType;
-
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Team", meta = (AllowPrivateAccess = "true"))
 	FGenericTeamId TeamId;
 
 /***** Functions *****/

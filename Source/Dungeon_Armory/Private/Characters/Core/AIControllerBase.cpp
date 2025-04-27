@@ -4,9 +4,6 @@
 #include "Characters/Core/AIControllerBase.h"
 #include "Characters/NPC/NPCBase.h"
 
-#include "Perception/AIPerceptionComponent.h"
-#include "Perception/AISenseConfig_Sight.h"
-
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -23,27 +20,8 @@ AAIControllerBase::AAIControllerBase()
     AIPerception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception"));
     SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
 
-    // 감지 범위 설정
-    SightConfig->SightRadius = 1500.0f; // AI가 감지할 최대 거리
-    SightConfig->LoseSightRadius = 1800.0f; // 감지 후 잃어버리는 거리
-    SightConfig->PeripheralVisionAngleDegrees = 90.0f; // 시야각 120도
-    SightConfig->SetMaxAge(5.0f); // 감지 정보 유지 시간
-
-    // 감지 설정 적용
-    SightConfig->DetectionByAffiliation.bDetectEnemies = true;
-    SightConfig->DetectionByAffiliation.bDetectNeutrals = false;
-    SightConfig->DetectionByAffiliation.bDetectFriendlies = false;
-
-	// AIPerceptionComponent에 감지 설정 추가
-    AIPerception->ConfigureSense(*SightConfig);
-    AIPerception->SetDominantSense(SightConfig->GetSenseImplementation());
-
-	// 감지 이벤트 처리
-    AIPerception->OnTargetPerceptionUpdated.AddDynamic(this, &AAIControllerBase::OnTargetPerceived);
-
-    // 팀 아이디 초기화
+    // 팀 컴포넌트 생성
 	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
-	TeamId = FGenericTeamId::NoTeam;
 
 	// 비헤이비어 트리 컴포넌트 초기화
 	BehaviorTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorTreeComponent"));
@@ -70,12 +48,6 @@ void AAIControllerBase::OnPossess(APawn* InPawn)
     }
 }
 
-void AAIControllerBase::Tick(float DeltaTime)
-{
-    Super::Tick(DeltaTime);
-
-}
-
 ETeamAttitude::Type AAIControllerBase::GetTeamAttitudeTowards(const AActor& Other) const
 {
     if (TeamComponent)
@@ -95,23 +67,3 @@ FGenericTeamId AAIControllerBase::GetGenericTeamId() const
 
     return FGenericTeamId::NoTeam;
 }
-
-// 감지 이벤트 처리
-void AAIControllerBase::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
-{
-    if (BlackboardComponent == nullptr)
-    {
-        return;
-    }
-    bool bDetectedTarget = Stimulus.WasSuccessfullySensed();
-    if (bDetectedTarget)
-    {
-        BlackboardComponent->SetValueAsObject("Target", Actor);
-    }
-    else
-    {
-        BlackboardComponent->SetValueAsObject("Target", nullptr);
-    }
-}
-
-

@@ -4,6 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+
+#include "GenericTeamAgentInterface.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Sight.h"
+
 #include "MobBase.generated.h"
 
 class UCharacterStatComponent;
@@ -23,7 +28,7 @@ enum class EMobState : uint8
 };
 
 UCLASS()
-class DUNGEON_ARMORY_API AMobBase : public ACharacter
+class DUNGEON_ARMORY_API AMobBase : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -34,9 +39,11 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-/***** Team *****/
+	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
+/***** Team *****/
+public:
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
 	UTeamComponent* TeamComponent;
 
 /***** State *****/

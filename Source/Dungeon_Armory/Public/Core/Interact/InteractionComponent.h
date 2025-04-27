@@ -26,6 +26,7 @@ public:
 
 /***** Interact *****/
 private:
+	AActor* OwnerActor;
 	AActor* CurrentTarget;
 	float TraceDistance = 500.f;
 

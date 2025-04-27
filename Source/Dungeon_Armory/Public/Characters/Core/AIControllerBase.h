@@ -5,12 +5,17 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Sight.h"
+
 #include "AIControllerBase.generated.h"
 
 class UAIPerceptionComponent;
 class UAISenseConfig_Sight;
 class UTeamComponent;
 class UBehaviorTreeComponent;
+
+struct FAIStimulus;
 
 /**
  * Base Class에서 Controller의 기능적 역할을 맡고,
@@ -27,23 +32,25 @@ public:
 
 protected:
 	virtual void BeginPlay() override;				// Called when the game starts or when spawned
-	virtual void Tick(float DeltaTime) override;	// Called every frame
 	virtual void OnPossess(APawn* InPawn) override;	// Called when the controller possess a Pawn
 
 /***** AI *****/
 protected:
-    // AI 감지 시스템
-    UPROPERTY(VisibleAnywhere, Category = "AI")
-    UAIPerceptionComponent* AIPerception;
+	// 현재 감지 중인 플레이어 참조
+	UPROPERTY(BlueprintReadOnly, Category = "AI")
+	AActor* DetectedPlayer;
 
-    // AI 시각 감지 설정
-    UPROPERTY(VisibleAnywhere, Category = "AI")
-    UAISenseConfig_Sight* SightConfig;
+	// AI 감지 시스템
+	UPROPERTY(VisibleAnywhere, Category = "AI")
+	UAIPerceptionComponent* AIPerception;
+
+	// AI 시각 감지 설정
+	UPROPERTY(VisibleAnywhere, Category = "AI")
+	UAISenseConfig_Sight* SightConfig;
 
 protected:
 	// 감지 처리 함수
-	UFUNCTION()
-	void OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus);
+	virtual void OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus) { };
 
 /***** Team *****/
 protected:

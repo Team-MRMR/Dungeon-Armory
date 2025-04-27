@@ -15,7 +15,6 @@ UInteractableComponent::UInteractableComponent()
 
 void UInteractableComponent::Interact_Implementation(AActor* Caller)
 {
-    UE_LOG(LogTemp, Log, TEXT("Interacted with: %s by %s"), *GetOwner()->GetName(), *Caller->GetName());
     // 실제 로직은 여기서 구현
 }
 
@@ -32,14 +31,12 @@ void UInteractableComponent::EnableOutline_Implementation()
 	TArray<UStaticMeshComponent*> MeshComponents;
 	OwnerActor->GetComponents<UStaticMeshComponent>(MeshComponents);
 
-	UE_LOG(LogTemp, Warning, TEXT("Outside Enabling outline"));
 	for (auto* MeshComp : MeshComponents)
 	{
 		if (MeshComp)
 		{
 			MeshComp->SetRenderCustomDepth(true);
-			MeshComp->SetCustomDepthStencilValue(1); // 예: 하이라이트용 스텐실 값
-			UE_LOG(LogTemp, Warning, TEXT("Inside Enabled outline for: %s"), *MeshComp->GetName());
+			MeshComp->SetCustomDepthStencilValue(1); // 예: 하이라이트용 스텐실
 		}
 	}
 }
@@ -52,13 +49,11 @@ void UInteractableComponent::DisableOutline_Implementation()
 	TArray<UStaticMeshComponent*> MeshComponents;
 	OwnerActor->GetComponents<UStaticMeshComponent>(MeshComponents);
 
-	UE_LOG(LogTemp, Warning, TEXT("Outside Disabling outline"));
 	for (auto* MeshComp : MeshComponents)
 	{
 		if (MeshComp)
 		{
 			MeshComp->SetRenderCustomDepth(false);
-			UE_LOG(LogTemp, Warning, TEXT("Inside Disabled outline for: %s"), *MeshComp->GetName());
 		}
 	}
 }

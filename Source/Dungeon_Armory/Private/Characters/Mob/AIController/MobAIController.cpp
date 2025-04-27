@@ -9,14 +9,32 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Sight.h"
+
 #include "Navigation/PathFollowingComponent.h"
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
 
-
 AMobAIController::AMobAIController()
 {
     PrimaryActorTick.bCanEverTick = false;
+
+    SightConfig->SightRadius = 500.0f;
+    SightConfig->LoseSightRadius = 700.f;
+    SightConfig->PeripheralVisionAngleDegrees = 60.f;
+    SightConfig->DetectionByAffiliation.bDetectEnemies = true;
+    SightConfig->DetectionByAffiliation.bDetectFriendlies = false;
+    SightConfig->DetectionByAffiliation.bDetectNeutrals = false;
+
+    // Perception 컴포넌트에 시야 감지 설정 추가
+    AIPerception->ConfigureSense(*SightConfig);
+
+    // 우선순위가 가장 높은 감각으로 설정
+    AIPerception->SetDominantSense(SightConfig->GetSenseImplementation());
+
+    // 감지 이벤트 콜백 등록
+    AIPerception->OnTargetPerceptionUpdated.AddDynamic(this, &AMobAIController::OnTargetPerceived);
 }
 
 void AMobAIController::BeginPlay()
@@ -62,4 +80,32 @@ void AMobAIController::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingRes
             MovableTask->OnMoveCompleted(BehaviorTreeComponent);
         }
 	}
+}
+
+// 감지 이벤트 처리
+void AMobAIController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
+{
+    if (!Actor)
+        return;
+
+    if (!BlackboardComponent)
+        return;
+
+    bool bDetectedTarget = Stimulus.WasSuccessfullySensed();
+    if (bDetectedTarget)
+    {
+        // 플레이어가 감지됨
+        DetectedPlayer = Actor;
+        BlackboardComponent->SetValueAsObject("Target", Actor);
+    }
+    else
+    {
+        // 플레이어를 놓침
+        if (DetectedPlayer == Actor)
+        {
+            DetectedPlayer = nullptr;
+            BlackboardComponent->SetValueAsObject("Target", nullptr);
+            // 상태를 Idle이나 Patrol로 변경하는 로직 추가
+        }
+    }
 }
