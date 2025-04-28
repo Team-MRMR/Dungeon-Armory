@@ -2,6 +2,7 @@
 
 
 #include "Characters/Mob/AIController/MobAIController.h"
+#include "Characters/Mob/MobBase.h"
 
 #include "AI/Interface/IMovableTask.h"
 
@@ -15,6 +16,8 @@
 #include "Navigation/PathFollowingComponent.h"
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
+
+const FName AMobAIController::MobStateKey(TEXT("MobState"));
 
 AMobAIController::AMobAIController()
 {
@@ -40,13 +43,21 @@ AMobAIController::AMobAIController()
 void AMobAIController::BeginPlay()
 {
     Super::BeginPlay();
-
 }
 
 void AMobAIController::OnPossess(APawn* InPawn)
 {
     // 팀 컴포넌트 설정
     Super::OnPossess(InPawn);
+
+    // 스탯 컴포넌트 참조 할당
+    if (ACharacter* MobCharacter = Cast<ACharacter>(GetPawn()))
+    {
+        if (AMobBase* MobBase = Cast<AMobBase>(MobCharacter))
+        {
+            StatComponent = MobBase->FindComponentByClass<UCharacterStatComponent>();
+        }
+    }
 
     // 비헤이비어 트리 실행
     if (BehaviorTree && BehaviorTree->BlackboardAsset)
@@ -57,7 +68,7 @@ void AMobAIController::OnPossess(APawn* InPawn)
         // 블랙보드 변수 초기화
         if (BlackboardComponent)
         {
-            BlackboardComponent->SetValueAsVector("HomeLocation", GetPawn()->GetActorLocation());
+            InitializeBlackboardKeys();
         }
 
         // 비헤이비어 트리 실행 (이 시점에서 BehaviorTreeComponent가 자동으로 생성됨)
@@ -68,18 +79,42 @@ void AMobAIController::OnPossess(APawn* InPawn)
     }
 }
 
+void AMobAIController::SetMobState(EMobState NewState)
+{
+    EMobState CurrState = static_cast<EMobState>(BlackboardComponent->GetValueAsEnum(MobStateKey));
+    if (CurrState == NewState)
+    {
+        return;  // 동일 상태로의 변경은 무시
+    }
+
+    // 블랙보드에 상태 업데이트
+    if (BlackboardComponent)
+    {
+        BlackboardComponent->SetValueAsEnum(MobStateKey, static_cast<uint8>(NewState));
+    }
+}
+
+void AMobAIController::InitializeBlackboardKeys()
+{
+    BlackboardComponent->SetValueAsVector("HomeLocation", GetPawn()->GetActorLocation());
+    BlackboardComponent->SetValueAsEnum("MobState", static_cast<uint8>(EMobState::Patrol));
+
+    BlackboardComponent->SetValueAsFloat(BBKeys::PatrolRadius, StatComponent->PatrolRadius);
+    BlackboardComponent->SetValueAsFloat(BBKeys::AcceptableRadius, StatComponent->AcceptableRadius);
+}
+
 void AMobAIController::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
 {
     const UBTNode* ActiveNode = (BehaviorTreeComponent->GetActiveNode());
     if (ActiveNode)
-	{
+    {
         // IIMovableTask 인터페이스를 사용하여 이동 완료 처리
         IIMovableTask* MovableTask = const_cast<IIMovableTask*>(Cast<IIMovableTask>(ActiveNode));
         if (MovableTask)
         {
             MovableTask->OnMoveCompleted(BehaviorTreeComponent);
         }
-	}
+    }
 }
 
 // 감지 이벤트 처리
@@ -91,21 +126,28 @@ void AMobAIController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
     if (!BlackboardComponent)
         return;
 
+	UE_LOG(LogTemp, Warning, TEXT("Perceived Actor: %s"), *Actor->GetName());
+
     bool bDetectedTarget = Stimulus.WasSuccessfullySensed();
     if (bDetectedTarget)
     {
         // 플레이어가 감지됨
         DetectedPlayer = Actor;
         BlackboardComponent->SetValueAsObject("Target", Actor);
+        BlackboardComponent->SetValueAsEnum(MobStateKey, static_cast<uint8>(EMobState::Chase));
     }
-    else
+    else if(DetectedPlayer == Actor)
     {
         // 플레이어를 놓침
-        if (DetectedPlayer == Actor)
-        {
-            DetectedPlayer = nullptr;
-            BlackboardComponent->SetValueAsObject("Target", nullptr);
-            // 상태를 Idle이나 Patrol로 변경하는 로직 추가
-        }
+        DetectedPlayer = nullptr;
+        BlackboardComponent->SetValueAsObject("Target", nullptr);
+        BlackboardComponent->SetValueAsEnum(MobStateKey, static_cast<uint8>(EMobState::Patrol));
+    }
+
+    StopMovement();
+    // 현재 실행 중인 BT Task 중단 (Patrol Task 중단)
+    if (BehaviorTreeComponent)
+    {
+        BehaviorTreeComponent->RequestExecution(EBTNodeResult::Type::Aborted);
     }
 }

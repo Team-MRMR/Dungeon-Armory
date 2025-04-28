@@ -6,36 +6,26 @@
 #include "AI/Interface/IMovableTask.h"
 
 #include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
-
-#include "BTTask_Patrol.generated.h"
+#include "BTTask_Chase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DUNGEON_ARMORY_API UBTTask_Patrol : public UBTTask_BlackboardBase, public IIMovableTask
+class DUNGEON_ARMORY_API UBTTask_Chase : public UBTTask_BlackboardBase, public IIMovableTask
 {
 	GENERATED_BODY()
 	
 public:
-	UBTTask_Patrol();
+	UBTTask_Chase();
 
-/***** Patrol *****/
-
-protected:
-	/** HomeLocation ≈∞ º±≈√ */
-	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	FBlackboardKeySelector BBkey_HomeLocation;
-	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	FBlackboardKeySelector BBkey_PatrolRadius;
+private:
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FBlackboardKeySelector BBkey_AcceptableRadius;
 
-
-/***** Task *****/
 protected:
 	virtual void InitializeFromAsset(UBehaviorTree& BehaviorTree) override;
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+    virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 protected:  // IIMovableTask
 	void OnMoveCompleted(UBehaviorTreeComponent* BehaviorTreeComponent) override;
