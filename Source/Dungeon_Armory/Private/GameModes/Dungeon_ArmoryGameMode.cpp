@@ -7,10 +7,9 @@
 ADungeon_ArmoryGameMode::ADungeon_ArmoryGameMode()
 {
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Characters/Player/Mannequin/Blueprints/BP_Manny"));
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPerson/Blueprints/BP_ThirdPersonCharacter"));
 	if (PlayerPawnBPClass.Class != NULL)
 	{
-
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 }
