@@ -15,11 +15,13 @@ class DUNGEON_ARMORY_API UTeamComponent : public UActorComponent, public IGeneri
 {
 	GENERATED_BODY()
 
+protected:
+    virtual void BeginPlay() override;
+
 /***** Variables ******/
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team", meta = (AllowPrivateAccess = "true"))
-	ETeamType TeamType;
-
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Team", meta = (AllowPrivateAccess = "true"))
+    ETeamType TeamType;
 	FGenericTeamId TeamId;
 
 /***** Functions *****/
@@ -42,7 +44,4 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Team")
     void SetTeamType(const ETeamType NewTeamType);
-
-protected:
-	virtual void BeginPlay() override;
 };

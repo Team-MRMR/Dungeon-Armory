@@ -1,7 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Characters/Mannequin/Manny.h"
+#include "Characters/Mannequin/ViewMode/ViewModeComponent.h"
 
 #include "Components/CapsuleComponent.h"
 
@@ -14,13 +15,17 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 
+#include "Core/Interact/InteractionComponent.h"
+
+#include "Kismet/KismetSystemLibrary.h"
+
 #include "Manager/TeamManager.h"
 
 // Sets default values
 AManny::AManny()
 {
 	// Set size for collision capsule
-	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+	GetCapsuleComponent()->InitCapsuleSize(42.0f, 96.0f);
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
@@ -41,34 +46,29 @@ AManny::AManny()
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	CameraSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraSpringArm->SetupAttachment(RootComponent);
+	CameraSpringArm->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
+	CameraSpringArm->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	CameraSpringArm->bInheritYaw   = true;
+	CameraSpringArm->bInheritPitch = true;
+	CameraSpringArm->bInheritRoll  = true;
 
 	// Create a follow camera
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	CameraComponent->SetupAttachment(CameraSpringArm, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	CameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	// Create AIPerceptionStimuliSourceComponent
 	StimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSourceComponent"));
 	
-	// Create Team Component and 
+	// Create Team Component and Setting
 	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
+	TeamComponent->SetTeamType(ETeamType::Player);
 
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
-	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
-}
+	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
 
-FGenericTeamId AManny::GetGenericTeamId() const
-{
-	return TeamComponent->GetGenericTeamId();
-}
-
-void AManny::SetGenericTeamId(const FGenericTeamId& NewTeamID)
-{
-	TeamComponent->SetTeamType(static_cast<ETeamType>(NewTeamID.GetId()));
+	ViewModeComponent = CreateDefaultSubobject<UViewModeComponent>(TEXT("ViewModeComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -87,12 +87,13 @@ void AManny::BeginPlay()
 			Subsystem->AddMappingContext(MappingContext, 0);
 		}
 	}
-
 }
 
 // Called to bind functionality to input
 void AManny::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 
@@ -105,7 +106,20 @@ void AManny::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AManny::Look);
+
+		// Interact
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AManny::Interact);
 	}
+}
+
+FGenericTeamId AManny::GetGenericTeamId() const
+{
+	return TeamComponent->GetGenericTeamId();
+}
+
+void AManny::SetGenericTeamId(const FGenericTeamId& NewTeamID)
+{
+	TeamComponent->SetTeamType(static_cast<ETeamType>(NewTeamID.GetId()));
 }
 
 void AManny::Move(const FInputActionValue& Value)
@@ -141,5 +155,13 @@ void AManny::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void AManny::Interact(const FInputActionValue& Value)
+{
+	if (UInteractionComponent* InteractionComp = FindComponentByClass<UInteractionComponent>())
+	{
+		InteractionComp->TryInteract();
 	}
 }
