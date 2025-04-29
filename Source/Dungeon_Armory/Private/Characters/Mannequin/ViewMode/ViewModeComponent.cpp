@@ -25,7 +25,7 @@ void UViewModeComponent::BeginPlay()
 		if (Camera)
 		{
 			// 카메라의 초기 위치를 저장
-			Camera->GetRelativeLocation() = TPSCameraPosition;
+			Camera->GetRelativeLocation() = FPSCameraPosition;
 		}
 
         Mesh = OwnerCharacter->GetMesh();
