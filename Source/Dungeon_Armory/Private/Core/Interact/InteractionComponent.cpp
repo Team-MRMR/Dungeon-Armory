@@ -4,6 +4,10 @@
 #include "Core/Interact/InteractableComponent.h"
 #include "Core/Interact/Interface/Interactable.h"
 
+#include "Characters/Mannequin/Manny.h"
+
+#include "Camera/CameraComponent.h"
+
 // Sets default values for this component's properties
 UInteractionComponent::UInteractionComponent()
 {
@@ -16,11 +20,8 @@ UInteractionComponent::UInteractionComponent()
 void UInteractionComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
+    OwnerActor = GetOwner();
 }
-
 
 // Called every frame
 void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -43,17 +44,17 @@ void UInteractionComponent::TryInteract()
 
 void UInteractionComponent::TraceForInteractable()
 {
-    AActor* Owner = GetOwner();
-    if (!Owner) return;
+    if (!OwnerActor)
+        return;
 
     FVector Start, End;
     FRotator ViewRot;
-    Owner->GetActorEyesViewPoint(Start, ViewRot);
+    OwnerActor->GetActorEyesViewPoint(Start, ViewRot);
     End = Start + ViewRot.Vector() * TraceDistance;
 
     FHitResult Hit;
     FCollisionQueryParams Params;
-    Params.AddIgnoredActor(Owner);
+    Params.AddIgnoredActor(OwnerActor);
 
     bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
     AActor* HitActor = bHit ? Hit.GetActor() : nullptr;
@@ -79,7 +80,7 @@ void UInteractionComponent::TraceForInteractable()
     if (HitActor)
     {
         UInteractableComponent* NewInteractable = HitActor->FindComponentByClass<UInteractableComponent>();
-        if (NewInteractable && NewInteractable->CanInteract(Owner))
+        if (NewInteractable && NewInteractable->CanInteract(OwnerActor))
         {
             NewInteractable->EnableOutline();
             CurrentTarget = HitActor;

@@ -19,8 +19,6 @@
 
 #include "Kismet/KismetSystemLibrary.h"
 
-#include "DrawDebugHelpers.h" // 디버그를 위한 헤더 추가
-
 #include "Manager/TeamManager.h"
 
 // Sets default values
@@ -64,11 +62,9 @@ AManny::AManny()
 	// Create AIPerceptionStimuliSourceComponent
 	StimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSourceComponent"));
 	
-	// Create Team Component and 
+	// Create Team Component and Setting
 	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
-
-	SightSource = CreateDefaultSubobject<USceneComponent>(TEXT("Sight Source"));
-	SightSource->SetupAttachment(RootComponent);
+	TeamComponent->SetTeamType(ETeamType::Player);
 
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
 
@@ -91,7 +87,6 @@ void AManny::BeginPlay()
 			Subsystem->AddMappingContext(MappingContext, 0);
 		}
 	}
-
 }
 
 // Called to bind functionality to input

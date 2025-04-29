@@ -7,18 +7,15 @@
 // Sets default values for this component's properties
 UTeamComponent::UTeamComponent()
 {
-	TeamType = ETeamType::None;
+    TeamType = ETeamType::None;
 	TeamId = FGenericTeamId::NoTeam;
 }
 
-ETeamType UTeamComponent::GetTeamType() const
+void UTeamComponent::BeginPlay()
 {
-	return static_cast<ETeamType>(TeamId.GetId());
-}
+    Super::BeginPlay();
 
-void UTeamComponent::SetTeamType(const ETeamType NewTeamType)
-{
-	SetGenericTeamId(FGenericTeamId(static_cast<uint8>(NewTeamType)));
+	SetTeamType(TeamType);
 }
 
 ETeamAttitude::Type UTeamComponent::GetTeamAttitudeTowards(const AActor& Other) const
@@ -36,22 +33,26 @@ ETeamAttitude::Type UTeamComponent::GetTeamAttitudeTowards(const AActor& Other) 
         return ETeamAttitude::Neutral;
     }
 
-	return ETeamAttitude::Neutral;
+    return ETeamAttitude::Neutral;
+}
+
+ETeamType UTeamComponent::GetTeamType() const
+{
+	return static_cast<ETeamType>(TeamId.GetId());
+}
+
+void UTeamComponent::SetTeamType(const ETeamType NewTeamType)
+{
+	SetGenericTeamId(FGenericTeamId(static_cast<uint8>(NewTeamType)));
 }
 
 FGenericTeamId UTeamComponent::GetGenericTeamId() const
 {
-	return TeamId;
+    return TeamId;
 }
 
 void UTeamComponent::SetGenericTeamId(const FGenericTeamId& NewTeamId)
 {
-	TeamId = NewTeamId;
+    TeamId = NewTeamId;
 }
 
-void UTeamComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	SetGenericTeamId(FGenericTeamId(static_cast<uint8>(TeamType)));
-}

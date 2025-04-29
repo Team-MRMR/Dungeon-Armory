@@ -27,6 +27,8 @@ void UViewModeComponent::BeginPlay()
 			// 카메라의 초기 위치를 저장
 			Camera->GetRelativeLocation() = TPSCameraPosition;
 		}
+
+        Mesh = OwnerCharacter->GetMesh();
     }
 }
 
@@ -75,6 +77,19 @@ void UViewModeComponent::UpdateViewMode(float DeltaTime)
 
         Camera->SetRelativeLocation(NewCameraPos);
         SpringArm->TargetArmLength = NewArmLength;
+
+        // 메시 렌더링 설정
+        if (Mesh)
+        {
+            if (InterpAlpha > FPSRenderOffTiming && TargetViewMode == EViewMode::FPS)
+            {
+                Mesh->SetOwnerNoSee(true);
+            }
+            else if (InterpAlpha > TPSRenderOffTiming && TargetViewMode == EViewMode::TPS)
+            {
+                Mesh->SetOwnerNoSee(false);
+            }
+        }
 
         if (InterpAlpha >= 1.0f)
         {

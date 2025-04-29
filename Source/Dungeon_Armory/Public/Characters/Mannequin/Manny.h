@@ -24,7 +24,6 @@ class DUNGEON_ARMORY_API AManny : public ACharacter, public IGenericTeamAgentInt
 
 /***** Variables *****/
 private:
-
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraSpringArm;
@@ -60,9 +59,6 @@ private:
 	/** Interact Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = LookAt, meta = (AllowPrivateAccess = "true"))
-	class USceneComponent* SightSource;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
 	class UInteractionComponent* InteractionComponent;

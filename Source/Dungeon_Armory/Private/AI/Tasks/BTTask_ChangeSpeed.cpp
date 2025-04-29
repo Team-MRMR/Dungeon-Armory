@@ -5,7 +5,7 @@
 
 #include "BehaviorTree/BlackboardComponent.h"
 
-#include "Characters/NPC/NPCAIControllerBase.h"
+#include "Characters/NPC/NPCAIController.h"
 #include "Characters/NPC/NPCBase.h"
 
 UBTTask_ChangeSpeed::UBTTask_ChangeSpeed()
@@ -15,7 +15,7 @@ UBTTask_ChangeSpeed::UBTTask_ChangeSpeed()
 
 EBTNodeResult::Type UBTTask_ChangeSpeed::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	auto NPCController = Cast<ANPCAIControllerBase>(OwnerComp.GetAIOwner());
+	auto NPCController = Cast<AAIControllerBase>(OwnerComp.GetAIOwner());
 	if (!NPCController)
 	{
 		return EBTNodeResult::Failed;

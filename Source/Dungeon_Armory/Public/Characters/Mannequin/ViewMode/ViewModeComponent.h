@@ -26,12 +26,15 @@ public:
 
     void SetIndoorState(bool bIndoor);
 
+
 private:
     void UpdateViewMode(float DeltaTime);
     void ApplyCameraTransform(float Alpha);
     void ApplySpringArmTransform(float Alpha);
 
 private:
+    USkeletalMeshComponent* Mesh = nullptr;
+
     ACharacter* OwnerCharacter = nullptr;
     USpringArmComponent* SpringArm = nullptr;
     UCameraComponent* Camera = nullptr;
@@ -57,4 +60,10 @@ private:
 
     UPROPERTY(EditAnywhere, Category = "ViewMode | TPS")
     float TPSTargetArmLength = 400.0f;
+
+    UPROPERTY(EditAnywhere, Category = "ViewMode | FPS")
+    float FPSRenderOffTiming = 0.0f;
+
+    UPROPERTY(EditAnywhere, Category = "ViewMode | TPS")
+    float TPSRenderOffTiming = 0.f;
 };
