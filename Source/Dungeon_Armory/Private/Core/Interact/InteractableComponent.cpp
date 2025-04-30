@@ -15,6 +15,7 @@ UInteractableComponent::UInteractableComponent()
 
 void UInteractableComponent::Interact_Implementation(AActor* Caller)
 {
+	UE_LOG(LogTemp, Warning, TEXT("UInteractableComponent::Interact Called"));
     // 실제 로직은 여기서 구현
 }
 

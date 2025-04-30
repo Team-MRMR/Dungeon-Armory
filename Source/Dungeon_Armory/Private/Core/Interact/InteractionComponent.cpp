@@ -37,6 +37,7 @@ void UInteractionComponent::TryInteract()
         UInteractableComponent* InteractableComp = CurrentTarget->FindComponentByClass<UInteractableComponent>();
         if (InteractableComp && InteractableComp->CanInteract(GetOwner()))
         {
+			UE_LOG(LogTemp, Warning, TEXT("UInteractionComponent::TryInteract() Called"));
             InteractableComp->Interact(GetOwner());
         }
     }

@@ -162,6 +162,7 @@ void AManny::Interact(const FInputActionValue& Value)
 {
 	if (UInteractionComponent* InteractionComp = FindComponentByClass<UInteractionComponent>())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("AManny::Interact() Called"));
 		InteractionComp->TryInteract();
 	}
 }
