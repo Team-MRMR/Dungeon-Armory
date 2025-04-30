@@ -3,8 +3,8 @@
 
 #include "Characters/Mob/MobBase.h"
 
-#include "Characters/Core/CharacterStatComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Characters/Core/Component/CharacterStatComponent.h"
 #include "AI/Team/TeamComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -47,4 +47,12 @@ void AMobBase::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation
 {
 	OutLocation = GetMesh()->GetSocketLocation(FName("EyeSocket"));	// 머리 위치를 기준으로 시점 설정
 	OutRotation = GetMesh()->GetSocketRotation(FName("EyeSocket"));	// 머리 위치를 기준으로 시점 설정
+}
+
+void AMobBase::ReceiveDamage(float DamageAmount)
+{
+	if (StatComponent)
+	{
+		StatComponent->ApplyDamage(DamageAmount);
+	}
 }

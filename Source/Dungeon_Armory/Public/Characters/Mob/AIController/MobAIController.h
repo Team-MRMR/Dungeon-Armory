@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Characters/Core/AIControllerBase.h"
 
-#include "Characters/Core/CharacterStatComponent.h"
+#include "Characters/Core/Component/CharacterStatComponent.h"
 
 #include "MobAIController.generated.h"
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+
 #include "CharacterStatComponent.generated.h"
 
 UENUM(BlueprintType)
@@ -76,7 +77,6 @@ public:
 	float AcceptableRadius = 50.0f;
 
 public:
-    // 체력 관련 함수
     UFUNCTION(BlueprintCallable, Category = "Damage")
     void ApplyDamage(float DamageAmount);
 

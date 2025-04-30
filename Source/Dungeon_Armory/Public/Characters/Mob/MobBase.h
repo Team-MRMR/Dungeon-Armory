@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 
+#include "Characters/Core/Interface/IDamageable.h"
+
 #include "GenericTeamAgentInterface.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
@@ -18,7 +20,7 @@ class UBlackboardComponent;
 class AAIController;
 
 UCLASS()
-class DUNGEON_ARMORY_API AMobBase : public ACharacter, public IGenericTeamAgentInterface
+class DUNGEON_ARMORY_API AMobBase : public ACharacter, public IGenericTeamAgentInterface, public IIDamageable
 {
 	GENERATED_BODY()
 
@@ -40,4 +42,8 @@ public:
 public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
 	UTeamComponent* TeamComponent;
+
+/***** Damage *****/
+public:
+	void ReceiveDamage(float DamageAmount) override;
 };
