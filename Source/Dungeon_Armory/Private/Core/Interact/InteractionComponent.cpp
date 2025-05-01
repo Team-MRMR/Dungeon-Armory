@@ -60,7 +60,7 @@ void UInteractionComponent::TraceForInteractable()
     bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
     AActor* HitActor = bHit ? Hit.GetActor() : nullptr;
 
-    DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Red : FColor::Green, false, 0.01f, 0, 2.0f);
+    /*DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Red : FColor::Green, false, 0.01f, 0, 2.0f);*/
 
     // 이미 동일한 대상이면 무시
     if (HitActor == CurrentTarget) return;

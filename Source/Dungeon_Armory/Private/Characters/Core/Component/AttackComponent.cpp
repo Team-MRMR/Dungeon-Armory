@@ -72,9 +72,23 @@ void UAttackComponent::TryCombo()
 void UAttackComponent::EnableCombo()
 {
 	bCanNextCombo = true;
+
+	// 일정 시간 후 입력 허용 해제
+	GetWorld()->GetTimerManager().SetTimer(
+		ComboInputTimerHandle,
+		this,
+		&UAttackComponent::DisableComboInput,
+		Duration,
+		false
+	);
+
 	CurrentComboIndex++;
 }
 
+void UAttackComponent::DisableComboInput()
+{
+	bCanNextCombo = false;
+}
 
 void UAttackComponent::ProceedCombo()
 {
@@ -102,7 +116,6 @@ void UAttackComponent::ProceedCombo()
 
 void UAttackComponent::PlayComboAttackMontage(int32 ComboIndex)
 {
-
 	if (!ComboAttackMontage || !AnimInstance || !ComboAttackSections.IsValidIndex(ComboIndex))
 		return;
 
@@ -113,8 +126,15 @@ void UAttackComponent::PlayComboAttackMontage(int32 ComboIndex)
 void UAttackComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	bIsAttacking = false;
+
+	// 콤보 유지 불가
 	bCanNextCombo = false;
+
+	// 콤보 초기화
 	CurrentComboIndex = 0;
+
+	// 타이머 제거
+	GetWorld()->GetTimerManager().ClearTimer(ComboInputTimerHandle);
 }
 
 void UAttackComponent::OnAttackHit()
@@ -143,7 +163,7 @@ void UAttackComponent::OnAttackHit()
 
 	FColor TraceColor = bHit ? FColor::Red : FColor::Green;
 
-	DrawDebugCapsule(
+	/*DrawDebugCapsule(
 		GetWorld(),
 		(Start + End) * 0.5f,
 		TraceDistance * 0.5f,
@@ -152,13 +172,13 @@ void UAttackComponent::OnAttackHit()
 		TraceColor,
 		false,
 		1.0f
-	);
+	);*/
 
 	if (bHit)
 	{
 		for (const FHitResult& Hit : HitResults)
 		{
-			DrawDebugSphere(
+			/*DrawDebugSphere(
 				GetWorld(),
 				Hit.ImpactPoint,
 				20.f,
@@ -166,7 +186,7 @@ void UAttackComponent::OnAttackHit()
 				FColor::Red,
 				false,
 				1.0f
-			);
+			);*/
 
 			AActor* HitActor = Hit.GetActor();
 			if (HitActor)

@@ -17,14 +17,14 @@ UCharacterStatComponent::UCharacterStatComponent()
 	{
 		OwnerCharacter = Mob;
 	}
+
+	CurrentHealth = MaxHealth;
 }
 
 // Called when the game starts
 void UCharacterStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	CurrentHealth = MaxHealth;
-	// ...
 	
 }
 void UCharacterStatComponent::ApplySpeedModifier(float SpeedMultiplier, float Duration)
