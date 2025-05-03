@@ -4,6 +4,9 @@
 #include "Characters/Mob/AIController/MobAIController.h"
 #include "Characters/Mob/MobBase.h"
 
+#include "Characters/Core/Component/CharacterStatComponent.h"
+#include "Characters/Core/Component/MovementControllerComponent.h"
+
 #include "AI/Interface/IMovableTask.h"
 
 #include "BehaviorTree/BehaviorTree.h"
@@ -22,22 +25,6 @@ const FName AMobAIController::MobStateKey(TEXT("MobState"));
 AMobAIController::AMobAIController()
 {
     PrimaryActorTick.bCanEverTick = false;
-
-    SightConfig->SightRadius = 500.0f;
-    SightConfig->LoseSightRadius = 700.f;
-    SightConfig->PeripheralVisionAngleDegrees = 60.f;
-    SightConfig->DetectionByAffiliation.bDetectEnemies = true;
-    SightConfig->DetectionByAffiliation.bDetectFriendlies = false;
-    SightConfig->DetectionByAffiliation.bDetectNeutrals = false;
-
-    // Perception 컴포넌트에 시야 감지 설정 추가
-    AIPerception->ConfigureSense(*SightConfig);
-
-    // 우선순위가 가장 높은 감각으로 설정
-    AIPerception->SetDominantSense(SightConfig->GetSenseImplementation());
-
-    // 감지 이벤트 콜백 등록
-    AIPerception->OnTargetPerceptionUpdated.AddDynamic(this, &AMobAIController::OnTargetPerceived);
 }
 
 void AMobAIController::BeginPlay()
@@ -50,12 +37,15 @@ void AMobAIController::OnPossess(APawn* InPawn)
     // 팀 컴포넌트 설정
     Super::OnPossess(InPawn);
 
-    // 스탯 컴포넌트 참조 할당
+    // 컴포넌트 참조 할당
     if (ACharacter* MobCharacter = Cast<ACharacter>(GetPawn()))
     {
         if (AMobBase* MobBase = Cast<AMobBase>(MobCharacter))
         {
             StatComponent = MobBase->FindComponentByClass<UCharacterStatComponent>();
+
+			MovementControllerComponent = MobBase->FindComponentByClass<UMovementControllerComponent>();
+			MovementControllerComponent->OnMovementCompleted.AddDynamic(this, &AMobAIController::OnMovementCompleted);
         }
     }
 
@@ -76,6 +66,31 @@ void AMobAIController::OnPossess(APawn* InPawn)
 
         // 내부적으로 생성된 BehaviorTreeComponent를 가져와서 멤버 변수에 할당
         BehaviorTreeComponent = FindComponentByClass<UBehaviorTreeComponent>();
+    }
+
+    if (StatComponent)
+    {
+        if (SightConfig)
+        {
+            SightConfig->SightRadius = StatComponent->SightRadius;
+            SightConfig->LoseSightRadius = StatComponent->LoseSightRadius;
+            SightConfig->PeripheralVisionAngleDegrees = StatComponent->PeripheralVisionAngleDegrees;
+            SightConfig->DetectionByAffiliation.bDetectEnemies = true;
+            SightConfig->DetectionByAffiliation.bDetectFriendlies = false;
+            SightConfig->DetectionByAffiliation.bDetectNeutrals = false;
+
+            if (AIPerception)
+            {
+                // Perception 컴포넌트에 시야 감지 설정 추가
+                AIPerception->ConfigureSense(*SightConfig);
+
+                // 우선순위가 가장 높은 감각으로 설정
+                AIPerception->SetDominantSense(SightConfig->GetSenseImplementation());
+
+                // 감지 이벤트 콜백 등록
+                AIPerception->OnTargetPerceptionUpdated.AddDynamic(this, &AMobAIController::OnTargetPerceived);
+            }
+        }
     }
 }
 
@@ -108,7 +123,7 @@ void AMobAIController::InitializeBlackboardKeys()
     BlackboardComponent->SetValueAsFloat(BBKeys::AcceptableRadius, StatComponent->AcceptableRadius);
 }
 
-void AMobAIController::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
+void AMobAIController::OnMovementCompleted()
 {
     const UBTNode* ActiveNode = (BehaviorTreeComponent->GetActiveNode());
     if (ActiveNode)
@@ -137,6 +152,7 @@ void AMobAIController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
     if (bDetectedTarget)
     {
         // 플레이어가 감지됨
+		OnMovementCompleted();
         DetectedPlayer = Actor;
         BlackboardComponent->SetValueAsObject("Target", Actor);
         BlackboardComponent->SetValueAsEnum(MobStateKey, static_cast<uint8>(EMobState::Chase));
@@ -144,6 +160,7 @@ void AMobAIController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
     else if(DetectedPlayer == Actor)
     {
         // 플레이어를 놓침
+        OnMovementCompleted();
         DetectedPlayer = nullptr;
         BlackboardComponent->SetValueAsObject("Target", nullptr);
         BlackboardComponent->SetValueAsEnum(MobStateKey, static_cast<uint8>(EMobState::Patrol));

@@ -19,6 +19,7 @@ UCharacterStatComponent::UCharacterStatComponent()
 	}
 
 	CurrentHealth = MaxHealth;
+	SetSpeed(BaseSpeed);
 }
 
 // Called when the game starts
@@ -53,12 +54,21 @@ float UCharacterStatComponent::GetSpeedForState(EMobState State) const
 {
 	switch (State)
 	{
-	case EMobState::Idle:    return BaseSpeed * IdleSpeedOffset;
-	case EMobState::Patrol:  return BaseSpeed * PatrolSpeedOffset;
-	case EMobState::Chase:   return BaseSpeed * ChaseSpeedOffset;
-	case EMobState::Battle:  return BaseSpeed * CombatSpeedOffset;
-	case EMobState::Dead:    return BaseSpeed * DeadSpeedOffset;
-	default:				 return BaseSpeed;
+	case EMobState::Idle:
+		return BaseSpeed * IdleSpeedFactor;
+
+	case EMobState::Patrol:
+		return BaseSpeed * PatrolSpeedFactor;
+
+	case EMobState::Chase:
+	case EMobState::Battle:
+		return BaseSpeed * ChaseSpeedFactor;
+
+	case EMobState::Dead:
+		return BaseSpeed * DeadSpeedFactor;
+
+	default:
+		return BaseSpeed;
 	}
 }
 

@@ -8,12 +8,17 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
+#include "Characters/Mob/MobBase.h"
+#include "Characters/Core/Component/MovementControllerComponent.h"
+
 #include "Navigation/PathFollowingComponent.h"
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
 
 UBTTask_Patrol::UBTTask_Patrol()
 {
+	bNotifyTick = true;
+
 	NodeName = TEXT("Mob Patrol");
 
 	// 기본적으로 Blackboard 키 자동 UI 지정
@@ -49,7 +54,8 @@ EBTNodeResult::Type UBTTask_Patrol::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 		return EBTNodeResult::Failed;
 	}
 
-	FNavLocation RandomLocation;
+	AcceptableRadius = BlackboardComp->GetValueAsFloat(BBkey_AcceptableRadius.SelectedKeyName);
+
 	float PatrolRadius = BlackboardComp->GetValueAsFloat(BBkey_PatrolRadius.SelectedKeyName);
 	bool bFound = NavSys->GetRandomPointInNavigableRadius(HomeLocation, PatrolRadius, RandomLocation);
 	if (!bFound)
@@ -63,16 +69,30 @@ EBTNodeResult::Type UBTTask_Patrol::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 		return EBTNodeResult::Failed;
 	}
 
-	float AcceptableRadius = BlackboardComp->GetValueAsFloat(BBkey_AcceptableRadius.SelectedKeyName);
-	FAIRequestID MoveRequestID = AIController->MoveToLocation(RandomLocation.Location, AcceptableRadius);
+	APawn* Pawn = AIController->GetPawn();
+	if (!Pawn)
+	{
+		return EBTNodeResult::Failed;
+	}
 
+	AMobBase* MobBase = Cast<AMobBase>(Pawn);
+	if (!MobBase)
+	{
+		return EBTNodeResult::Failed;
+	}
 
-	if (!MoveRequestID.IsValid())
+	MovementController = MobBase->FindComponentByClass<UMovementControllerComponent>();
+	if (!MovementController)
 	{
 		return EBTNodeResult::Failed;
 	}
 
 	return EBTNodeResult::InProgress;
+}
+
+void UBTTask_Patrol::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	MovementController->MoveToDestination(RandomLocation.Location, AcceptableRadius);
 }
 
 void UBTTask_Patrol::OnMoveCompleted(UBehaviorTreeComponent* BTComp)

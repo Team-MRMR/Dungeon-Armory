@@ -3,8 +3,10 @@
 
 #include "Characters/Mob/MobBase.h"
 
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Characters/Core/Component/CharacterStatComponent.h"
+#include "Characters/Core/Component/MovementControllerComponent.h"
+
+#include "GameFramework/CharacterMovementComponent.h"
 #include "AI/Team/TeamComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -29,8 +31,18 @@ AMobBase::AMobBase()
 	// 회전 속도 설정 (원하는 속도로 조정)
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 480.f, 0.f);
 
+	GetCharacterMovement()->UseAccelerationForPathFollowing();
+
+	GetCharacterMovement()->MaxAcceleration = 512.f;			 // 낮을수록 서서히 가속
+	GetCharacterMovement()->BrakingDecelerationWalking = 256.f;  // 낮을수록 서서히 멈춤
+	GetCharacterMovement()->GroundFriction = 4.f;				 // 마찰력, 감속에 영향
+
+
 	// 스탯 컴포넌트 생성
 	StatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("StatComponent"));
+
+	// 이동 컨트롤러 컴포넌트 생성
+	MovementControllerComponent = CreateDefaultSubobject<UMovementControllerComponent>(TEXT("MovementControllerComponent"));
 
 	// 팀 컴포넌트 생성
 	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
@@ -41,6 +53,10 @@ AMobBase::AMobBase()
 void AMobBase::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AMobBase::Tick(float DeltaSeconds)
+{
 }
 
 void AMobBase::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const

@@ -14,6 +14,7 @@
 #include "MobBase.generated.h"
 
 class UCharacterStatComponent;
+class UMovementControllerComponent;
 class UTeamComponent;
 class UBlackboardComponent;
 
@@ -31,12 +32,19 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const override;
 
 /***** Stat *****/
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
 	UCharacterStatComponent* StatComponent;
+
+/***** Movement *****/
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
+	UMovementControllerComponent* MovementControllerComponent;
 
 /***** Team *****/
 public:

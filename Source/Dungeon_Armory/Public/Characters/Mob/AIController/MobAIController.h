@@ -4,14 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Characters/Core/AIControllerBase.h"
-
 #include "Characters/Core/Component/CharacterStatComponent.h"
 
 #include "MobAIController.generated.h"
 
-/**
- * 
- */
+class UCharacterStatComponent;
+class UMovementControllerComponent;
+
 UCLASS()
 class DUNGEON_ARMORY_API AMobAIController : public AAIControllerBase
 {
@@ -29,6 +28,7 @@ protected:
 /***** Stat *****/
 private:
 	UCharacterStatComponent* StatComponent;
+	UMovementControllerComponent* MovementControllerComponent;
 
 /***** Behavior Tree *****/
 protected:
@@ -41,10 +41,21 @@ public:
 private:
 	void InitializeBlackboardKeys();
 
-	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result) override;
+	UFUNCTION()
+	void OnMovementCompleted();
 
 /***** AI *****/
 protected:
 	UFUNCTION()
 	void OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus) override;
 };
+
+// --- 블랙보드 키값 스트링 캐싱 ---
+namespace BBKeys
+{
+	static const FName CurrentHealth(TEXT("CurrentHealth"));
+
+	static const FName MobState(TEXT("MobState"));
+	static const FName PatrolRadius(TEXT("PatrolRadius"));
+	static const FName AcceptableRadius(TEXT("AcceptableRadius"));
+}

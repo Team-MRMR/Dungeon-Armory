@@ -2,8 +2,11 @@
 
 
 #include "Characters/Mob/Tasks/BTTask_Chase.h"
-#include "GameFramework/Actor.h"
+#include "Characters/Mob/MobBase.h"
+#include "Characters/Core/Component/MovementControllerComponent.h"
 #include "AIController.h"
+
+#include "GameFramework/Actor.h"
 
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -31,38 +34,49 @@ void UBTTask_Chase::InitializeFromAsset(UBehaviorTree& BehaviorTreeAsset)
 
 EBTNodeResult::Type UBTTask_Chase::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-    AAIController* AIController = OwnerComp.GetAIOwner();
-    if (AIController == nullptr)
-    {
-        return EBTNodeResult::Failed;
-    }
-
     UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
     if (BlackboardComp == nullptr)
     {
         return EBTNodeResult::Failed;
     }
 
-    AActor* TargetActor = Cast<AActor>(BlackboardComp->GetValueAsObject(TEXT("Target")));
+    AcceptableRadius = BlackboardComp->GetValueAsFloat(BBkey_AcceptableRadius.SelectedKeyName);
+    TargetActor = Cast<AActor>(BlackboardComp->GetValueAsObject(TEXT("Target")));
     if (TargetActor == nullptr)
     {
         return EBTNodeResult::Failed;
     }
 
-    float AcceptableRadius = BlackboardComp->GetValueAsFloat(BBkey_AcceptableRadius.SelectedKeyName);
+    AAIController* AIController = OwnerComp.GetAIOwner();
+    if (!AIController)
+    {
+        return EBTNodeResult::Failed;
+    }
 
-    FAIMoveRequest MoveRequest;
-    MoveRequest.SetGoalActor(TargetActor);
-    MoveRequest.SetAcceptanceRadius(AcceptableRadius);
+    APawn* Pawn = AIController->GetPawn();
+    if (!Pawn)
+    {
+        return EBTNodeResult::Failed;
+    }
 
-    EPathFollowingRequestResult::Type RequestResultID = AIController->MoveTo(MoveRequest);
+    AMobBase* MobBase = Cast<AMobBase>(Pawn);
+    if (!MobBase)
+    {
+        return EBTNodeResult::Failed;
+    }
 
-    if (RequestResultID == EPathFollowingRequestResult::Failed)
+    MovementController = MobBase->FindComponentByClass<UMovementControllerComponent>();
+    if (!MovementController)
     {
         return EBTNodeResult::Failed;
     }
 
     return EBTNodeResult::InProgress;
+}
+
+void UBTTask_Chase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	MovementController->MoveToDestination(TargetActor->GetActorLocation(), AcceptableRadius);
 }
 
 void UBTTask_Chase::OnMoveCompleted(UBehaviorTreeComponent* BTComp)

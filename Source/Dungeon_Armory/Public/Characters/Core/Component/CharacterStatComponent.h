@@ -40,7 +40,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
     float MaxHealth = 100.f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
     float CurrentHealth;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
@@ -52,29 +52,38 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
     float BaseSpeed = 250;
 
-    // --- 상태 변화에 따른 속도 변화 ---
+// --- 상태 변화에 따른 속도 변화 계수---
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
-    float IdleSpeedOffset = 0.f;
+    float IdleSpeedFactor = 0.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
-    float PatrolSpeedOffset = 1.f;
+    float PatrolSpeedFactor = 1.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
-    float ChaseSpeedOffset = 1.f;
+    float ChaseSpeedFactor = 1.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
-    float CombatSpeedOffset = 1.f;
+    float DeadSpeedFactor = 0.f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
-    float DeadSpeedOffset = 0.f;
-
-	// --- 이동 거리 관련 수치 ---
+// --- 거리 관련 수치 ---
+public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Distance")
     float PatrolRadius = 500.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Distance")
-	float AcceptableRadius = 50.0f;
+	float AcceptableRadius = 100.0f;
+
+// --- AI Perception 관련 수치 ---
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception")
+    float SightRadius = 500.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception")
+    float LoseSightRadius = 700.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception")
+    float PeripheralVisionAngleDegrees = 90.0f;
 
 public:
     UFUNCTION(BlueprintCallable, Category = "Damage")
@@ -96,14 +105,3 @@ private:
     UFUNCTION(BlueprintCallable, Category = "Movement")
     float GetSpeedForState(EMobState State) const;
 };
-
-
-// --- 블랙보드 키값 스트링 캐싱 ---
-namespace BBKeys
-{
-	static const FName CurrentHealth(TEXT("CurrentHealth"));
-
-	static const FName MobState(TEXT("MobState"));
-    static const FName PatrolRadius(TEXT("PatrolRadius"));
-    static const FName AcceptableRadius(TEXT("AcceptanceRadius"));
-}
