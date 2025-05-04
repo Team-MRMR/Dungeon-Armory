@@ -34,39 +34,44 @@ protected:
 private:
     ACharacter* OwnerCharacter;
 
-/***** Stat *****/
+// --- HP & MP 관련 스탯 ---
 public:
-    // --- 스탯 (공통 속성) ---
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
     float MaxHealth = 100.f;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
     float CurrentHealth;
 
+// --- 공격 & 방어 관련 스탯 ---
+public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float BaseDamage = 10.f;
+    float BaseAttackDamage = 10.f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float BaseAttackSpeed = 1.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
     float Defense = 5.f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float BaseSpeed = 250;
 
-// --- 상태 변화에 따른 속도 변화 계수---
+// --- 이동 속도 관련 스탯 ---
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
-    float IdleSpeedFactor = 0.f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float BaseSpeed = 100.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
-    float PatrolSpeedFactor = 1.f;
+    float IdleSpeedFactor = 0.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
-    float ChaseSpeedFactor = 1.f;
+    float PatrolSpeedFactor = 1.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
-    float DeadSpeedFactor = 0.f;
+    float ChaseSpeedFactor = 1.25f;
 
-// --- 거리 관련 수치 ---
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
+    float DeadSpeedFactor = 0.0f;
+
+// --- 이동 거리 관련 수치 ---
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Distance")
     float PatrolRadius = 500.0f;
@@ -85,6 +90,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception")
     float PeripheralVisionAngleDegrees = 90.0f;
 
+// --- Function ---
 public:
     UFUNCTION(BlueprintCallable, Category = "Damage")
     void ApplyDamage(float DamageAmount);
@@ -92,16 +98,14 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Dead")
     bool IsDead() const;
 
-    // 상태에 따라 속도 적용
     UFUNCTION(BlueprintCallable, Category = "Movement")
     void SetSpeedForState(EMobState State);
+
+    UFUNCTION(BlueprintCallable, Category = "Movement")
+    float GetSpeedForState(EMobState State) const;
 
 private:
     void ResetSpeed();
     void ApplySpeedModifier(float SpeedMultiplier, float Duration);
     void SetSpeed(float NewSpeed);
-
-    // 상태에 따라 속도 반환
-    UFUNCTION(BlueprintCallable, Category = "Movement")
-    float GetSpeedForState(EMobState State) const;
 };

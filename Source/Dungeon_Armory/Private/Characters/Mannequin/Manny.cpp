@@ -3,7 +3,7 @@
 
 #include "Characters/Mannequin/Manny.h"
 #include "Characters/Mannequin/ViewMode/ViewModeComponent.h"
-#include "Characters/Core/Component/AttackComponent.h"
+#include "Characters/Core/Component/AttackComponentBase.h"
 #include "Characters/Core/Component/CharacterStatComponent.h"
 
 #include "Components/CapsuleComponent.h"
@@ -74,7 +74,7 @@ AManny::AManny()
 
 	StatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("StatComponent"));
 
-	AttackComponent = CreateDefaultSubobject<UAttackComponent>(TEXT("AttackComponent"));
+	PlayerAttackComponent = CreateDefaultSubobject<UAttackComponentBase>(TEXT("PlayerAttackComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -179,10 +179,10 @@ void AManny::Interact(const FInputActionValue& Value)
 
 void AManny::Attack(const FInputActionValue& Value)
 {
-	if (AttackComponent)
+	if (PlayerAttackComponent)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Attack"));
-		AttackComponent->StartAttack();
+		PlayerAttackComponent->StartAttack();
 	}
 }
 

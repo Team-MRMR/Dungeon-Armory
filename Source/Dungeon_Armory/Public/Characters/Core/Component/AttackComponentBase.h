@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "AttackComponent.generated.h"
+#include "AttackComponentBase.generated.h"
 
 class UAnimMontage;
 class UCharacterStatComponent;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DUNGEON_ARMORY_API UAttackComponent : public UActorComponent
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent)/*Abstract*/)
+class DUNGEON_ARMORY_API UAttackComponentBase : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -22,9 +22,6 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
     TArray<FName> ComboAttackSections;
 
-    UPROPERTY(EditAnywhere, Category = "Attack", meta = (AllowPrivateAccess = "true"))
-	float Duration = 0.5f; // 공격 모션 지속 시간
-
     UPROPERTY()
     ACharacter* OwnerCharacter;
 
@@ -34,16 +31,18 @@ private:
     UPROPERTY()
     UCharacterStatComponent* StatComponent;
 
-    int32 CurrentComboIndex;
-    bool bIsAttacking;
-    bool bCanNextCombo;
+	int32 CurrentComboIndex; // 현재 콤보 인덱스
+
+	bool bIsMontageEnded;   // 몽타주 종료 여부
+	bool bCanReceiveInput;  // 콤보 입력 가능 여부
+	bool bNextCombo;        // 다음 콤보 진행 여부
 
     FTimerHandle ComboInputTimerHandle;  // 콤보 지속시간 핸들러
 
 /***** Unreal *****/
 public:	
 	// Sets default values for this component's properties
-	UAttackComponent();
+	UAttackComponentBase();
 
 protected:
 	// Called when the game starts
@@ -53,19 +52,12 @@ protected:
 public:
     void StartAttack();     // 외부에서 공격 시작 시 호출
     void OnAttackHit();     // AttackNotify에서 호출
-    void EnableCombo();     // AttackNotify에서 호출
-
+	void ReceiveInput(); // 콤보 입력 수신
+    void OnAttackEnded();
 
 protected:
-    void TryCombo();
     void ProceedCombo();		
     void PlayComboAttackMontage(int32 ComboIndex);
-
-	UFUNCTION()
-    void DisableComboInput();
-
-    UFUNCTION()
-    void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 
 };
