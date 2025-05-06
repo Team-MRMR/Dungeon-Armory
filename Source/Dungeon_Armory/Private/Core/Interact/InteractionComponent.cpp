@@ -12,7 +12,7 @@
 UInteractionComponent::UInteractionComponent()
 {
     PrimaryComponentTick.bCanEverTick = true;
-    CurrentTarget = nullptr;
+    InteractableTarget = nullptr;
 }
 
 
@@ -32,13 +32,13 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UInteractionComponent::TryInteract()
 {
-    if (CurrentTarget)
+    if (InteractableTarget)
     {
-        UInteractableComponent* InteractableComp = CurrentTarget->FindComponentByClass<UInteractableComponent>();
-        if (InteractableComp && InteractableComp->CanInteract(GetOwner()))
+        IInteractable* InteractableActor = Cast<IInteractable>(InteractableTarget);
+        if (InteractableActor && IInteractable::Execute_CanInteract(InteractableTarget, GetOwner()))
         {
 			UE_LOG(LogTemp, Warning, TEXT("UInteractionComponent::TryInteract() Called"));
-            InteractableComp->Interact(GetOwner());
+            InteractableActor->IInteractable::Execute_Interact(InteractableTarget, GetOwner());
         }
     }
 }
@@ -59,32 +59,28 @@ void UInteractionComponent::TraceForInteractable()
 
     bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
     AActor* HitActor = bHit ? Hit.GetActor() : nullptr;
+    
 
-    /*DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Red : FColor::Green, false, 0.01f, 0, 2.0f);*/
+    DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Red : FColor::Green, false, 0.01f, 0, 2.0f);
 
     // 이미 동일한 대상이면 무시
-    if (HitActor == CurrentTarget) return;
+    if (HitActor == InteractableTarget)
+        return;
+
 
     // 이전 강조 해제
-    if (CurrentTarget)
+    if (InteractableTarget)
     {
-        UInteractableComponent* PrevInteractable = CurrentTarget->FindComponentByClass<UInteractableComponent>();
-        if (PrevInteractable)
-        {
-            PrevInteractable->DisableOutline();
-        }
+        IInteractable::Execute_DisableOutline(InteractableTarget);
     }
 
-    CurrentTarget = nullptr;
+    InteractableTarget = nullptr;
 
     // 새 대상 설정
-    if (HitActor)
+    IInteractable* InteractableActor = Cast<IInteractable>(HitActor);
+    if (InteractableActor)
     {
-        UInteractableComponent* NewInteractable = HitActor->FindComponentByClass<UInteractableComponent>();
-        if (NewInteractable && NewInteractable->CanInteract(OwnerActor))
-        {
-            NewInteractable->EnableOutline();
-            CurrentTarget = HitActor;
-        }
+        InteractableTarget = HitActor;
+        IInteractable::Execute_EnableOutline(HitActor);
     }
 }
