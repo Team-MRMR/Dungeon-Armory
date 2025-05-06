@@ -58,4 +58,6 @@ void UInGameTimeManager::UpdateTime()
         // 시간 변경 이벤트 호출
         OnTimePeriodChanged.Broadcast();
     }
+
+	UE_LOG(LogTemp, Warning, TEXT("Current In-Game Time: %02d:%02d:%2d"), CurrInGameTime.Hours, CurrInGameTime.Minutes);
 }
