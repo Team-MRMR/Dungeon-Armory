@@ -46,7 +46,6 @@ EBTNodeResult::Type UBTTask_ChangeSpeed::ExecuteTask(UBehaviorTreeComponent& Own
 		break;
 	}
 
-    NPC->SetMovementSpeed(NewSpeed);
 
     return EBTNodeResult::Succeeded;
 }

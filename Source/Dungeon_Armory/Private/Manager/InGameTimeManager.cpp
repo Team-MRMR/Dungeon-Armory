@@ -50,12 +50,14 @@ void UInGameTimeManager::StartTimer()
 
 void UInGameTimeManager::UpdateTime()
 {
-    // 시간 누적 계산
+    // 시간 누적 계산 (Time Scale)
     CurrInGameTime.AddMinutes(TimeScale);
 
-	if (3.0f <= CurrInGameTime.Minutes && CurrInGameTime.Minutes < 4.0f)
-    {
-        // 시간 변경 이벤트 호출
-        OnTimePeriodChanged.Broadcast();
-    }
+	//if (3.0f <= CurrInGameTime.Minutes && CurrInGameTime.Minutes < 4.0f)
+    //{
+    //    // 시간 변경 이벤트 호출
+    //    OnTimePeriodChanged.Broadcast();
+    //}
+
+	UE_LOG(LogTemp, Warning, TEXT("Current In-Game Time: %02d:%02f"), CurrInGameTime.Hours, CurrInGameTime.Minutes);
 }

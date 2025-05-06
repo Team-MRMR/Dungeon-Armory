@@ -23,7 +23,4 @@ protected:
 
     UFUNCTION()
     void OnTriggerEndOverlap(AActor* OverlappedActor, AActor* OtherActor);
-
-private:
-    void UpdateIndoorState(AActor* Actor, bool bIndoor);
 };

@@ -11,7 +11,7 @@
 #include "InteractableComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
 class DUNGEON_ARMORY_API UInteractableComponent : public UActorComponent, public IInteractable
 {
 	GENERATED_BODY()

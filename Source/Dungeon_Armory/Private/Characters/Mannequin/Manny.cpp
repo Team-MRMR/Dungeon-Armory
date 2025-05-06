@@ -3,6 +3,8 @@
 
 #include "Characters/Mannequin/Manny.h"
 #include "Characters/Mannequin/ViewMode/ViewModeComponent.h"
+#include "Characters/Core/Component/AttackComponentBase.h"
+#include "Characters/Core/Component/CharacterStatComponent.h"
 
 #include "Components/CapsuleComponent.h"
 
@@ -69,6 +71,10 @@ AManny::AManny()
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
 
 	ViewModeComponent = CreateDefaultSubobject<UViewModeComponent>(TEXT("ViewModeComponent"));
+
+	StatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("StatComponent"));
+
+	PlayerAttackComponent = CreateDefaultSubobject<UAttackComponentBase>(TEXT("PlayerAttackComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -84,7 +90,8 @@ void AManny::BeginPlay()
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(MappingContext, 0);
+			Subsystem->AddMappingContext(CoreContext, 1);
+			Subsystem->AddMappingContext(BattleContext, 0);
 		}
 	}
 }
@@ -109,6 +116,9 @@ void AManny::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		// Interact
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AManny::Interact);
+
+		// Attack
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AManny::Attack);
 	}
 }
 
@@ -162,6 +172,24 @@ void AManny::Interact(const FInputActionValue& Value)
 {
 	if (UInteractionComponent* InteractionComp = FindComponentByClass<UInteractionComponent>())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("AManny::Interact() Called"));
 		InteractionComp->TryInteract();
+	}
+}
+
+void AManny::Attack(const FInputActionValue& Value)
+{
+	if (PlayerAttackComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Attack"));
+		PlayerAttackComponent->StartAttack();
+	}
+}
+
+void AManny::ReceiveDamage(float DamageAmount)
+{
+	if (StatComponent)
+	{
+		StatComponent->ApplyDamage(DamageAmount);
 	}
 }

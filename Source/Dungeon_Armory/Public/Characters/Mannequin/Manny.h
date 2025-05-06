@@ -4,25 +4,31 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Perception/AIPerceptionStimuliSourceComponent.h"
-#include "AI/Team/TeamComponent.h"
 
+#include "AI/Team/TeamComponent.h"
 #include "GenericTeamAgentInterface.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+
+#include "Characters/Core/Interface/IDamageable.h"
 
 #include "Manny.generated.h"
 
 class USpringArmComponent;
 class UCameraComponent;
+class UViewModeComponent;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
+class UInteractionComponent;
+class UCharacterStatComponent;
+class UAttackComponentBase;
 
 UCLASS()
-class DUNGEON_ARMORY_API AManny : public ACharacter, public IGenericTeamAgentInterface
+class DUNGEON_ARMORY_API AManny : public ACharacter, public IGenericTeamAgentInterface, public IIDamageable
 {
 	GENERATED_BODY()
 
-/***** Variables *****/
+/***** Camera *****/
 private:
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -32,6 +38,11 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CameraComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "View", meta = (AllowPrivateAccess = "true"))
+	UViewModeComponent* ViewModeComponent;
+
+/****** Team ******/
+private:
 	/** AI Perception Stimuli Source */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Perception", meta = (AllowPrivateAccess = "true"))
 	UAIPerceptionStimuliSourceComponent* StimuliSourceComponent;
@@ -40,50 +51,55 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Team, meta = (AllowPrivateAccess = "true"))
 	UTeamComponent* TeamComponent;
 
+/***** Input *****/
+private:
 	/** MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputMappingContext* MappingContext;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
+	UInputMappingContext* CoreContext;
+
+	/** MappingContext */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Battle", meta = (AllowPrivateAccess = "true"))
+	UInputMappingContext* BattleContext;
 
 	/** Jump Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
 	UInputAction* JumpAction;
 
 	/** Move Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
 
 	/** Look Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
 	/** Interact Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
 
+	/** Attack Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Battle", meta = (AllowPrivateAccess = "true"))
+	UInputAction* AttackAction;
+
+/***** Interaction *****/
+private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
-	class UInteractionComponent* InteractionComponent;
+	UInteractionComponent* InteractionComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "View", meta = (AllowPrivateAccess = "true"))
-	class UViewModeComponent* ViewModeComponent;
+/***** Stat *****/
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = "true"))
+	UCharacterStatComponent* StatComponent;
 
+/***** Attack *****/
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
+	UAttackComponentBase* PlayerAttackComponent;
 
-/***** Functions *****/
+/***** Unreal *****/
 public:
 	// Sets default values for this character's properties
 	AManny();
-
-	/** IGenericTeamAgentInterface implementation */
-	virtual FGenericTeamId GetGenericTeamId() const override;
-
-	/** Assigns Team Agent to given TeamID */
-	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
-
-public:
-	/** Returns CameraBoom subobject **/
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraSpringArm; }
-
-	/** Returns FollowCamera subobject **/
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return CameraComponent; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -92,6 +108,22 @@ protected:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+/***** Team *****/
+	/** IGenericTeamAgentInterface implementation */
+	virtual FGenericTeamId GetGenericTeamId() const override;
+
+	/** Assigns Team Agent to given TeamID */
+	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
+
+/***** Camera *****/
+public:
+	/** Returns CameraBoom subobject **/
+	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraSpringArm; }
+
+	/** Returns FollowCamera subobject **/
+	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return CameraComponent; }
+
+/***** Input *****/
 protected:
 	/** Called for moving input */
 	void Move(const FInputActionValue& Value);
@@ -99,7 +131,15 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
-	/** Called for Interactinginput */
+	/** Called for Interacting input */
 	void Interact(const FInputActionValue& Value);
+
+	/** Called for Attacking input */
+	void Attack(const FInputActionValue& Value);
+
+/***** Damage*****/
+public:
+	// IIDamageable을(를) 통해 상속됨
+	void ReceiveDamage(float DamageAmount) override;
 
 };
