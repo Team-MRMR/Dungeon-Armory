@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "InteractionComponent.generated.h"
 
+class IInteractable;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DUNGEON_ARMORY_API UInteractionComponent : public UActorComponent
@@ -27,7 +28,7 @@ public:
 /***** Interact *****/
 private:
 	AActor* OwnerActor;
-	AActor* CurrentTarget;
+	AActor* InteractableTarget;
 	float TraceDistance = 500.f;
 
 public:
