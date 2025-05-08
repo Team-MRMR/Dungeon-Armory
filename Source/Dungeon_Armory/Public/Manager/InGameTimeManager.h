@@ -109,6 +109,9 @@ public:
     void StartTimer();
     void UpdateTime();
 
-    UFUNCTION(BlueprintCallable, Category = "TimeManager")
+    UFUNCTION(BlueprintCallable, Category = "In-Game Time")
     FInGameTime GetCurrentInGameTime() const;
+
+    UFUNCTION(BlueprintCallable, Category = "In-Game Time")
+    void SetTimeScale(float NewScale) { TimeScale = NewScale; }
 };
