@@ -90,7 +90,7 @@ void AManny::BeginPlay()
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(CoreContext, 1);
+			//Subsystem->AddMappingContext(CoreContext, 1);
 			Subsystem->AddMappingContext(BattleContext, 0);
 		}
 	}
@@ -104,18 +104,18 @@ void AManny::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 
-		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		//// Jumping
+		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
-		// Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AManny::Move);
+		//// Moving
+		//EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AManny::Move);
 
-		// Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AManny::Look);
+		//// Looking
+		//EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AManny::Look);
 
-		// Interact
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AManny::Interact);
+		//// Interact
+		//EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AManny::Interact);
 
 		// Attack
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AManny::Attack);
@@ -132,50 +132,50 @@ void AManny::SetGenericTeamId(const FGenericTeamId& NewTeamID)
 	TeamComponent->SetTeamType(static_cast<ETeamType>(NewTeamID.GetId()));
 }
 
-void AManny::Move(const FInputActionValue& Value)
-{
-	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
-	{
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-
-		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-		// add movement 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
-	}
-}
-
-void AManny::Look(const FInputActionValue& Value)
-{
-	// input is a Vector2D
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
-	{
-		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
-	}
-}
-
-void AManny::Interact(const FInputActionValue& Value)
-{
-	if (UInteractionComponent* InteractionComp = FindComponentByClass<UInteractionComponent>())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AManny::Interact() Called"));
-		InteractionComp->TryInteract();
-	}
-}
+//void AManny::Move(const FInputActionValue& Value)
+//{
+//	// input is a Vector2D
+//	FVector2D MovementVector = Value.Get<FVector2D>();
+//
+//	if (Controller != nullptr)
+//	{
+//		// find out which way is forward
+//		const FRotator Rotation = Controller->GetControlRotation();
+//		const FRotator YawRotation(0, Rotation.Yaw, 0);
+//
+//		// get forward vector
+//		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+//
+//		// get right vector 
+//		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+//
+//		// add movement 
+//		AddMovementInput(ForwardDirection, MovementVector.Y);
+//		AddMovementInput(RightDirection, MovementVector.X);
+//	}
+//}
+//
+//void AManny::Look(const FInputActionValue& Value)
+//{
+//	// input is a Vector2D
+//	FVector2D LookAxisVector = Value.Get<FVector2D>();
+//
+//	if (Controller != nullptr)
+//	{
+//		// add yaw and pitch input to controller
+//		AddControllerYawInput(LookAxisVector.X);
+//		AddControllerPitchInput(LookAxisVector.Y);
+//	}
+//}
+//
+//void AManny::Interact(const FInputActionValue& Value)
+//{
+//	if (UInteractionComponent* InteractionComp = FindComponentByClass<UInteractionComponent>())
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("AManny::Interact() Called"));
+//		InteractionComp->TryInteract();
+//	}
+//}
 
 void AManny::Attack(const FInputActionValue& Value)
 {

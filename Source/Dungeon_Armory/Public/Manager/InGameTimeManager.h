@@ -80,14 +80,10 @@ class DUNGEON_ARMORY_API UInGameTimeManager : public UManagerBase
 
 /***** Variables *****/
 protected:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "In-Game Time")
     FInGameTime CurrInGameTime;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "In-Game Time")
     float TimeScale = 1.0f;
 
 private:
-    float AccumulatedTime = 0.0f;
     FTimerHandle TimerHandle;
 
 /***** Functions (Unreal) *****/
@@ -109,4 +105,9 @@ public:
     void StartTimer();
     void UpdateTime();
 
+    UFUNCTION(BlueprintCallable, Category = "In-Game Time")
+    FInGameTime GetCurrentInGameTime() const { return CurrInGameTime;};
+
+    UFUNCTION(BlueprintCallable, Category = "In-Game Time")
+    void SetTimeScale(float NewScale) { TimeScale = NewScale; }
 };

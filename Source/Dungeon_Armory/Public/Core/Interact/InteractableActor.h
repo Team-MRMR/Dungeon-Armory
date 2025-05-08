@@ -3,27 +3,35 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/Interface.h"
-#include "Interactable.generated.h"
+#include "GameFramework/Actor.h"
 
-// This class does not need to be modified.
-UINTERFACE(MinimalAPI/*, Blueprintable*/)
-class UInteractable : public UInterface
+#include "Core/Interact/Interface/Interactable.h"
+
+#include "InteractableActor.generated.h"
+
+UCLASS()
+class DUNGEON_ARMORY_API AInteractableActor : public AActor, public IInteractable
 {
 	GENERATED_BODY()
-};
-
-/**
- * 
- */
-class DUNGEON_ARMORY_API IInteractable
-{
-	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	AInteractableActor();
 
 protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
+/***** Interact *****/
+protected:
+	UPROPERTY(EditAnywhere)
+	bool bIsInteractable = true;
+
 public:
 	// 상호작용 여부 판단
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
@@ -39,4 +47,5 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
 	void DisableOutline();
+
 };
