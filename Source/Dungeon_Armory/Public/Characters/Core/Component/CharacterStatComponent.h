@@ -36,65 +36,77 @@ private:
 
 // --- HP & MP 관련 스탯 ---
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | HP & MP")
     float MaxHealth = 100.f;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat | HP & MP")
     float CurrentHealth;
 
-// --- 공격 & 방어 관련 스탯 ---
+// --- 공격력 관련 스탯 ---
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Battle | Damage")
     float BaseAttackDamage = 10.f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float BaseAttackSpeed = 1.0f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Battle | Speed")
+	float BaseAttackSpeed = 1.0f;   // 초당 공격 횟수
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Battle | Ciritical")
+    float CriticalChance = 0.2f;    // 크리티컬 확률
+
+public:
+    UFUNCTION(BlueprintCallable, Category = "Damage")
+    void ApplyDamage(float DamageAmount);
+
+    UFUNCTION(BlueprintCallable, Category = "Damage")
+    float GetAttackCooldown() const { return 1.0f / FMath::Max(BaseAttackSpeed, 0.01f); }
+
+    UFUNCTION(BlueprintCallable, Category = "Damage")
+    float GetAttackPlayRate(float AnimationLength) const { return AnimationLength * BaseAttackSpeed; }
+
+
+// --- 방어력 관련 스탯 ---
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Defense")
     float Defense = 5.f;
 
 
 // --- 이동 속도 관련 스탯 ---
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Speed")
     float BaseSpeed = 100.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Speed")
     float IdleSpeedFactor = 0.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Speed")
     float PatrolSpeedFactor = 1.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Speed")
     float ChaseSpeedFactor = 1.25f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Speed")
     float DeadSpeedFactor = 0.0f;
 
 // --- 이동 거리 관련 수치 ---
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Distance")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Distance")
     float PatrolRadius = 500.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Distance")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Distance")
 	float AcceptableRadius = 100.0f;
 
 // --- AI Perception 관련 수치 ---
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | AI Perception")
     float SightRadius = 500.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | AI Perception")
     float LoseSightRadius = 700.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | AI Perception")
     float PeripheralVisionAngleDegrees = 90.0f;
 
 // --- Function ---
 public:
-    UFUNCTION(BlueprintCallable, Category = "Damage")
-    void ApplyDamage(float DamageAmount);
-
     UFUNCTION(BlueprintCallable, Category = "Dead")
     bool IsDead() const;
 
