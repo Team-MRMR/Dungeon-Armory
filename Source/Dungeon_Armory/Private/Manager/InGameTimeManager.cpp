@@ -61,8 +61,3 @@ void UInGameTimeManager::UpdateTime()
 
 	UE_LOG(LogTemp, Warning, TEXT("Current In-Game Time: %02d:%02f"), CurrInGameTime.Hours, CurrInGameTime.Minutes);
 }
-
-FInGameTime UInGameTimeManager::GetCurrentInGameTime() const
-{
-    return CurrInGameTime;
-}
