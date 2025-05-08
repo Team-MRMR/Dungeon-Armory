@@ -53,29 +53,29 @@ private:
 
 /***** Input *****/
 private:
-	///** MappingContext */
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
-	//UInputMappingContext* CoreContext;
+	/** MappingContext */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
+	UInputMappingContext* CoreContext;
 
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Battle", meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* BattleContext;
 
-	///** Jump Input Action */
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
-	//UInputAction* JumpAction;
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
+	UInputAction* JumpAction;
 
-	///** Move Input Action */
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
-	//UInputAction* MoveAction;
+	/** Move Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
+	UInputAction* MoveAction;
 
-	///** Look Input Action */
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
-	//UInputAction* LookAction;
+	/** Look Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
+	UInputAction* LookAction;
 
-	///** Interact Input Action */
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
-	//UInputAction* InteractAction;
+	/** Interact Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
+	UInputAction* InteractAction;
 
 	/** Attack Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Battle", meta = (AllowPrivateAccess = "true"))
@@ -125,14 +125,14 @@ public:
 
 /***** Input *****/
 protected:
-	///** Called for moving input */
-	//void Move(const FInputActionValue& Value);
+	/** Called for moving input */
+	void Move(const FInputActionValue& Value);
 
-	///** Called for looking input */
-	//void Look(const FInputActionValue& Value);
+	/** Called for looking input */
+	void Look(const FInputActionValue& Value);
 
-	///** Called for Interacting input */
-	//void Interact(const FInputActionValue& Value);
+	/** Called for Interacting input */
+	void Interact(const FInputActionValue& Value);
 
 	/** Called for Attacking input */
 	void Attack(const FInputActionValue& Value);
