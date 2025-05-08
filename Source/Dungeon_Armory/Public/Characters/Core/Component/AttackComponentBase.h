@@ -22,13 +22,8 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
     TArray<FName> ComboAttackSections;
 
-    UPROPERTY()
     ACharacter* OwnerCharacter;
-
-    UPROPERTY()
     UAnimInstance* AnimInstance;
-
-    UPROPERTY()
     UCharacterStatComponent* StatComponent;
 
 	int32 CurrentComboIndex; // 현재 콤보 인덱스
@@ -52,7 +47,7 @@ protected:
 public:
     void StartAttack();     // 외부에서 공격 시작 시 호출
     void OnAttackHit();     // AttackNotify에서 호출
-	void ReceiveInput(); // 콤보 입력 수신
+	void ReceiveInput();    // 콤보 입력 수신
     void OnAttackEnded();
 
 protected:
