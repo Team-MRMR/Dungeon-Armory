@@ -3,12 +3,12 @@
 
 #include "Characters/Mob/Tasks/BTTask_Patrol.h"
 
-#include "AIController.h"
-
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 #include "Characters/Mob/MobBase.h"
+#include "Characters/Mob/AIController/MobAIController.h"
+#include "Characters/Core/Component/CharacterStatComponent.h"
 #include "Characters/Core/Component/MovementControllerComponent.h"
 
 #include "Navigation/PathFollowingComponent.h"
@@ -20,49 +20,44 @@ UBTTask_Patrol::UBTTask_Patrol()
 	bNotifyTick = true;
 
 	NodeName = TEXT("Mob Patrol");
-
-	// 기본적으로 Blackboard 키 자동 UI 지정
-	BBkey_HomeLocation.AddVectorFilter(this, GET_MEMBER_NAME_CHECKED(UBTTask_Patrol, BBkey_HomeLocation));
-	BBkey_PatrolRadius.AddFloatFilter(this, GET_MEMBER_NAME_CHECKED(UBTTask_Patrol, BBkey_PatrolRadius));
-	BBkey_AcceptableRadius.AddFloatFilter(this, GET_MEMBER_NAME_CHECKED(UBTTask_Patrol, BBkey_AcceptableRadius));
 }
 
 void UBTTask_Patrol::InitializeFromAsset(UBehaviorTree& BehaviorTreeAsset)
 {
 	Super::InitializeFromAsset(BehaviorTreeAsset);
-
-	if (UBlackboardData* BlackboardAsset = BehaviorTreeAsset.BlackboardAsset)
-	{
-		BBkey_HomeLocation.ResolveSelectedKey(*BlackboardAsset);
-		BBkey_PatrolRadius.ResolveSelectedKey(*BlackboardAsset);
-		BBkey_AcceptableRadius.ResolveSelectedKey(*BlackboardAsset);
-	}
 }
 
 EBTNodeResult::Type UBTTask_Patrol::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
-	if (!BlackboardComp)
+	UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent();
+	if (!Blackboard)
 	{
 		return EBTNodeResult::Failed;
 	}
 
-	FVector HomeLocation = BlackboardComp->GetValueAsVector(BBkey_HomeLocation.SelectedKeyName);
-	UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(OwnerComp.GetWorld());
+	auto Stat = Cast<UCharacterStatComponent>(Blackboard->GetValueAsObject(BBKeys::Stat));
+	if (!Stat)
+	{
+		return EBTNodeResult::Failed;
+	}
+
+	auto* NavSys = UNavigationSystemV1::GetCurrent(OwnerComp.GetWorld());
 	if (!NavSys)
 	{
 		return EBTNodeResult::Failed;
 	}
 
-	AcceptableRadius = BlackboardComp->GetValueAsFloat(BBkey_AcceptableRadius.SelectedKeyName);
+	FVector HomeLocation = Blackboard->GetValueAsVector(BBKeys::HomeLocation);
 
-	float PatrolRadius = BlackboardComp->GetValueAsFloat(BBkey_PatrolRadius.SelectedKeyName);
-	bool bFound = NavSys->GetRandomPointInNavigableRadius(HomeLocation, PatrolRadius, RandomLocation);
+	FNavLocation RandomLocation;
+	bool bFound = NavSys->GetRandomPointInNavigableRadius(HomeLocation, Stat->PatrolRadius, RandomLocation);
 	if (!bFound)
 	{
 		return EBTNodeResult::Failed;
 	}
+	Blackboard->SetValueAsVector(BBKeys::RandomLocation, RandomLocation.Location);
 
+	// MovementControllerComponent 할당 과정
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (!AIController)
 	{
@@ -81,18 +76,38 @@ EBTNodeResult::Type UBTTask_Patrol::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 		return EBTNodeResult::Failed;
 	}
 
-	MovementController = MobBase->FindComponentByClass<UMovementControllerComponent>();
+	auto MovementController = MobBase->FindComponentByClass<UMovementControllerComponent>();
 	if (!MovementController)
 	{
 		return EBTNodeResult::Failed;
 	}
+	Blackboard->SetValueAsObject(BBKeys::MovementController, MovementController);
 
 	return EBTNodeResult::InProgress;
 }
 
 void UBTTask_Patrol::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
-	MovementController->MoveToDestination(RandomLocation.Location, AcceptableRadius);
+	UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent();
+	if (!Blackboard)
+	{
+		return;
+	}
+
+	auto* MovementController = Cast<UMovementControllerComponent>(Blackboard->GetValueAsObject(BBKeys::MovementController));
+	if (!MovementController)
+	{
+		return;
+	}
+
+	auto* Stat = Cast<UCharacterStatComponent>(Blackboard->GetValueAsObject(BBKeys::Stat));
+	if (!Stat)
+	{
+		return;
+	}
+
+	FVector Location = Blackboard->GetValueAsVector(BBKeys::RandomLocation);
+	MovementController->MoveToDestination(Location);
 }
 
 void UBTTask_Patrol::OnMoveCompleted(UBehaviorTreeComponent* BTComp)

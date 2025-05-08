@@ -14,6 +14,6 @@ void UAttackNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* 
 
 	if (UAttackComponentBase* PlayerAttackComponent = Owner->FindComponentByClass<UAttackComponentBase>())
 	{
-		PlayerAttackComponent->OnAttackHit(); // 컴포넌트 함수 호출
+		PlayerAttackComponent->OnAttack(); // 컴포넌트 함수 호출
 	}
 }

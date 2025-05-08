@@ -53,9 +53,19 @@ protected:
 // --- 블랙보드 키값 스트링 캐싱 ---
 namespace BBKeys
 {
-	static const FName CurrentHealth(TEXT("CurrentHealth"));
-
+	// 상태 수치
 	static const FName MobState(TEXT("MobState"));
-	static const FName PatrolRadius(TEXT("PatrolRadius"));
-	static const FName AcceptableRadius(TEXT("AcceptableRadius"));
+
+	// 플레이어 객체
+	static const FName Target(TEXT("Target"));
+
+	// 스탯 관련 수치
+	static const FName Stat(TEXT("Stat"));
+
+	// 이동 관련 객체
+	static const FName MovementController(TEXT("MovementController"));
+	
+	// 거리 관련 수치
+	static const FName HomeLocation(TEXT("HomeLocation"));
+	static const FName RandomLocation(TEXT("RandomLocation"));
 }

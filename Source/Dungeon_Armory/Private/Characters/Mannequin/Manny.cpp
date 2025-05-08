@@ -3,7 +3,7 @@
 
 #include "Characters/Mannequin/Manny.h"
 #include "Characters/Mannequin/ViewMode/ViewModeComponent.h"
-#include "Characters/Core/Component/AttackComponentBase.h"
+#include "Characters/Core/Component/PlayerAttackComponent.h"
 #include "Characters/Core/Component/CharacterStatComponent.h"
 
 #include "Components/CapsuleComponent.h"
@@ -53,7 +53,7 @@ AManny::AManny()
 
 	StatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("StatComponent"));
 
-	PlayerAttackComponent = CreateDefaultSubobject<UAttackComponentBase>(TEXT("PlayerAttackComponent"));
+	PlayerAttackComponent = CreateDefaultSubobject<UPlayerAttackComponent>(TEXT("PlayerAttackComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -62,12 +62,9 @@ void AManny::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
-	// Set size for collision capsule
-	GetCapsuleComponent()->InitCapsuleSize(42.0f, 96.0f);
-
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
@@ -184,10 +181,11 @@ void AManny::Attack(const FInputActionValue& Value)
 	}
 }
 
-void AManny::ReceiveDamage(float DamageAmount)
+void AManny::ReceiveDamage(const float DamageAmount)
 {
 	if (StatComponent)
 	{
+		UE_LOG(LogTemp, Error, TEXT("Damage Amount: %f"), DamageAmount);
 		StatComponent->ApplyDamage(DamageAmount);
 	}
 }

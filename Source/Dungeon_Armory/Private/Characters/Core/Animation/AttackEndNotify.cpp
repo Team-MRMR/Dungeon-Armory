@@ -2,7 +2,7 @@
 
 
 #include "Characters/Core/Animation/AttackEndNotify.h"
-#include "Characters/Core/Component/AttackComponentBase.h"
+#include "Characters/Core/Component/PlayerAttackComponent.h"
 
 void UAttackEndNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
@@ -13,7 +13,7 @@ void UAttackEndNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBas
 	if (!Owner)
 		return;
 
-	if (UAttackComponentBase* PlayerAttackComponent = Owner->FindComponentByClass<UAttackComponentBase>())
+	if (UPlayerAttackComponent* PlayerAttackComponent = Owner->FindComponentByClass<UPlayerAttackComponent>())
 	{
 		PlayerAttackComponent->OnAttackEnded();
 	}

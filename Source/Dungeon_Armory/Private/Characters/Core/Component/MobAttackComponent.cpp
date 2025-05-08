@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Characters/Mob/MobBase.h"
-
 #include "Characters/Core/Component/MobAttackComponent.h"
+
+#include "Characters/Mob/MobBase.h"
 #include "Characters/Core/Component/CharacterStatComponent.h"
 
 // Sets default values for this component's properties
@@ -28,8 +28,8 @@ void UMobAttackComponent::BeginPlay()
 			return;
 
 		// 스탯 컴포넌트 생성
-		StatComponent = Mob->StatComponent;
-		if (!StatComponent)
+		Stat = Mob->StatComponent;
+		if (!Stat)
 			return;
 	}
 }
@@ -51,7 +51,7 @@ void UMobAttackComponent::StartAttack()
 		return;
 
 	const float RandomValue = FMath::FRandRange(0.0f, 1.0f);
-	if (RandomValue <= StatComponent->CriticalChance)
+	if (RandomValue <= Stat->CriticalChance)
 	{
 		// 크리티컬 공격
 		AnimInstance->Montage_Play(CriticalAttackMontage);
@@ -60,6 +60,73 @@ void UMobAttackComponent::StartAttack()
 	{
 		// 일반 공격
 		AnimInstance->Montage_Play(NormalAttackMontage);
+	}
+}
+
+void UMobAttackComponent::OnAttack()
+{
+	if (!GetOwner())
+		return;
+
+	const FVector Start = GetOwner()->GetActorLocation();
+	const FVector Forward = GetOwner()->GetActorForwardVector();
+	const float TraceDistance = Stat->AttackRange;
+	const FVector End = Start + Forward * TraceDistance;
+
+	const float Radius = Stat->AttackRadius;
+	TArray<FHitResult> HitResults;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(GetOwner());
+
+	bool bHit = GetWorld()->SweepMultiByChannel(
+		HitResults,
+		Start,
+		End,
+		FQuat::Identity,
+		ECC_Pawn,
+		FCollisionShape::MakeSphere(Radius),
+		Params
+	);
+
+	FColor TraceColor = bHit ? FColor::Red : FColor::Green;
+
+	DrawDebugCapsule(
+		GetWorld(),
+		(Start + End) * 0.5f,
+		TraceDistance * 0.5f,
+		Radius,
+		FRotationMatrix::MakeFromZ(End - Start).ToQuat(),
+		TraceColor,
+		false,
+		0.25f
+	);
+
+	if (bHit)
+	{
+		for (const FHitResult& Hit : HitResults)
+		{
+			DrawDebugSphere(
+				GetWorld(),
+				Hit.ImpactPoint,
+				1.0f,
+				12,
+				FColor::Red,
+				false,
+				0.25f
+			);
+
+			AActor* HitActor = Hit.GetActor();
+			if (HitActor)
+			{
+				UE_LOG(LogTemp, Error, TEXT("Hit Actor: %s"), *HitActor->GetName());
+				IIDamageable* DamagedActor = Cast<IIDamageable>(HitActor);
+				if (DamagedActor && Stat)
+				{
+					const float DamageAmount = Stat->BaseAttackDamage;
+					DamagedActor->ReceiveDamage(DamageAmount);
+				}
+			}
+		}
 	}
 }
 

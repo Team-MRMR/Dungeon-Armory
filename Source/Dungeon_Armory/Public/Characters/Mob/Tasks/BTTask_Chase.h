@@ -20,15 +20,6 @@ public:
 	UBTTask_Chase();
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	FBlackboardKeySelector BBkey_AcceptableRadius;
-
-private:
-	UMovementControllerComponent* MovementController;
-	AActor* TargetActor;
-	float AcceptableRadius;
-
-protected:
 	virtual void InitializeFromAsset(UBehaviorTree& BehaviorTree) override;
     virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;

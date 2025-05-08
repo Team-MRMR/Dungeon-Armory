@@ -2,7 +2,7 @@
 
 
 #include "Characters/Core/Animation/ReceiveInputNotify.h"
-#include "Characters/Core/Component/AttackComponentBase.h"
+#include "Characters/Core/Component/PlayerAttackComponent.h"
 
 void UReceiveInputNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
@@ -13,7 +13,7 @@ void UReceiveInputNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequence
 	if (!Owner)
 		return;
 
-	if (UAttackComponentBase* PlayerAttackComponent = Owner->FindComponentByClass<UAttackComponentBase>())
+	if (UPlayerAttackComponent* PlayerAttackComponent = Owner->FindComponentByClass<UPlayerAttackComponent>())
 	{
 		PlayerAttackComponent->ReceiveInput();
 	}

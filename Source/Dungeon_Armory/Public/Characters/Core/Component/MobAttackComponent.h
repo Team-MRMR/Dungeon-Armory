@@ -39,8 +39,9 @@ private:
 
 	UAnimInstance* AnimInstance;
 
-	UCharacterStatComponent* StatComponent;
+	UCharacterStatComponent* Stat;
 
 public:
 	void StartAttack();
+	void OnAttack();
 };

@@ -116,11 +116,15 @@ void AMobAIController::SetMobState(EMobState NewState)
 
 void AMobAIController::InitializeBlackboardKeys()
 {
-    BlackboardComponent->SetValueAsVector("HomeLocation", GetPawn()->GetActorLocation());
+	// --- 상태 관련 키값 ---
     BlackboardComponent->SetValueAsEnum(BBKeys::MobState, static_cast<uint8>(EMobState::Patrol));
 
-    BlackboardComponent->SetValueAsFloat(BBKeys::PatrolRadius, StatComponent->PatrolRadius);
-    BlackboardComponent->SetValueAsFloat(BBKeys::AcceptableRadius, StatComponent->AcceptableRadius);
+	// --- 컴포넌트 관련 키값 ---
+	BlackboardComponent->SetValueAsObject(BBKeys::Stat, StatComponent);
+	BlackboardComponent->SetValueAsObject(BBKeys::MovementController, MovementControllerComponent);
+
+    // --- 거리 관련 키값 ---
+    BlackboardComponent->SetValueAsVector(BBKeys::HomeLocation, GetPawn()->GetActorLocation());
 }
 
 void AMobAIController::OnMovementCompleted()
