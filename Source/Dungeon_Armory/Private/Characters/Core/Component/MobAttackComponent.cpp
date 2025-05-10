@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Characters/Mob/MobBase.h"
-
 #include "Characters/Core/Component/MobAttackComponent.h"
+
+#include "Characters/Mob/MobBase.h"
 #include "Characters/Core/Component/CharacterStatComponent.h"
 
 // Sets default values for this component's properties
