@@ -70,7 +70,8 @@ public:
     float GetAttackCooldown() const { return 1.0f / FMath::Max(BaseAttackSpeed, 0.01f); }
 
     UFUNCTION(BlueprintCallable, Category = "Damage")
-    float GetAttackPlayRate(float AnimationLength) const { return AnimationLength * BaseAttackSpeed; }
+    float GetAttackPlayRate(float AnimationLength) const { return (AnimationLength < GetAttackCooldown()) ? 1.0f : (BaseAttackSpeed * AnimationLength);
+    }
 
 
 // --- 방어력 관련 스탯 ---

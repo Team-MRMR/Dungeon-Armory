@@ -50,7 +50,7 @@ public:
     void StartAttack();     // 외부에서 공격 시작 시 호출
     void OnAttack();     // AttackNotify에서 호출
     void ReceiveInput();    // 콤보 입력 수신
-    void OnAttackEnded();
+    void OnAttackEnd();
 
 protected:
     void ProceedCombo();

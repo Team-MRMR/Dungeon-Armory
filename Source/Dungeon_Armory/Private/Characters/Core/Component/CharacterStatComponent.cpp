@@ -80,9 +80,7 @@ void UCharacterStatComponent::SetSpeedForState(EMobState State)
 
 void UCharacterStatComponent::ApplyDamage(const float DamageAmount)
 {
-	UE_LOG(LogTemp, Error, TEXT("Damage Amount: %f"), DamageAmount);
 	CurrentHealth = FMath::Clamp(CurrentHealth - DamageAmount, 0.f, MaxHealth);
-	UE_LOG(LogTemp, Error, TEXT("Current Health: %f"), CurrentHealth);
 	IsDead();
 }
 

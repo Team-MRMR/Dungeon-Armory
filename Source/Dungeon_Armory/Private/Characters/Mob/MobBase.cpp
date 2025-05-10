@@ -70,6 +70,7 @@ void AMobBase::ReceiveDamage(float DamageAmount)
 {
 	if (StatComponent)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("MobBase::ReceiveDamage()"));
 		StatComponent->ApplyDamage(DamageAmount);
 	}
 }

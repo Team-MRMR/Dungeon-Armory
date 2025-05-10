@@ -36,6 +36,7 @@ void UPlayerAttackComponent::BeginPlay()
 
 void UPlayerAttackComponent::StartAttack()
 {
+	UE_LOG(LogTemp, Warning, TEXT("UPlayerAttackComponent::StartAttack()"));
 	if (bCanReceiveInput)
 	{
 		bNextCombo = true;
@@ -76,7 +77,7 @@ void UPlayerAttackComponent::PlayComboAttackMontage(int32 ComboIndex)
 }
 
 // AttackEndNotify에서 호출
-void UPlayerAttackComponent::OnAttackEnded()
+void UPlayerAttackComponent::OnAttackEnd()
 {
 	if (bNextCombo == false || CurrentComboIndex == ComboAttackSections.Num())
 	{

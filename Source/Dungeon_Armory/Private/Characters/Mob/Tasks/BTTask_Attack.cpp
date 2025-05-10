@@ -10,6 +10,12 @@
 
 #include "BehaviorTree/BlackboardComponent.h"
 
+UBTTask_Attack::UBTTask_Attack()
+{
+	bNotifyTick = true;
+	NodeName = TEXT("Mob Attack");
+}
+
 EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
     auto Controller = OwnerComp.GetAIOwner();
@@ -27,4 +33,17 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	AttackComponent->StartAttack();
 
 	return EBTNodeResult::InProgress;
+}
+
+void UBTTask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	auto Blackboard = OwnerComp.GetBlackboardComponent();
+	if (!Blackboard)
+		return;
+
+	auto AttackComponent = Cast<UMobAttackComponent>(Blackboard->GetValueAsObject(TEXT("AttackComponent")));
+	if (AttackComponent->GetCanAttack())
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	}
 }

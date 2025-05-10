@@ -24,11 +24,12 @@ protected:
 	virtual void BeginPlay() override;
 
 /***** Attack *****/
-private:
+protected:
 	UAnimInstance* AnimInstance;
-	UCharacterStatComponent* StatComponent;
+	UCharacterStatComponent* Stat;
 
 public:
     virtual void StartAttack();   // 외부에서 공격 시작 시 호출
     virtual void OnAttack();      // AttackNotify에서 호출
+	virtual void OnAttackEnd(); // AttackNotify에서 호출
 };

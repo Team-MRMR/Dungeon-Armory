@@ -167,7 +167,6 @@ void AManny::Interact(const FInputActionValue& Value)
 {
 	if (UInteractionComponent* InteractionComp = FindComponentByClass<UInteractionComponent>())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AManny::Interact() Called"));
 		InteractionComp->TryInteract();
 	}
 }
@@ -176,7 +175,6 @@ void AManny::Attack(const FInputActionValue& Value)
 {
 	if (PlayerAttackComponent)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Attack"));
 		PlayerAttackComponent->StartAttack();
 	}
 }
@@ -185,7 +183,6 @@ void AManny::ReceiveDamage(const float DamageAmount)
 {
 	if (StatComponent)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Damage Amount: %f"), DamageAmount);
 		StatComponent->ApplyDamage(DamageAmount);
 	}
 }

@@ -5,13 +5,15 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 
+#include "Characters/Core/Component/AttackComponentBase.h"
+
 #include "MobAttackComponent.generated.h"
 
 class UAnimMontage;
 class UCharacterStatComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DUNGEON_ARMORY_API UMobAttackComponent : public UActorComponent
+class DUNGEON_ARMORY_API UMobAttackComponent : public UAttackComponentBase
 {
 	GENERATED_BODY()
 
@@ -28,7 +30,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-
 /***** Attack *****/
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
@@ -37,11 +38,17 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* CriticalAttackMontage;
 
-	UAnimInstance* AnimInstance;
+	bool bIsStartedAttack;
+	bool bIsEndedAttack;
+	float ElapsedTime;
 
-	UCharacterStatComponent* Stat;
+	bool bCanAttack;
 
 public:
-	void StartAttack();
-	void OnAttack();
+	void StartAttack() override;
+	bool GetCanAttack() const;
+
+private:
+	void OnAttack() override;
+	void OnAttackEnd() override;
 };
