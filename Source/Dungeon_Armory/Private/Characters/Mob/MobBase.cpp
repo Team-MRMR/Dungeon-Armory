@@ -4,6 +4,7 @@
 #include "Characters/Mob/MobBase.h"
 
 #include "Characters/Core/Component/CharacterStatComponent.h"
+#include "Characters/Core/Component/MobAttackComponent.h"
 #include "Characters/Core/Component/MovementControllerComponent.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
@@ -17,7 +18,20 @@ AMobBase::AMobBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	// 컨트롤러 회전 제어 해제
+	// 스탯 컴포넌트 생성
+	StatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("StatComponent"));
+
+	// 공격 컴포넌트 생성
+	AttackComponent = CreateDefaultSubobject<UMobAttackComponent>(TEXT("AttackComponent"));
+
+	// 이동 컨트롤러 컴포넌트 생성
+	MovementControllerComponent = CreateDefaultSubobject<UMovementControllerComponent>(TEXT("MovementControllerComponent"));
+
+	// 팀 컴포넌트 생성
+	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
+	TeamComponent->SetTeamType(ETeamType::Mob);
+
+	// (Pawn) 컨트롤러 회전 제어 해제
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
@@ -32,27 +46,14 @@ AMobBase::AMobBase()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 480.f, 0.f);
 
 	GetCharacterMovement()->UseAccelerationForPathFollowing();
-
-	GetCharacterMovement()->MaxAcceleration = 512.f;			 // 낮을수록 서서히 가속
-	GetCharacterMovement()->BrakingDecelerationWalking = 256.f;  // 낮을수록 서서히 멈춤
-	GetCharacterMovement()->GroundFriction = 4.f;				 // 마찰력, 감속에 영향
-
-
-	// 스탯 컴포넌트 생성
-	StatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("StatComponent"));
-
-	// 이동 컨트롤러 컴포넌트 생성
-	MovementControllerComponent = CreateDefaultSubobject<UMovementControllerComponent>(TEXT("MovementControllerComponent"));
-
-	// 팀 컴포넌트 생성
-	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
-	TeamComponent->SetTeamType(ETeamType::Mob);
 }
 
 // Called when the game starts or when spawned
 void AMobBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetCharacterMovement()->MaxWalkSpeed = StatComponent->BaseSpeed;
 }
 
 void AMobBase::Tick(float DeltaSeconds)
@@ -69,6 +70,7 @@ void AMobBase::ReceiveDamage(float DamageAmount)
 {
 	if (StatComponent)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("MobBase::ReceiveDamage()"));
 		StatComponent->ApplyDamage(DamageAmount);
 	}
 }

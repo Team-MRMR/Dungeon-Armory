@@ -41,7 +41,7 @@ public:
 	void PatrolAtBase(const FVector& Destination, const float AcceptableRadius);
 	void ChaseToTarget();
 	void ReturnToBase();
-	void MoveToDestination(const FVector& Destination, const float AcceptableRadius);
+	void MoveToDestination(const FVector& Destination, const float AcceptableRadius = 1.0f);
 		
 private:
 	void StopMovement();

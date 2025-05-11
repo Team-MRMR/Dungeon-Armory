@@ -6,6 +6,7 @@
 
 #include "Characters/Core/Component/CharacterStatComponent.h"
 #include "Characters/Core/Component/MovementControllerComponent.h"
+#include "Characters/Core/Component/MobAttackComponent.h"
 
 #include "AI/Interface/IMovableTask.h"
 
@@ -38,7 +39,7 @@ void AMobAIController::OnPossess(APawn* InPawn)
     Super::OnPossess(InPawn);
 
     // 컴포넌트 참조 할당
-    if (ACharacter* MobCharacter = Cast<ACharacter>(GetPawn()))
+    if (ACharacter* MobCharacter = Cast<ACharacter>(InPawn))
     {
         if (AMobBase* MobBase = Cast<AMobBase>(MobCharacter))
         {
@@ -46,6 +47,8 @@ void AMobAIController::OnPossess(APawn* InPawn)
 
 			MovementControllerComponent = MobBase->FindComponentByClass<UMovementControllerComponent>();
 			MovementControllerComponent->OnMovementCompleted.AddDynamic(this, &AMobAIController::OnMovementCompleted);
+
+			MobAttackComponent = MobBase->FindComponentByClass<UMobAttackComponent>();
         }
     }
 
@@ -116,11 +119,16 @@ void AMobAIController::SetMobState(EMobState NewState)
 
 void AMobAIController::InitializeBlackboardKeys()
 {
-    BlackboardComponent->SetValueAsVector("HomeLocation", GetPawn()->GetActorLocation());
+	// --- 상태 관련 키값 ---
     BlackboardComponent->SetValueAsEnum(BBKeys::MobState, static_cast<uint8>(EMobState::Patrol));
 
-    BlackboardComponent->SetValueAsFloat(BBKeys::PatrolRadius, StatComponent->PatrolRadius);
-    BlackboardComponent->SetValueAsFloat(BBKeys::AcceptableRadius, StatComponent->AcceptableRadius);
+	// --- 컴포넌트 관련 키값 ---
+	BlackboardComponent->SetValueAsObject(BBKeys::Stat, StatComponent);
+	BlackboardComponent->SetValueAsObject(BBKeys::MovementController, MovementControllerComponent);
+	BlackboardComponent->SetValueAsObject(BBKeys::AttackComponent, MobAttackComponent);
+
+    // --- 거리 관련 키값 ---
+    BlackboardComponent->SetValueAsVector(BBKeys::HomeLocation, GetPawn()->GetActorLocation());
 }
 
 void AMobAIController::OnMovementCompleted()
@@ -145,8 +153,6 @@ void AMobAIController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
 
     if (!BlackboardComponent)
         return;
-
-	UE_LOG(LogTemp, Warning, TEXT("Perceived Actor: %s"), *Actor->GetName());
 
     bool bDetectedTarget = Stimulus.WasSuccessfullySensed();
     if (bDetectedTarget)
