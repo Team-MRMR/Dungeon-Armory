@@ -35,6 +35,7 @@ void UBTTask_Chase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 	UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent();
     if (!Blackboard)
     {
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
         return;
     }
 
@@ -55,6 +56,7 @@ void UBTTask_Chase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 	auto* Stat = Cast<UCharacterStatComponent>(Blackboard->GetValueAsObject(BBKeys::Stat));
 	if (!Stat)
 	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		return;
 	}
 
@@ -63,11 +65,11 @@ void UBTTask_Chase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 
 void UBTTask_Chase::OnMoveCompleted(UBehaviorTreeComponent* BTComp)
 {
-	auto MobAIController = Cast<AMobAIController>(BTComp->GetAIOwner());
-	if (!MobAIController)
-		return;
-	
-	MobAIController->SetMobState(EMobState::Battle);
+	//auto MobAIController = Cast<AMobAIController>(BTComp->GetAIOwner());
+	//if (!MobAIController)
+	//	return;
+	//
+	//MobAIController->SetMobState(EMobState::Battle);
 
     // Task Á¾·á
     FinishLatentTask(*BTComp, EBTNodeResult::Succeeded);

@@ -46,10 +46,11 @@ void UMovementControllerComponent::PatrolAtBase(const FVector& Destination, cons
     if (!CharacterOwner || !MovementComponent)
         return;
 
-    FVector Direction = Destination - CharacterOwner->GetActorLocation();
+	FVector CharacterLocation = CharacterOwner->GetActorLocation();
+    FVector Direction = Destination - CharacterLocation;
     Direction = Direction.GetSafeNormal2D();
 
-    float Distance = FVector::Dist2D(CharacterOwner->GetActorLocation(), Destination);
+    float Distance = FVector::Dist2D(CharacterLocation, Destination);
     if (Distance <= AcceptableRadius)
     {
 		OnMovementCompleted.Broadcast();

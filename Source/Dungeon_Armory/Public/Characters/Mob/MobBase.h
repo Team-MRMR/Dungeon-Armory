@@ -50,6 +50,11 @@ public:
 public:
 	void ReceiveDamage(float DamageAmount) override;
 
+protected:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Die")
+	void Die();
+	virtual void Die_Implementation();
+
 /***** Movement *****/
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")

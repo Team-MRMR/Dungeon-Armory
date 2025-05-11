@@ -42,7 +42,11 @@ private:
 	bool bIsEndedAttack;
 	float ElapsedTime;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
 	bool bCanAttack;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
+	bool bIsCritical;
 
 public:
 	void StartAttack() override;

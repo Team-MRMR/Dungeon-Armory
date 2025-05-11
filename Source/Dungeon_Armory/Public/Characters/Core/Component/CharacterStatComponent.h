@@ -56,6 +56,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Attack | Ciritical")
     float CriticalFactor = 1.5f;    // 크리티컬 배율
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat | Attack | Ciritical")
+    bool bIsCritical = false;       // 크리티컬 성패
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Attack | Logic")
 	float AttackRange = 150.0f;     // 공격 범위
 
@@ -70,14 +73,12 @@ public:
     float GetAttackCooldown() const { return 1.0f / FMath::Max(BaseAttackSpeed, 0.01f); }
 
     UFUNCTION(BlueprintCallable, Category = "Damage")
-    float GetAttackPlayRate(float AnimationLength) const { return (AnimationLength < GetAttackCooldown()) ? 1.0f : (BaseAttackSpeed * AnimationLength);
-    }
-
+    float GetAttackPlayRate(float AnimationLength) const
+    { return (AnimationLength < GetAttackCooldown()) ? 1.0f : (BaseAttackSpeed * AnimationLength); }
 
 // --- 방어력 관련 스탯 ---
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Defense")
     float Defense = 5.f;
-
 
 // --- 이동 속도 관련 스탯 ---
 public:
