@@ -117,9 +117,6 @@ public:
 
 // --- Function ---
 public:
-    UFUNCTION(BlueprintCallable, Category = "Dead")
-    bool IsDead() const;
-
     UFUNCTION(BlueprintCallable, Category = "Movement")
     void SetSpeedForState(EMobState State);
 
