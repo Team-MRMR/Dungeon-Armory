@@ -21,7 +21,7 @@ class UInputAction;
 struct FInputActionValue;
 class UInteractionComponent;
 class UCharacterStatComponent;
-class UAttackComponentBase;
+class UPlayerAttackComponent;
 
 UCLASS()
 class DUNGEON_ARMORY_API AManny : public ACharacter, public IGenericTeamAgentInterface, public IIDamageable
@@ -94,7 +94,7 @@ private:
 /***** Attack *****/
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
-	UAttackComponentBase* PlayerAttackComponent;
+	UPlayerAttackComponent* PlayerAttackComponent;
 
 /***** Unreal *****/
 public:

@@ -14,6 +14,7 @@
 #include "MobBase.generated.h"
 
 class UCharacterStatComponent;
+class UMobAttackComponent;
 class UMovementControllerComponent;
 class UTeamComponent;
 class UBlackboardComponent;
@@ -41,6 +42,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
 	UCharacterStatComponent* StatComponent;
 
+/***** Attack *****/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
+	UMobAttackComponent* AttackComponent;
+
+/***** Damage *****/
+public:
+	void ReceiveDamage(float DamageAmount) override;
+
 /***** Movement *****/
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
@@ -51,7 +60,4 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
 	UTeamComponent* TeamComponent;
 
-/***** Damage *****/
-public:
-	void ReceiveDamage(float DamageAmount) override;
 };

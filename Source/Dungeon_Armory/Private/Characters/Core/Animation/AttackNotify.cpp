@@ -4,16 +4,23 @@
 #include "Characters/Core/Animation/AttackNotify.h"
 #include "Characters/Core/Component/AttackComponentBase.h"
 
+#include "Characters/Mob/MobBase.h"
+#include "Characters/Mannequin/Manny.h"
+
 void UAttackNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
-	if (!MeshComp)
+	AActor* Owner = MeshComp->GetOwner();
+	if (!Owner)
 		return;
 
-	AActor* Owner = MeshComp->GetOwner();
-	if (!Owner) return;
+	auto Player = Cast<AManny>(Owner);	// 여기서 플레이어랑 몬스터 캐스팅 문제 해결해야 함
+	auto Mob = Cast<AMobBase>(Owner);	// 여기서 플레이어랑 몬스터 캐스팅 문제 해결해야 함
+	if (!Mob && !Player)
+		return;
 
-	if (UAttackComponentBase* PlayerAttackComponent = Owner->FindComponentByClass<UAttackComponentBase>())
-	{
-		PlayerAttackComponent->OnAttackHit(); // 컴포넌트 함수 호출
-	}
+	auto AttackComponent = Owner->FindComponentByClass<UAttackComponentBase>();
+	if (!AttackComponent)
+		return;
+
+	AttackComponent->OnAttack();
 }

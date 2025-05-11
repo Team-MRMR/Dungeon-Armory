@@ -44,14 +44,23 @@ public:
 
 // --- 공격력 관련 스탯 ---
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Battle | Damage")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Attack | Damage")
     float BaseAttackDamage = 10.f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Battle | Speed")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Attack | Speed")
 	float BaseAttackSpeed = 1.0f;   // 초당 공격 횟수
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Battle | Ciritical")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Attack | Ciritical")
     float CriticalChance = 0.2f;    // 크리티컬 확률
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Attack | Ciritical")
+    float CriticalFactor = 1.5f;    // 크리티컬 배율
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Attack | Logic")
+	float AttackRange = 150.0f;     // 공격 범위
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Attack | Logic")
+    float AttackRadius = 50.0f;     // 공격 반경
 
 public:
     UFUNCTION(BlueprintCallable, Category = "Damage")
@@ -61,7 +70,8 @@ public:
     float GetAttackCooldown() const { return 1.0f / FMath::Max(BaseAttackSpeed, 0.01f); }
 
     UFUNCTION(BlueprintCallable, Category = "Damage")
-    float GetAttackPlayRate(float AnimationLength) const { return AnimationLength * BaseAttackSpeed; }
+    float GetAttackPlayRate(float AnimationLength) const { return (AnimationLength < GetAttackCooldown()) ? 1.0f : (BaseAttackSpeed * AnimationLength);
+    }
 
 
 // --- 방어력 관련 스탯 ---
@@ -92,7 +102,7 @@ public:
     float PatrolRadius = 500.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Distance")
-	float AcceptableRadius = 100.0f;
+	float AttackableDistance = 100.0f;
 
 // --- AI Perception 관련 수치 ---
 public:
