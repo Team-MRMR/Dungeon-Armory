@@ -52,20 +52,36 @@ void UMobAttackComponent::StartAttack()
 	if (!NormalAttackMontage || !CriticalAttackMontage)
 		return;
 
-	//const float RandomValue = FMath::FRandRange(0.0f, 1.0f);
-	//if (RandomValue <= Stat->CriticalChance)
-	//{
-	//	const float AttackRate = Stat->GetAttackPlayRate(NormalAttackMontage->GetPlayLength());
-	//	AnimInstance->Montage_Play(NormalAttackMontage);	// 일반 공격
-	//}
-	//else
-	//{
-	//	const float AttackRate = Stat->GetAttackPlayRate(CriticalAttackMontage->GetPlayLength());
-	//	AnimInstance->Montage_Play(CriticalAttackMontage);	// 크리티컬 공격
-	//}
+	const float RandomValue = FMath::FRandRange(0.0f, 1.0f);
+	if (RandomValue <= Stat->CriticalChance)
+	{
+		const float AttackRate = Stat->GetAttackPlayRate(NormalAttackMontage->GetPlayLength());
+		
+		// 일반 공격 재생
+		AnimInstance->Montage_Play(
+			NormalAttackMontage,
+			AttackRate,
+			EMontagePlayReturnType::MontageLength,
+			0.0f,
+			true
+		);	
+	}
+	else
+	{
+		const float AttackRate = Stat->GetAttackPlayRate(CriticalAttackMontage->GetPlayLength());
+
+		// 크리티컬 공격 재생
+		AnimInstance->Montage_Play(
+			CriticalAttackMontage,
+			AttackRate,
+			EMontagePlayReturnType::MontageLength,
+			0.0f,
+			true
+		);
+	}
 
 	const float AttackRate = Stat->GetAttackPlayRate(NormalAttackMontage->GetPlayLength());
-	AnimInstance->Montage_Play(NormalAttackMontage, AttackRate, EMontagePlayReturnType::MontageLength, 0.0f, true);	// 일반 공격
+	
 
 	ElapsedTime = 0.0f;
 	bIsStartedAttack = true;
