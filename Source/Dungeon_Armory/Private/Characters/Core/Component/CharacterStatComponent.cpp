@@ -17,15 +17,16 @@ UCharacterStatComponent::UCharacterStatComponent()
 	{
 		OwnerCharacter = Mob;
 	}
-
-	CurrentHealth = MaxHealth;
-	SetSpeed(BaseSpeed);
 }
 
 // Called when the game starts
 void UCharacterStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+
+	CurrentHealth = MaxHealth;
+	SetSpeed(BaseSpeed);
 	
 }
 void UCharacterStatComponent::ApplySpeedModifier(float SpeedMultiplier, float Duration)
@@ -81,10 +82,4 @@ void UCharacterStatComponent::SetSpeedForState(EMobState State)
 void UCharacterStatComponent::ApplyDamage(const float DamageAmount)
 {
 	CurrentHealth = FMath::Clamp(CurrentHealth - DamageAmount, 0.f, MaxHealth);
-	IsDead();
-}
-
-bool UCharacterStatComponent::IsDead() const
-{
-	return CurrentHealth <= 0.f;
 }

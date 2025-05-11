@@ -186,3 +186,8 @@ void AManny::ReceiveDamage(const float DamageAmount)
 		StatComponent->ApplyDamage(DamageAmount);
 	}
 }
+
+void AManny::Die_Implementation()
+{
+
+}
