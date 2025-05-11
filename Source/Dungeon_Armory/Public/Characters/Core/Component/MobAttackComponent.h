@@ -38,12 +38,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* CriticalAttackMontage;
 
-	bool bIsStartedAttack;
-	bool bIsEndedAttack;
 	float ElapsedTime;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
 	bool bCanAttack;
+	bool bIsStartedAttack;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
+	bool bIsEndedAttack;
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
 	bool bIsCritical;
