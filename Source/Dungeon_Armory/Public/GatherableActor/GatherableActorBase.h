@@ -7,16 +7,25 @@
 
 #include "Characters/Core/Interface/IDamageable.h"
 
-#include "GatherableActor.generated.h"
+#include "GatherableActorBase.generated.h"
+
+UENUM(BlueprintType)
+enum class EResourceType : uint8
+{
+	Other    UMETA(DisplayName = "Other"),
+
+	Tree	 UMETA(DisplayName = "Tree"),
+	Vein     UMETA(DisplayName = "Vein")
+};
 
 UCLASS()
-class DUNGEON_ARMORY_API AGatherableActor : public AActor, public IIDamageable
+class DUNGEON_ARMORY_API AGatherableActorBase : public AActor, public IIDamageable
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AGatherableActor();
+	AGatherableActorBase();
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,7 +35,12 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+public:
+	EResourceType GetResourceType() const { return ResourceType; }
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+	EResourceType ResourceType;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
 	float MaxHealth;
 
@@ -41,6 +55,6 @@ public:
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Die")
 	void Die() override;
-	virtual void Die_Implementation(float Damage) { }
+	virtual void Die_Implementation() { }
 
 };

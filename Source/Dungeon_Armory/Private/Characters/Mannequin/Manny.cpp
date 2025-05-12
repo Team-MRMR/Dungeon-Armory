@@ -3,8 +3,7 @@
 
 #include "Characters/Mannequin/Manny.h"
 #include "Characters/Mannequin/ViewMode/ViewModeComponent.h"
-#include "Characters/Mannequin/Component/AxeStatComponent.h"
-#include "Characters/Mannequin/Component/PickaxeStatComponent.h"
+#include "Characters/Mannequin/Component/ToolComponent.h"
 
 #include "Characters/Core/Component/PlayerAttackComponent.h"
 #include "Characters/Core/Component/CharacterStatComponent.h"
@@ -58,8 +57,7 @@ AManny::AManny()
 
 	StatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("StatComponent"));
 
-	AxeStatComponent = CreateDefaultSubobject<UAxeStatComponent>(TEXT("AxeStatComponent"));
-	PickaxeStatComponent = CreateDefaultSubobject<UPickaxeStatComponent>(TEXT("PickaxeStatComponent"));
+	ToolActionComponent = CreateDefaultSubobject<UToolComponent>(TEXT("ToolActionComponent"));
 }
 
 // Called when the game starts or when spawned

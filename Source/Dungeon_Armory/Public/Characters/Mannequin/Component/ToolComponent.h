@@ -4,18 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "ToolStatComponent.generated.h"
+
+#include "Item/Interface/IToolType.h"
+
+#include "ToolComponent.generated.h"
 
 
-//UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-UCLASS(abstract)
-class DUNGEON_ARMORY_API UToolStatComponent : public UActorComponent
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class DUNGEON_ARMORY_API UToolComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UToolStatComponent();
+	UToolComponent();
 
 protected:
 	// Called when the game starts
@@ -33,4 +35,11 @@ public:
 	float Speed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
 	float Efficiency;
+
+private:
+	void PerformByResourceType();
+
+	FHitResult Hit;
+	void DoLineTrace(FHitResult& HitResult);
+
 };

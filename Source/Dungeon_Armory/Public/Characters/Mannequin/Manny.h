@@ -10,6 +10,7 @@
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 
 #include "Characters/Core/Interface/IDamageable.h"
+#include "Item/Interface/IToolType.h"
 
 #include "Manny.generated.h"
 
@@ -20,13 +21,13 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 class UInteractionComponent;
-class UPlayerAttackComponent;
 class UCharacterStatComponent;
-class UAxeStatComponent;
-class UPickaxeStatComponent;
+class UPlayerAttackComponent;
+class UToolComponent;
+
 
 UCLASS()
-class DUNGEON_ARMORY_API AManny : public ACharacter, public IGenericTeamAgentInterface, public IIDamageable
+class DUNGEON_ARMORY_API AManny : public ACharacter, public IGenericTeamAgentInterface, public IIDamageable, public IIToolType
 {
 	GENERATED_BODY()
 
@@ -88,23 +89,20 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
 	UInteractionComponent* InteractionComponent;
 
-/***** Attack *****/
-private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
-	UPlayerAttackComponent* AttackComponent;
-
 /***** Stat *****/
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = "true"))
 	UCharacterStatComponent* StatComponent;
 
+/***** Attack *****/
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
+	UPlayerAttackComponent* AttackComponent;
+
 /***** Tool Stat *****/
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = "true"))
-	UAxeStatComponent* AxeStatComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = "true"))
-	UPickaxeStatComponent* PickaxeStatComponent;
+	UToolComponent* ToolActionComponent;
 
 
 
@@ -156,6 +154,7 @@ public:
 
 
 /***** Utilities *****/
+public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Die")
 	void Die();
 	virtual void Die_Implementation() { };
@@ -163,4 +162,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Durability")
 	void DecreaseDurability();
 	virtual void DecreaseDurability_Implementation() { };
+
+	virtual EToolType GetToolType_Implementation() const override { return EToolType::Other; }
 };
