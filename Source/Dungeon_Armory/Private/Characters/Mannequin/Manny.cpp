@@ -3,6 +3,9 @@
 
 #include "Characters/Mannequin/Manny.h"
 #include "Characters/Mannequin/ViewMode/ViewModeComponent.h"
+#include "Characters/Mannequin/Component/AxeStatComponent.h"
+#include "Characters/Mannequin/Component/PickaxeStatComponent.h"
+
 #include "Characters/Core/Component/PlayerAttackComponent.h"
 #include "Characters/Core/Component/CharacterStatComponent.h"
 
@@ -51,9 +54,12 @@ AManny::AManny()
 
 	ViewModeComponent = CreateDefaultSubobject<UViewModeComponent>(TEXT("ViewModeComponent"));
 
+	AttackComponent = CreateDefaultSubobject<UPlayerAttackComponent>(TEXT("AttackComponent"));
+
 	StatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("StatComponent"));
 
-	PlayerAttackComponent = CreateDefaultSubobject<UPlayerAttackComponent>(TEXT("PlayerAttackComponent"));
+	AxeStatComponent = CreateDefaultSubobject<UAxeStatComponent>(TEXT("AxeStatComponent"));
+	PickaxeStatComponent = CreateDefaultSubobject<UPickaxeStatComponent>(TEXT("PickaxeStatComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -173,9 +179,10 @@ void AManny::Interact(const FInputActionValue& Value)
 
 void AManny::Attack(const FInputActionValue& Value)
 {
-	if (PlayerAttackComponent)
+	if (AttackComponent)
 	{
-		PlayerAttackComponent->StartAttack();
+		UE_LOG(LogTemp, Warning, TEXT("AManny::Attack()"));
+		AttackComponent->StartAttack();
 	}
 }
 
@@ -185,9 +192,4 @@ void AManny::ReceiveDamage(const float DamageAmount)
 	{
 		StatComponent->ApplyDamage(DamageAmount);
 	}
-}
-
-void AManny::Die_Implementation()
-{
-
 }

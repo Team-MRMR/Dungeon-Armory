@@ -31,5 +31,5 @@ protected:
 public:
     virtual void StartAttack();   // 외부에서 공격 시작 시 호출
     virtual void OnAttack();      // AttackNotify에서 호출
-	virtual void OnAttackEnd(); // AttackNotify에서 호출
+	virtual void OnAttackEnd();   // AttackNotify에서 호출
 };

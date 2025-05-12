@@ -6,6 +6,7 @@
 #include "Characters/Core/Component/AttackComponentBase.h"
 #include "PlayerAttackComponent.generated.h"
 
+class AManny;
 class UAnimMontage;
 class UCharacterStatComponent;
 
@@ -25,7 +26,7 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
     TArray<FName> ComboAttackSections;
 
-    ACharacter* OwnerCharacter;
+    AManny* OwnerPlayerCharacter;
     UAnimInstance* AnimInstance;
     UCharacterStatComponent* StatComponent;
 
@@ -47,10 +48,10 @@ protected:
 
     /***** Attack *****/
 public:
-    void StartAttack();     // 외부에서 공격 시작 시 호출
-    void OnAttack();     // AttackNotify에서 호출
+    void StartAttack()override;     // 외부에서 공격 시작 시 호출
+    void OnAttack() override;        // AttackNotify에서 호출
+    void OnAttackEnd() override;
     void ReceiveInput();    // 콤보 입력 수신
-    void OnAttackEnd();
 
 protected:
     void ProceedCombo();

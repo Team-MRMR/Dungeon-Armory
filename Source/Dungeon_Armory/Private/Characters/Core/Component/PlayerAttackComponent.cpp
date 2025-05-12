@@ -6,6 +6,8 @@
 
 #include "Characters/Core/Interface/IDamageable.h"
 
+#include "Characters/Mannequin/Manny.h"
+
 #include "GameFramework/Character.h"
 #include "Animation/AnimInstance.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -26,11 +28,11 @@ void UPlayerAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OwnerCharacter = Cast<ACharacter>(GetOwner());
-	if (OwnerCharacter)
+	OwnerPlayerCharacter = Cast<AManny>(GetOwner());
+	if (OwnerPlayerCharacter)
 	{
-		AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
-		StatComponent = OwnerCharacter->FindComponentByClass<UCharacterStatComponent>();
+		AnimInstance = OwnerPlayerCharacter->GetMesh()->GetAnimInstance();
+		StatComponent = OwnerPlayerCharacter->FindComponentByClass<UCharacterStatComponent>();
 	}
 }
 
@@ -166,8 +168,10 @@ void UPlayerAttackComponent::OnAttack()
 				{
 					const float DamageAmount = StatComponent->BaseAttackDamage;
 					DamagedActor->ReceiveDamage(DamageAmount);
+					OwnerPlayerCharacter->DecreaseDurability();
 				}
 			}
+
 		}
 	}
 }

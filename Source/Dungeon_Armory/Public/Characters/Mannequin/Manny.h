@@ -20,8 +20,10 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 class UInteractionComponent;
-class UCharacterStatComponent;
 class UPlayerAttackComponent;
+class UCharacterStatComponent;
+class UAxeStatComponent;
+class UPickaxeStatComponent;
 
 UCLASS()
 class DUNGEON_ARMORY_API AManny : public ACharacter, public IGenericTeamAgentInterface, public IIDamageable
@@ -86,15 +88,25 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
 	UInteractionComponent* InteractionComponent;
 
+/***** Attack *****/
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
+	UPlayerAttackComponent* AttackComponent;
+
 /***** Stat *****/
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = "true"))
 	UCharacterStatComponent* StatComponent;
 
-/***** Attack *****/
+/***** Tool Stat *****/
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
-	UPlayerAttackComponent* PlayerAttackComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = "true"))
+	UAxeStatComponent* AxeStatComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = "true"))
+	UPickaxeStatComponent* PickaxeStatComponent;
+
+
 
 /***** Unreal *****/
 public:
@@ -142,8 +154,13 @@ public:
 	// IIDamageable을(를) 통해 상속됨
 	void ReceiveDamage(float DamageAmount) override;
 
-protected:
+
+/***** Utilities *****/
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Die")
 	void Die();
-	virtual void Die_Implementation();
+	virtual void Die_Implementation() { };
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Durability")
+	void DecreaseDurability();
+	virtual void DecreaseDurability_Implementation() { };
 };

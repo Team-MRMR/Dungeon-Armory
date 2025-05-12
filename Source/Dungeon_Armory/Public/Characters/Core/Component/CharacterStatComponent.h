@@ -17,6 +17,16 @@ enum class EMobState : uint8
     Dead
 };
 
+UENUM(BlueprintType)
+enum class EElementalType : uint8
+{
+	None,   // 없음
+
+    Aqua,   // 물
+    Ignis,  // 불
+	Terra   // 땅
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DUNGEON_ARMORY_API UCharacterStatComponent : public UActorComponent
 {
@@ -34,13 +44,26 @@ protected:
 private:
     ACharacter* OwnerCharacter;
 
-// --- HP & MP 관련 스탯 ---
+// --- HP관련 스탯 ---
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | HP & MP")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | HP")
     float MaxHealth = 100.f;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat | HP & MP")
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat | HP")
     float CurrentHealth;
+
+// --- Stamina 관련 스탯 ---
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | HP")
+    float MaxStamina = 100.f;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat | HP")
+    float CurrentStamina;
+
+// --- 플레이어 및 무기 속성 관련 스탯 ---
+public:
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat | Elemental")
+	EElementalType WeaponElementType = EElementalType::None;
 
 // --- 공격력 관련 스탯 ---
 public:
@@ -77,6 +100,7 @@ public:
     { return (AnimationLength < GetAttackCooldown()) ? 1.0f : (BaseAttackSpeed * AnimationLength); }
 
 // --- 방어력 관련 스탯 ---
+public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Defense")
     float Defense = 5.f;
 
@@ -104,6 +128,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Distance")
 	float AttackableDistance = 100.0f;
+
+// --- 벌목 관련 수치 ---
+public:
+
+// --- 채광 관련 수치 ---
 
 // --- AI Perception 관련 수치 ---
 public:
