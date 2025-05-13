@@ -2,7 +2,7 @@
 
 
 #include "Characters/Core/Animation/ReceiveInputNotify.h"
-#include "Characters/Core/Component/PlayerAttackComponent.h"
+#include "Characters/Mannequin/Component/PlayerAttackComponent.h"
 
 void UReceiveInputNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {

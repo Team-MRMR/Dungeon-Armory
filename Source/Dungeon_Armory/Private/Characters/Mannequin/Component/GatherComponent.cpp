@@ -1,0 +1,186 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Characters/Mannequin/Component/GatherComponent.h"
+#include "Characters/Mannequin/Interface/IToolEuipable.h"
+
+#include "GatherableActor/GatherableActorBase.h"
+
+// Sets default values for this component's properties
+UGatherComponent::UGatherComponent()
+{
+	PrimaryComponentTick.bCanEverTick = false;
+
+}
+
+// Called when the game starts
+void UGatherComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
+
+
+// Called every frame
+void UGatherComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+}
+
+void UGatherComponent::StartGather()
+{
+    if (bCanReceiveInput)
+    {
+        bHasNextGather = true;
+        bCanReceiveInput = false;
+    }
+
+    if (bIsMontageEnded)
+    {
+        ProceedGather();
+    }
+}
+
+void UGatherComponent::OnGather()
+{
+    FHitResult HitResult;
+    DoLineTrace(HitResult);
+
+    // 1. 라인 트레이스를 통해 감지한 대상 검사
+    AActor* Target = HitResult.GetActor();
+    if (!Target)
+        return;
+
+    // 2. 플레이어의 도구와 자원 액터의 타입을 가져오기 위한 준비
+    IIToolEuipable* IToolEuipable = Cast<IIToolEuipable>(GetOwner());
+	if (!IToolEuipable)
+		return;
+
+    AGatherableActorBase* GatherableActor = Cast<AGatherableActorBase>(Target);
+	if (!GatherableActor)
+		return;
+
+    // 3. 대상에 따라 분기 처리
+	EResourceType ResourceType = GatherableActor->GetResourceType();      // 자원 액터에서 ResourceType을 가져옴
+    if (ToolType == EToolType::Axe && ResourceType == EResourceType::Tree)
+    {
+        Logging(GatherableActor);
+    }
+    else if(ToolType == EToolType::Pickaxe && ResourceType == EResourceType::Vein)
+    {
+        Mining(GatherableActor);
+    }
+}
+
+void UGatherComponent::OnGatherEnd()
+{
+    bIsMontageEnded = true;
+    bCanReceiveInput = true;
+
+    if (bHasNextGather)
+    {
+        ProceedGather();
+        bHasNextGather = false;
+    }
+
+}
+
+void UGatherComponent::ReceiveInput()
+{
+    bCanReceiveInput = true;
+}
+
+void UGatherComponent::DoLineTrace(FHitResult& HitResult)
+{
+    // 1. 플레이어 또는 컴포넌트 오너 얻기
+    AActor* OwnerActor = GetOwner();
+    if (!OwnerActor)
+        return;
+
+    // 2. 라인 트레이스의 시작점과 끝점 계산
+    FVector Start, End;
+    FRotator ViewRot;
+    OwnerActor->GetActorEyesViewPoint(Start, ViewRot);
+    End = Start + ViewRot.Vector() * GatheringDistance;
+
+    // 3. 충돌 파라미터 설정
+    FCollisionQueryParams TraceParams;
+    TraceParams.AddIgnoredActor(OwnerActor); // 자신은 무시
+
+    // 4. 실제 라인 트레이스 수행
+    GetWorld()->LineTraceSingleByChannel(
+        HitResult,
+        Start,
+        End,
+        ECC_Visibility, // 또는 커스텀 채널: ECC_GameTraceChannel1 등
+        TraceParams
+    );
+
+    // 5. 디버그용 선 그리기 (테스트 시에만)
+#if WITH_EDITOR
+    DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 0.1f);
+    if (HitResult.bBlockingHit)
+    {
+        DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 5.0f, 12, FColor::Red, false, 0.1f);
+    }
+#endif
+}
+
+void UGatherComponent::UpdateToolType()
+{
+    auto OwnerActor = GetOwner();
+    if (!OwnerActor)
+        return;
+
+    auto IToolEuipable = Cast<IIToolEuipable>(OwnerActor);
+    if (!IToolEuipable)
+        return;
+
+    ToolType = IToolEuipable->Execute_GetToolType(OwnerActor);
+}
+
+void UGatherComponent::Logging(AGatherableActorBase* ResourceActor)
+{
+}
+
+void UGatherComponent::Mining(AGatherableActorBase* ResourceActor)
+{
+}
+
+void UGatherComponent::ProceedGather()
+{
+    UpdateToolType();
+
+    PlayGatherMontage();
+
+    bHasNextGather = false;
+}
+
+void UGatherComponent::PlayGatherMontage()
+{
+    if (!AnimInstance)
+        return;
+
+    if (!LoggingMontage || !MiningMontage)
+        return;
+
+    if (AnimInstance->Montage_IsPlaying(LoggingMontage) || AnimInstance->Montage_IsPlaying(MiningMontage))
+        return;
+
+    switch (ToolType)
+    {
+    case EToolType::Axe:
+        AnimInstance->Montage_Play(LoggingMontage);
+        break;
+
+    case EToolType::Pickaxe:
+        AnimInstance->Montage_Play(MiningMontage);
+        break;
+
+    default:
+        break;
+    }
+    
+    bIsMontageEnded = false;
+}

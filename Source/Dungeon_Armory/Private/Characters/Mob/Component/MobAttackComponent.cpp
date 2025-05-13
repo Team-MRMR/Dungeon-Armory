@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Characters/Core/Component/MobAttackComponent.h"
+#include "Characters/Mob/Component/MobAttackComponent.h"
 #include "Characters/Core/Component/CharacterStatComponent.h"
 #include "Characters/Core/Animation/AttackNotify.h"
 #include "Characters/Core/Animation/AttackEndNotify.h"

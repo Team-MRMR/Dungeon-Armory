@@ -36,8 +36,6 @@ private:
     bool bCanReceiveInput;  // 콤보 입력 가능 여부
     bool bNextCombo;        // 다음 콤보 진행 여부
 
-    FTimerHandle ComboInputTimerHandle;  // 콤보 지속시간 핸들러
-
     /***** Unreal *****/
 public:
     UPlayerAttackComponent();

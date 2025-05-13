@@ -4,21 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "IToolType.generated.h"
+#include "IToolEuipable.generated.h"
 
 UENUM(BlueprintType)
 enum class EToolType : uint8
 {
 	Other    UMETA(DisplayName = "Other"),
 
-	//Weapon   UMETA(DisplayName = "Weapon"),
+	Weapon   UMETA(DisplayName = "Weapon"),
 	Axe      UMETA(DisplayName = "Axe"),
 	Pickaxe  UMETA(DisplayName = "Pickaxe")
 };
 
 // 도구 액터의 ToolType을 가져오는 인터페이스
 UINTERFACE(MinimalAPI)
-class UIToolType : public UInterface
+class UIToolEuipable : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -26,7 +26,7 @@ class UIToolType : public UInterface
 /**
  * 
  */
-class DUNGEON_ARMORY_API IIToolType
+class DUNGEON_ARMORY_API IIToolEuipable
 {
 	GENERATED_BODY()
 

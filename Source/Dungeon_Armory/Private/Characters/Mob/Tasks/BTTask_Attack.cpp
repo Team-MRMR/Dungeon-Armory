@@ -5,8 +5,8 @@
 
 #include "Characters/Mob/MobBase.h"
 #include "Characters/Mob/AIController/MobAIController.h"
+#include "Characters/Mob/Component/MobAttackComponent.h"
 
-#include "Characters/Core/Component/MobAttackComponent.h"
 #include "Characters/Core/Component/CharacterStatComponent.h"
 
 #include "BehaviorTree/BlackboardComponent.h"

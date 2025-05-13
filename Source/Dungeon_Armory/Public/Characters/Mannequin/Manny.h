@@ -10,7 +10,7 @@
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 
 #include "Characters/Core/Interface/IDamageable.h"
-#include "Item/Interface/IToolType.h"
+#include "Characters/Mannequin/Interface/IToolEuipable.h"
 
 #include "Manny.generated.h"
 
@@ -23,11 +23,11 @@ struct FInputActionValue;
 class UInteractionComponent;
 class UCharacterStatComponent;
 class UPlayerAttackComponent;
-class UToolComponent;
+class UGatherComponent;
 
 
 UCLASS()
-class DUNGEON_ARMORY_API AManny : public ACharacter, public IGenericTeamAgentInterface, public IIDamageable, public IIToolType
+class DUNGEON_ARMORY_API AManny : public ACharacter, public IGenericTeamAgentInterface, public IIDamageable, public IIToolEuipable
 {
 	GENERATED_BODY()
 
@@ -102,7 +102,7 @@ private:
 /***** Tool Stat *****/
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = "true"))
-	UToolComponent* ToolActionComponent;
+	UGatherComponent* GatherComponent;
 
 
 
@@ -145,7 +145,7 @@ protected:
 	void Interact(const FInputActionValue& Value);
 
 	/** Called for Attacking input */
-	void Attack(const FInputActionValue& Value);
+	void LeftClickInteract(const FInputActionValue& Value);
 
 /***** Damage*****/
 public:
