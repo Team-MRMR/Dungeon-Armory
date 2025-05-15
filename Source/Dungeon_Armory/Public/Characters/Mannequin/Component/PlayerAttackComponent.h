@@ -6,6 +6,7 @@
 #include "Characters/Core/Component/AttackComponentBase.h"
 #include "PlayerAttackComponent.generated.h"
 
+class AManny;
 class UAnimMontage;
 class UCharacterStatComponent;
 
@@ -25,7 +26,7 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
     TArray<FName> ComboAttackSections;
 
-    ACharacter* OwnerCharacter;
+    AManny* OwnerPlayerCharacter;
     UAnimInstance* AnimInstance;
     UCharacterStatComponent* StatComponent;
 
@@ -34,8 +35,6 @@ private:
     bool bIsMontageEnded;   // 몽타주 종료 여부
     bool bCanReceiveInput;  // 콤보 입력 가능 여부
     bool bNextCombo;        // 다음 콤보 진행 여부
-
-    FTimerHandle ComboInputTimerHandle;  // 콤보 지속시간 핸들러
 
     /***** Unreal *****/
 public:
@@ -47,10 +46,10 @@ protected:
 
     /***** Attack *****/
 public:
-    void StartAttack();     // 외부에서 공격 시작 시 호출
-    void OnAttack();     // AttackNotify에서 호출
+    void StartAttack()override;     // 외부에서 공격 시작 시 호출
+    void OnAttack() override;        // AttackNotify에서 호출
+    void OnAttackEnd() override;
     void ReceiveInput();    // 콤보 입력 수신
-    void OnAttackEnd();
 
 protected:
     void ProceedCombo();

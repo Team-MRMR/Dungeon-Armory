@@ -3,8 +3,13 @@
 
 #include "Characters/Mannequin/Manny.h"
 #include "Characters/Mannequin/ViewMode/ViewModeComponent.h"
-#include "Characters/Core/Component/PlayerAttackComponent.h"
+#include "Characters/Mannequin/Component/GatherComponent.h"
+
+#include "Characters/Mannequin/Component/PlayerAttackComponent.h"
 #include "Characters/Core/Component/CharacterStatComponent.h"
+
+#include "Characters/Mob/MobBase.h"
+#include "GatherableActor/GatherableActorBase.h"
 
 #include "Components/CapsuleComponent.h"
 
@@ -51,9 +56,11 @@ AManny::AManny()
 
 	ViewModeComponent = CreateDefaultSubobject<UViewModeComponent>(TEXT("ViewModeComponent"));
 
+	AttackComponent = CreateDefaultSubobject<UPlayerAttackComponent>(TEXT("AttackComponent"));
+
 	StatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("StatComponent"));
 
-	PlayerAttackComponent = CreateDefaultSubobject<UPlayerAttackComponent>(TEXT("PlayerAttackComponent"));
+	GatherComponent = CreateDefaultSubobject<UGatherComponent>(TEXT("ToolActionComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -113,7 +120,7 @@ void AManny::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AManny::Interact);
 
 		// Attack
-		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AManny::Attack);
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AManny::LeftClickInteract);
 	}
 }
 
@@ -171,11 +178,46 @@ void AManny::Interact(const FInputActionValue& Value)
 	}
 }
 
-void AManny::Attack(const FInputActionValue& Value)
+void AManny::LeftClickInteract(const FInputActionValue& Value)
 {
-	if (PlayerAttackComponent)
+	// 1. 라인 트레이스의 시작점과 끝점 계산
+	FVector Start, End;
+	FRotator ViewRot;
+	GetActorEyesViewPoint(Start, ViewRot);
+	End = Start + ViewRot.Vector() * StatComponent->AttackableDistance;
+
+	// 2. 충돌 파라미터 설정
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	// 3. 실제 라인 트레이스 수행
+	bool bHit = GetWorld()->LineTraceSingleByChannel(
+		Hit,
+		Start,
+		End,
+		ECC_Visibility,
+		Params
+	);
+	AActor* HitActor = bHit ? Hit.GetActor() : nullptr;
+
+	// 4. 디버그용으로 시각화	
+#if WITH_EDITOR
+	DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Red : FColor::Green, false, 0.1f, 0, 1.0f);
+#endif
+
+	auto MobBase = Cast<AMobBase>(HitActor);
+	auto GatherableActor = Cast<AGatherableActorBase>(HitActor);
+
+	if (MobBase && AttackComponent)
 	{
-		PlayerAttackComponent->StartAttack();
+		UE_LOG(LogTemp, Warning, TEXT("AManny::LeftClickInteract"));
+		AttackComponent->StartAttack();
+	}
+	else if (GatherableActor && GatherComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AManny::Attack()"));
+		GatherComponent->StartGather();
 	}
 }
 
@@ -185,9 +227,4 @@ void AManny::ReceiveDamage(const float DamageAmount)
 	{
 		StatComponent->ApplyDamage(DamageAmount);
 	}
-}
-
-void AManny::Die_Implementation()
-{
-
 }

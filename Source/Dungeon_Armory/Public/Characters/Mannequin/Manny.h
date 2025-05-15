@@ -10,6 +10,7 @@
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 
 #include "Characters/Core/Interface/IDamageable.h"
+#include "Characters/Mannequin/Interface/IToolEuipable.h"
 
 #include "Manny.generated.h"
 
@@ -22,9 +23,11 @@ struct FInputActionValue;
 class UInteractionComponent;
 class UCharacterStatComponent;
 class UPlayerAttackComponent;
+class UGatherComponent;
+
 
 UCLASS()
-class DUNGEON_ARMORY_API AManny : public ACharacter, public IGenericTeamAgentInterface, public IIDamageable
+class DUNGEON_ARMORY_API AManny : public ACharacter, public IGenericTeamAgentInterface, public IIDamageable, public IIToolEuipable
 {
 	GENERATED_BODY()
 
@@ -94,7 +97,14 @@ private:
 /***** Attack *****/
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
-	UPlayerAttackComponent* PlayerAttackComponent;
+	UPlayerAttackComponent* AttackComponent;
+
+/***** Tool Stat *****/
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = "true"))
+	UGatherComponent* GatherComponent;
+
+
 
 /***** Unreal *****/
 public:
@@ -135,15 +145,23 @@ protected:
 	void Interact(const FInputActionValue& Value);
 
 	/** Called for Attacking input */
-	void Attack(const FInputActionValue& Value);
+	void LeftClickInteract(const FInputActionValue& Value);
 
 /***** Damage*****/
 public:
 	// IIDamageable을(를) 통해 상속됨
 	void ReceiveDamage(float DamageAmount) override;
 
-protected:
+
+/***** Utilities *****/
+public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Die")
 	void Die();
-	virtual void Die_Implementation();
+	virtual void Die_Implementation() { };
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Durability")
+	void DecreaseDurability();
+	virtual void DecreaseDurability_Implementation() { };
+
+	virtual EToolType GetToolType_Implementation() const override { return EToolType::Other; }
 };

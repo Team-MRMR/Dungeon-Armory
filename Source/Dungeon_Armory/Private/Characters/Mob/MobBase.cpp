@@ -2,9 +2,9 @@
 
 
 #include "Characters/Mob/MobBase.h"
+#include "Characters/Mob/Component/MobAttackComponent.h"
 
 #include "Characters/Core/Component/CharacterStatComponent.h"
-#include "Characters/Core/Component/MobAttackComponent.h"
 #include "Characters/Core/Component/MovementControllerComponent.h"
 
 #include "GameFramework/CharacterMovementComponent.h"

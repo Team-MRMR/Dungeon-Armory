@@ -1,10 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Characters/Core/Component/PlayerAttackComponent.h"
-#include "Characters/Core/Component/CharacterStatComponent.h"
+#include "Characters/Mannequin/Component/PlayerAttackComponent.h"
 
+#include "Characters/Core/Component/CharacterStatComponent.h"
 #include "Characters/Core/Interface/IDamageable.h"
+
+#include "Characters/Mannequin/Manny.h"
 
 #include "GameFramework/Character.h"
 #include "Animation/AnimInstance.h"
@@ -26,11 +28,11 @@ void UPlayerAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OwnerCharacter = Cast<ACharacter>(GetOwner());
-	if (OwnerCharacter)
+	OwnerPlayerCharacter = Cast<AManny>(GetOwner());
+	if (OwnerPlayerCharacter)
 	{
-		AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
-		StatComponent = OwnerCharacter->FindComponentByClass<UCharacterStatComponent>();
+		AnimInstance = OwnerPlayerCharacter->GetMesh()->GetAnimInstance();
+		StatComponent = OwnerPlayerCharacter->FindComponentByClass<UCharacterStatComponent>();
 	}
 }
 
@@ -166,8 +168,10 @@ void UPlayerAttackComponent::OnAttack()
 				{
 					const float DamageAmount = StatComponent->BaseAttackDamage;
 					DamagedActor->ReceiveDamage(DamageAmount);
+					OwnerPlayerCharacter->DecreaseDurability();
 				}
 			}
+
 		}
 	}
 }

@@ -2,11 +2,11 @@
 
 
 #include "Characters/Mob/AIController/MobAIController.h"
+#include "Characters/Mob/Component/MobAttackComponent.h"
 #include "Characters/Mob/MobBase.h"
 
 #include "Characters/Core/Component/CharacterStatComponent.h"
 #include "Characters/Core/Component/MovementControllerComponent.h"
-#include "Characters/Core/Component/MobAttackComponent.h"
 
 #include "AI/Interface/IMovableTask.h"
 
@@ -25,7 +25,7 @@ const FName AMobAIController::MobStateKey(TEXT("MobState"));
 
 AMobAIController::AMobAIController()
 {
-    PrimaryActorTick.bCanEverTick = false;
+    PrimaryActorTick.bCanEverTick = true;
 }
 
 void AMobAIController::BeginPlay()
@@ -100,6 +100,30 @@ void AMobAIController::OnPossess(APawn* InPawn)
 void AMobAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+    if (!BlackboardComponent)
+        return;
+
+    if (!DetectedPlayer)
+        return;
+
+    // 플레이어와의 거리 계산
+    FVector MobLocation = GetPawn()->GetActorLocation();
+    FVector PlayerLocation = DetectedPlayer->GetActorLocation();
+    float Distance = FVector::Dist2D(MobLocation, PlayerLocation);
+
+    if (Distance <= StatComponent->AttackableDistance)  // 공격 범위 내라면
+    {
+        BlackboardComponent->SetValueAsEnum(MobStateKey, static_cast<uint8>(EMobState::Battle));
+    }
+    else if (Distance <= StatComponent->SightRadius)    // 추격 범위 내라면
+    {
+        BlackboardComponent->SetValueAsEnum(MobStateKey, static_cast<uint8>(EMobState::Chase));
+    }
+    else    // 추격 범위 밖이라면
+    {
+        BlackboardComponent->SetValueAsEnum(MobStateKey, static_cast<uint8>(EMobState::Patrol));
+    }
 }
 
 void AMobAIController::SetMobState(EMobState NewState)
@@ -161,7 +185,7 @@ void AMobAIController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
 		OnMovementCompleted();
         DetectedPlayer = Actor;
         BlackboardComponent->SetValueAsObject("Target", Actor);
-        BlackboardComponent->SetValueAsEnum(MobStateKey, static_cast<uint8>(EMobState::Chase));
+
     }
     else if(DetectedPlayer == Actor)
     {
@@ -169,11 +193,10 @@ void AMobAIController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
         OnMovementCompleted();
         DetectedPlayer = nullptr;
         BlackboardComponent->SetValueAsObject("Target", nullptr);
-        BlackboardComponent->SetValueAsEnum(MobStateKey, static_cast<uint8>(EMobState::Patrol));
     }
 
     StopMovement();
-    // 현재 실행 중인 BT Task 중단 (Patrol Task 중단)
+    // 현재 실행 중인 BTTask 중단 (Patrol Task 중단)
     if (BehaviorTreeComponent)
     {
         BehaviorTreeComponent->RequestExecution(EBTNodeResult::Type::Aborted);

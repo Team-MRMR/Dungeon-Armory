@@ -1,8 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Characters/Core/Component/MobAttackComponent.h"
-
-#include "Characters/Mob/MobBase.h"
+#include "Characters/Mob/Component/MobAttackComponent.h"
 #include "Characters/Core/Component/CharacterStatComponent.h"
 #include "Characters/Core/Animation/AttackNotify.h"
 #include "Characters/Core/Animation/AttackEndNotify.h"
@@ -25,8 +23,8 @@ UMobAttackComponent::UMobAttackComponent()
 // Called when the game starts
 void UMobAttackComponent::BeginPlay()
 {
-	// ¾Ö´Ô ÀÎ½ºÅÏ½º »ý¼º
-	// ½ºÅÈ ÄÄÆ÷³ÍÆ® »ý¼º
+	// ï¿½Ö´ï¿½ ï¿½Î½ï¿½ï¿½Ï½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
 	Super::BeginPlay();
 }
 
@@ -54,14 +52,16 @@ void UMobAttackComponent::StartAttack()
 	if (!NormalAttackMontage || !CriticalAttackMontage)
 		return;
 
-	const float RandomValue = FMath::FRandRange(0.0f, 1.0f);
-	if (RandomValue <= Stat->CriticalChance)
+	float Chance = FMath::FRandRange(0.0f, 1.0f);
+	bIsCritical = (Chance <= Stat->CriticalChance) ? true : false;
+
+	if (bIsCritical)
 	{
-		const float AttackRate = Stat->GetAttackPlayRate(NormalAttackMontage->GetPlayLength());
+		const float AttackRate = Stat->GetAttackPlayRate(CriticalAttackMontage->GetPlayLength());
 		
-		// ÀÏ¹Ý °ø°Ý Àç»ý
+		// Å©ï¿½ï¿½Æ¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 		AnimInstance->Montage_Play(
-			NormalAttackMontage,
+			CriticalAttackMontage,
 			AttackRate,
 			EMontagePlayReturnType::MontageLength,
 			0.0f,
@@ -70,19 +70,17 @@ void UMobAttackComponent::StartAttack()
 	}
 	else
 	{
-		const float AttackRate = Stat->GetAttackPlayRate(CriticalAttackMontage->GetPlayLength());
+		const float AttackRate = Stat->GetAttackPlayRate(NormalAttackMontage->GetPlayLength());
 
-		// Å©¸®Æ¼ÄÃ °ø°Ý Àç»ý
+		// ï¿½Ï¹ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 		AnimInstance->Montage_Play(
-			CriticalAttackMontage,
+			NormalAttackMontage,
 			AttackRate,
 			EMontagePlayReturnType::MontageLength,
 			0.0f,
 			true
 		);
 	}
-
-	const float AttackRate = Stat->GetAttackPlayRate(NormalAttackMontage->GetPlayLength());
 	
 
 	ElapsedTime = 0.0f;
