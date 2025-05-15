@@ -23,8 +23,8 @@ UMobAttackComponent::UMobAttackComponent()
 // Called when the game starts
 void UMobAttackComponent::BeginPlay()
 {
-	// ¾Ö´Ô ÀÎ½ºÅÏ½º »ý¼º
-	// ½ºÅÈ ÄÄÆ÷³ÍÆ® »ý¼º
+	// ï¿½Ö´ï¿½ ï¿½Î½ï¿½ï¿½Ï½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
 	Super::BeginPlay();
 }
 
@@ -59,7 +59,7 @@ void UMobAttackComponent::StartAttack()
 	{
 		const float AttackRate = Stat->GetAttackPlayRate(CriticalAttackMontage->GetPlayLength());
 		
-		// Å©¸®Æ¼ÄÃ °ø°Ý Àç»ý
+		// Å©ï¿½ï¿½Æ¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 		AnimInstance->Montage_Play(
 			CriticalAttackMontage,
 			AttackRate,
@@ -72,7 +72,7 @@ void UMobAttackComponent::StartAttack()
 	{
 		const float AttackRate = Stat->GetAttackPlayRate(NormalAttackMontage->GetPlayLength());
 
-		// ÀÏ¹Ý °ø°Ý Àç»ý
+		// ï¿½Ï¹ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 		AnimInstance->Montage_Play(
 			NormalAttackMontage,
 			AttackRate,
