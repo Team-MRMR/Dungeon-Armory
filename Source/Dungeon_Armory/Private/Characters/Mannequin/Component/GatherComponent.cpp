@@ -3,6 +3,7 @@
 
 #include "Characters/Mannequin/Component/GatherComponent.h"
 #include "Characters/Mannequin/Interface/IToolEuipable.h"
+#include "Characters/Mannequin/Manny.h"
 
 #include "GatherableActor/GatherableActorBase.h"
 
@@ -11,6 +12,9 @@ UGatherComponent::UGatherComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
+    bIsMontageEnded = true;
+    bCanReceiveInput = true;
+    bHasNextGather = false;
 }
 
 // Called when the game starts
@@ -18,6 +22,12 @@ void UGatherComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
+    auto OwnerPlayerCharacter = Cast<AManny>(GetOwner());
+    if (OwnerPlayerCharacter)
+    {
+        AnimInstance = OwnerPlayerCharacter->GetMesh()->GetAnimInstance();
+    }
+
 }
 
 

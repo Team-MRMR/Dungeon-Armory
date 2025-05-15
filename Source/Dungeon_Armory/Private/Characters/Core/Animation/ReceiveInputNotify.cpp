@@ -2,6 +2,11 @@
 
 
 #include "Characters/Core/Animation/ReceiveInputNotify.h"
+
+#include "Characters/Mannequin/Manny.h"
+
+#include "Characters/Mannequin/Interface/IToolEuipable.h"
+#include "Characters/Mannequin/Component/GatherComponent.h"
 #include "Characters/Mannequin/Component/PlayerAttackComponent.h"
 
 void UReceiveInputNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
@@ -13,8 +18,28 @@ void UReceiveInputNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequence
 	if (!Owner)
 		return;
 
-	if (UPlayerAttackComponent* PlayerAttackComponent = Owner->FindComponentByClass<UPlayerAttackComponent>())
+	auto Player = Cast<AManny>(Owner);
+	auto IToolEuipable = Cast<IIToolEuipable>(Owner);
+	if (!Player || !IToolEuipable)
+		return;
+
+	EToolType ToolType = IToolEuipable->Execute_GetToolType(Owner);
+	if (ToolType == EToolType::Weapon)
 	{
-		PlayerAttackComponent->ReceiveInput();
+		auto AttackComponent = Player->FindComponentByClass<UPlayerAttackComponent>();
+		if (!AttackComponent)
+			return;
+
+		AttackComponent->ReceiveInput();
 	}
+	else if (ToolType == EToolType::Axe || ToolType == EToolType::Pickaxe)
+	{
+		auto GatherComponent = Player->FindComponentByClass<UGatherComponent>();
+		if (!GatherComponent)
+			return;
+
+		GatherComponent->ReceiveInput();
+	}
+
+	return;
 }

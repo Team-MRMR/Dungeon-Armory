@@ -31,21 +31,13 @@ void UAttackNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* 
 
 			AttackComponent->OnAttack();
 		}
-		else if (ToolType == EToolType::Axe)
+		else if (ToolType == EToolType::Axe || ToolType == EToolType::Pickaxe)
 		{
 			auto GatherComponent = Player->FindComponentByClass<UGatherComponent>();
 			if (!GatherComponent)
 				return;
 
 			GatherComponent->OnGather();
-		}
-		else if (ToolType == EToolType::Pickaxe)
-		{
-			auto GatherComponent = Player->FindComponentByClass<UGatherComponent>();
-			if (!GatherComponent)
-				return;
-
-			GatherComponent->OnGather(); // 여기서 채집을 해야 하는데 힛 리줄트 문제 해결해야 함
 		}
 
 		return;
