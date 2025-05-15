@@ -8,6 +8,7 @@
 #include "Characters/Mob/Component/MobAttackComponent.h"
 
 #include "Characters/Core/Component/CharacterStatComponent.h"
+#include "Characters/Core/Component/MovementControllerComponent.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -42,7 +43,17 @@ void UBTTask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	if (!Blackboard)
 		return;
 
-	auto AttackComponent = Cast<UMobAttackComponent>(Blackboard->GetValueAsObject(TEXT("AttackComponent")));
+	auto MovementController = Cast<UMovementControllerComponent>(Blackboard->GetValueAsObject(BBKeys::MovementController));
+	if (MovementController)
+	{
+		auto Target = Cast<AActor>(Blackboard->GetValueAsObject(BBKeys::Target));
+		if (Target)
+		{
+			MovementController->RotateToTarget(Target->GetActorLocation(), DeltaSeconds);
+		}
+	}
+
+	auto AttackComponent = Cast<UMobAttackComponent>(Blackboard->GetValueAsObject(BBKeys::AttackComponent));
 	if (AttackComponent->GetCanAttack())
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

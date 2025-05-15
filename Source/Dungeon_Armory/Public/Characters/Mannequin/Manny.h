@@ -145,7 +145,7 @@ protected:
 	void Interact(const FInputActionValue& Value);
 
 	/** Called for Attacking input */
-	void LeftClickInteract(const FInputActionValue& Value);
+	void LeftClickAction(const FInputActionValue& Value);
 
 /***** Damage*****/
 public:

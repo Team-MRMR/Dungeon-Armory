@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Characters/Mob/Component/MobAttackComponent.h"
+#include "Characters/Mob/MobBase.h"
+
 #include "Characters/Core/Component/CharacterStatComponent.h"
 #include "Characters/Core/Animation/AttackNotify.h"
 #include "Characters/Core/Animation/AttackEndNotify.h"
-
-#include "Characters/Mob/MobBase.h"
 
 
 // Sets default values for this component's properties
@@ -102,7 +102,7 @@ void UMobAttackComponent::OnAttack()
 
 	const FVector Start = GetOwner()->GetActorLocation();
 	const FVector Forward = GetOwner()->GetActorForwardVector();
-	const float TraceDistance = Stat->AttackRange;
+	const float TraceDistance = Stat->AttackableDistance;
 	const FVector End = Start + Forward * TraceDistance;
 
 	const float Radius = Stat->AttackRadius;

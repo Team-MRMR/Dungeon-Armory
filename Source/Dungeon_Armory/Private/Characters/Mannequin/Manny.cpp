@@ -92,8 +92,8 @@ void AManny::BeginPlay()
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(CoreContext, 1);
 			Subsystem->AddMappingContext(BattleContext, 0);
+			Subsystem->AddMappingContext(CoreContext, 1);
 		}
 	}
 }
@@ -120,7 +120,7 @@ void AManny::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AManny::Interact);
 
 		// Attack
-		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AManny::LeftClickInteract);
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AManny::LeftClickAction);
 	}
 }
 
@@ -178,7 +178,7 @@ void AManny::Interact(const FInputActionValue& Value)
 	}
 }
 
-void AManny::LeftClickInteract(const FInputActionValue& Value)
+void AManny::LeftClickAction(const FInputActionValue& Value)
 {
 	// 1. 라인 트레이스의 시작점과 끝점 계산
 	FVector Start, End;
@@ -196,7 +196,7 @@ void AManny::LeftClickInteract(const FInputActionValue& Value)
 		Hit,
 		Start,
 		End,
-		ECC_Visibility,
+		ECC_Pawn,
 		Params
 	);
 	AActor* HitActor = bHit ? Hit.GetActor() : nullptr;
@@ -211,12 +211,12 @@ void AManny::LeftClickInteract(const FInputActionValue& Value)
 
 	if (MobBase && AttackComponent)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AManny::LeftClickInteract"));
+		UE_LOG(LogTemp, Warning, TEXT("AttackComponent->StartAttack();"));
 		AttackComponent->StartAttack();
 	}
 	else if (GatherableActor && GatherComponent)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AManny::Attack()"));
+		UE_LOG(LogTemp, Warning, TEXT("GatherComponent->StartGather();"));
 		GatherComponent->StartGather();
 	}
 }

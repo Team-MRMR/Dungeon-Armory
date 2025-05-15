@@ -60,6 +60,7 @@ void UBTTask_Chase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 		return;
 	}
 
+
 	MovementController->MoveToDestination(TargetActor->GetActorLocation(), Stat->AttackableDistance);
 }
 

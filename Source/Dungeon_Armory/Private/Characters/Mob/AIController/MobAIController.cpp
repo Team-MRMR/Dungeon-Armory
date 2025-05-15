@@ -101,9 +101,6 @@ void AMobAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-    if (!BlackboardComponent)
-        return;
-
     if (!DetectedPlayer)
         return;
 
@@ -114,15 +111,11 @@ void AMobAIController::Tick(float DeltaTime)
 
     if (Distance <= StatComponent->AttackableDistance)  // 공격 범위 내라면
     {
-        BlackboardComponent->SetValueAsEnum(MobStateKey, static_cast<uint8>(EMobState::Battle));
+		SetMobState(EMobState::Battle);
     }
     else if (Distance <= StatComponent->SightRadius)    // 추격 범위 내라면
     {
-        BlackboardComponent->SetValueAsEnum(MobStateKey, static_cast<uint8>(EMobState::Chase));
-    }
-    else    // 추격 범위 밖이라면
-    {
-        BlackboardComponent->SetValueAsEnum(MobStateKey, static_cast<uint8>(EMobState::Patrol));
+		SetMobState(EMobState::Chase);
     }
 }
 
@@ -181,24 +174,23 @@ void AMobAIController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
     bool bDetectedTarget = Stimulus.WasSuccessfullySensed();
     if (bDetectedTarget)
     {
+        // 현재 실행 중인 BTTask 중단
+        BehaviorTreeComponent->RequestExecution(EBTNodeResult::Type::Aborted);
+        //OnMovementCompleted();
+
         // 플레이어가 감지됨
-		OnMovementCompleted();
         DetectedPlayer = Actor;
         BlackboardComponent->SetValueAsObject("Target", Actor);
-
     }
     else if(DetectedPlayer == Actor)
     {
+        // 현재 실행 중인 BTTask 중단
+        BehaviorTreeComponent->RequestExecution(EBTNodeResult::Type::Aborted);
+        //OnMovementCompleted();
+
         // 플레이어를 놓침
-        OnMovementCompleted();
         DetectedPlayer = nullptr;
         BlackboardComponent->SetValueAsObject("Target", nullptr);
-    }
-
-    StopMovement();
-    // 현재 실행 중인 BTTask 중단 (Patrol Task 중단)
-    if (BehaviorTreeComponent)
-    {
-        BehaviorTreeComponent->RequestExecution(EBTNodeResult::Type::Aborted);
+        SetMobState(EMobState::Patrol);
     }
 }
