@@ -148,15 +148,18 @@ void UMobAttackComponent::OnAttack()
 			);
 
 			AActor* HitActor = Hit.GetActor();
-			if (HitActor)
+			if (!HitActor)
+				return;
+
+			auto TargetStat = HitActor->FindComponentByClass<UCharacterStatComponent>();
+			if (!TargetStat)
+				return;
+
+			IIDamageable* DamagedActor = Cast<IIDamageable>(HitActor);
+			if (DamagedActor && Stat)
 			{
-				UE_LOG(LogTemp, Error, TEXT("Hit Actor: %s"), *HitActor->GetName());
-				IIDamageable* DamagedActor = Cast<IIDamageable>(HitActor);
-				if (DamagedActor && Stat)
-				{
-					const float DamageAmount = Stat->BaseAttackDamage;
-					DamagedActor->ReceiveDamage(DamageAmount);
-				}
+				const float DamageAmount = CalculateDamage(Stat, TargetStat);
+				DamagedActor->ReceiveDamage(DamageAmount);
 			}
 		}
 	}
@@ -165,5 +168,10 @@ void UMobAttackComponent::OnAttack()
 void UMobAttackComponent::OnAttackEnd()
 {
 	bIsEndedAttack = true;
+}
+
+float UMobAttackComponent::CalculateDamage(UCharacterStatComponent* Attacker, UCharacterStatComponent* Defender)
+{
+	return Super::CalculateDamage(Attacker, Defender);
 }
 

@@ -24,8 +24,15 @@ void UCharacterStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	auto World = GetWorld();
+	if (World)
+	{
+		AttackStamina.Initialize(World);
+		SkillStamina.Initialize(World);
+		LoggingStamina.Initialize(World);
+		MiningStamina.Initialize(World);
+	}
 
-	CurrentHealth = MaxHealth;
 	SetSpeed(BaseSpeed);
 	
 }
@@ -71,6 +78,30 @@ float UCharacterStatComponent::GetSpeedForState(EMobState State) const
 	default:
 		return BaseSpeed;
 	}
+}
+
+void UCharacterStatComponent::ConsumeAttackStamina()
+{
+	const float ConsumptionStamina = AttackStamina.Consumption;
+	AttackStamina.Consume(ConsumptionStamina);
+}
+
+void UCharacterStatComponent::ConsumeSkillStamina()
+{
+	const float ConsumptionStamina = SkillStamina.Consumption;
+	SkillStamina.Consume(ConsumptionStamina);
+}
+
+void UCharacterStatComponent::ConsumeLoggingStamina()
+{
+	const float ConsumptionStamina = LoggingStamina.Consumption;
+	LoggingStamina.Consume(ConsumptionStamina);
+}
+
+void UCharacterStatComponent::ConsumeMiningStamina()
+{
+	const float ConsumptionStamina = MiningStamina.Consumption;
+	MiningStamina.Consume(ConsumptionStamina);
 }
 
 void UCharacterStatComponent::SetSpeedForState(EMobState State)

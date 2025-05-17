@@ -73,12 +73,10 @@ void AMobBase::ReceiveDamage(float DamageAmount)
 {
 	if (StatComponent)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MobBase::ReceiveDamage()"));
 		StatComponent->ApplyDamage(DamageAmount);
 
 		if (StatComponent->CurrentHealth <= 0.0f)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("MobBase::ReceiveDamage() - IsDead()\nCurrentHealth: %.02f"), StatComponent->CurrentHealth);
 			// Á×À½ Ã³¸®
 			Die();
 		}

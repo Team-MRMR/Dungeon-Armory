@@ -43,3 +43,14 @@ void UAttackComponentBase::OnAttackEnd()
 {
 
 }
+
+float UAttackComponentBase::CalculateDamage(UCharacterStatComponent* Attacker, UCharacterStatComponent* Defender)
+{
+	int8 AttackerElement = static_cast<int8>(Attacker->WeaponElementType);
+	int8 DefenderElement = static_cast<int8>(Defender->WeaponElementType);
+	float ElementalFactor = ElementalCompatibility[AttackerElement][DefenderElement];
+
+	float Damage = (Attacker->BaseAttackDamage * ElementalFactor) - Defender->Defense;
+
+	return Damage;
+}

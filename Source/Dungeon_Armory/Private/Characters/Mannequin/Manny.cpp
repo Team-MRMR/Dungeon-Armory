@@ -60,7 +60,7 @@ AManny::AManny()
 
 	StatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("StatComponent"));
 
-	GatherComponent = CreateDefaultSubobject<UGatherComponent>(TEXT("ToolActionComponent"));
+	GatherComponent = CreateDefaultSubobject<UGatherComponent>(TEXT("GatherComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -203,7 +203,7 @@ void AManny::LeftClickAction(const FInputActionValue& Value)
 
 	// 4. 디버그용으로 시각화	
 #if WITH_EDITOR
-	DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Red : FColor::Green, false, 0.1f, 0, 1.0f);
+	// DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Red : FColor::Green, false, 0.1f, 0, 1.0f);
 #endif
 
 	auto MobBase = Cast<AMobBase>(HitActor);
@@ -211,12 +211,10 @@ void AManny::LeftClickAction(const FInputActionValue& Value)
 
 	if (MobBase && AttackComponent)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AttackComponent->StartAttack();"));
 		AttackComponent->StartAttack();
 	}
 	else if (GatherableActor && GatherComponent)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("GatherComponent->StartGather();"));
 		GatherComponent->StartGather();
 	}
 }
@@ -226,5 +224,11 @@ void AManny::ReceiveDamage(const float DamageAmount)
 	if (StatComponent)
 	{
 		StatComponent->ApplyDamage(DamageAmount);
+
+		if (StatComponent->CurrentHealth <= 0.0f)
+		{
+			// 죽음 처리
+			Die();
+		}
 	}
 }
