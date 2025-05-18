@@ -4,28 +4,24 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
-#include "Navigation/PathFollowingComponent.h"  // EPathFollowingResult Æ÷ÇÔ
+#include "Characters/Core/AI/Interface/IMovableTask.h"
 
 #include "BTTask_MoveToPoint.generated.h"
 
 class UBehaviorTreeComponent;
 
 UCLASS()
-class DUNGEON_ARMORY_API UBTTask_MoveToPoint : public UBTTask_BlackboardBase
+class DUNGEON_ARMORY_API UBTTask_MoveToPoint : public UBTTask_BlackboardBase, public IIMovableTask
 {
 	GENERATED_BODY()
 
-/***** Variables *****/
-private:
-	UBehaviorTreeComponent* BehaviorTreeCmp;
-
-/***** Functions *****/
 public:
 	UBTTask_MoveToPoint();
 
-	UFUNCTION()
-	void OnMovingCompleted(UBehaviorTreeComponent* BehaviorTreeComp);
-
 protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+
+protected: // IIMovableTask
+	void OnMoveCompleted(UBehaviorTreeComponent* BTComp);
 };

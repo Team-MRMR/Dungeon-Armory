@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 
-#include "AI/Team/TeamComponent.h"
+#include "Characters/Core/AI/Team/TeamComponent.h"
 #include "GenericTeamAgentInterface.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 
@@ -145,7 +145,7 @@ protected:
 	void Interact(const FInputActionValue& Value);
 
 	/** Called for Attacking input */
-	void LeftClickInteract(const FInputActionValue& Value);
+	void LeftClickAction(const FInputActionValue& Value);
 
 /***** Damage*****/
 public:

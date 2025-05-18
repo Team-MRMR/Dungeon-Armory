@@ -28,7 +28,7 @@ private:
 
     AManny* OwnerPlayerCharacter;
     UAnimInstance* AnimInstance;
-    UCharacterStatComponent* StatComponent;
+    UCharacterStatComponent* Stat;
 
     int32 CurrentComboIndex; // ÇöÀç ÄÞº¸ ÀÎµ¦½º
 
@@ -54,4 +54,7 @@ public:
 protected:
     void ProceedCombo();
     void PlayComboAttackMontage(int32 ComboIndex);
+
+private:
+    virtual float CalculateDamage(UCharacterStatComponent* Attacker, UCharacterStatComponent* Defender);
 };

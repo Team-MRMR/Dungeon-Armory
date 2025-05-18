@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Characters/Mob/Component/MobAttackComponent.h"
+#include "Characters/Mob/MobBase.h"
+
 #include "Characters/Core/Component/CharacterStatComponent.h"
 #include "Characters/Core/Animation/AttackNotify.h"
 #include "Characters/Core/Animation/AttackEndNotify.h"
-
-#include "Characters/Mob/MobBase.h"
 
 
 // Sets default values for this component's properties
@@ -102,7 +102,7 @@ void UMobAttackComponent::OnAttack()
 
 	const FVector Start = GetOwner()->GetActorLocation();
 	const FVector Forward = GetOwner()->GetActorForwardVector();
-	const float TraceDistance = Stat->AttackRange;
+	const float TraceDistance = Stat->AttackableDistance;
 	const FVector End = Start + Forward * TraceDistance;
 
 	const float Radius = Stat->AttackRadius;
@@ -148,15 +148,18 @@ void UMobAttackComponent::OnAttack()
 			);
 
 			AActor* HitActor = Hit.GetActor();
-			if (HitActor)
+			if (!HitActor)
+				return;
+
+			auto TargetStat = HitActor->FindComponentByClass<UCharacterStatComponent>();
+			if (!TargetStat)
+				return;
+
+			IIDamageable* DamagedActor = Cast<IIDamageable>(HitActor);
+			if (DamagedActor && Stat)
 			{
-				UE_LOG(LogTemp, Error, TEXT("Hit Actor: %s"), *HitActor->GetName());
-				IIDamageable* DamagedActor = Cast<IIDamageable>(HitActor);
-				if (DamagedActor && Stat)
-				{
-					const float DamageAmount = Stat->BaseAttackDamage;
-					DamagedActor->ReceiveDamage(DamageAmount);
-				}
+				const float DamageAmount = CalculateDamage(Stat, TargetStat);
+				DamagedActor->ReceiveDamage(DamageAmount);
 			}
 		}
 	}
@@ -165,5 +168,10 @@ void UMobAttackComponent::OnAttack()
 void UMobAttackComponent::OnAttackEnd()
 {
 	bIsEndedAttack = true;
+}
+
+float UMobAttackComponent::CalculateDamage(UCharacterStatComponent* Attacker, UCharacterStatComponent* Defender)
+{
+	return Super::CalculateDamage(Attacker, Defender);
 }
 

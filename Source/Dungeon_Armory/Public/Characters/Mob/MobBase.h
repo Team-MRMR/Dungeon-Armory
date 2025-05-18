@@ -42,11 +42,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
 	UCharacterStatComponent* StatComponent;
 
+/***** Team *****/
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
+	UTeamComponent* TeamComponent;
+
 /***** Attack *****/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
 	UMobAttackComponent* AttackComponent;
 
-/***** Damage *****/
 public:
 	void ReceiveDamage(float DamageAmount) override;
 
@@ -54,15 +58,4 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Die")
 	void Die();
 	virtual void Die_Implementation();
-
-/***** Movement *****/
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
-	UMovementControllerComponent* MovementControllerComponent;
-
-/***** Team *****/
-public:
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
-	UTeamComponent* TeamComponent;
-
 };

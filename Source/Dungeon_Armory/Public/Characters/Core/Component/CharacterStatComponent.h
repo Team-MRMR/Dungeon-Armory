@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 
+#include "Characters/Core/Stat/StaminaStat.h"
+
 #include "CharacterStatComponent.generated.h"
 
 UENUM(BlueprintType)
@@ -26,6 +28,16 @@ enum class EElementalType : uint8
     Ignis,  // 불
 	Terra   // 땅
 };
+
+constexpr float ElementalCompatibility[4][4] =
+{
+    // None, Aqua, Ignis, Terra
+    {1.0f, 1.0f, 1.0f, 1.0f}, // None
+    {1.0f, 1.0f, 1.2f, 0.8f}, // Aqua
+    {1.0f, 0.8f, 1.0f, 1.2f}, // Ignis
+    {1.0f, 1.2f, 0.8f, 1.0f}, // Terra
+};
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DUNGEON_ARMORY_API UCharacterStatComponent : public UActorComponent
@@ -54,15 +66,21 @@ public:
 
 // --- Stamina 관련 스탯 ---
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | HP")
-    float MaxStamina = 100.f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Stamina")
+    FStaminaStat AttackStamina;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat | HP")
-    float CurrentStamina;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Stamina")
+    FStaminaStat SkillStamina;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Stamina")
+    FStaminaStat LoggingStamina;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Stamina")
+    FStaminaStat MiningStamina;
 
 // --- 플레이어 및 무기 속성 관련 스탯 ---
 public:
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat | Elemental")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Elemental")
 	EElementalType WeaponElementType = EElementalType::None;
 
 // --- 공격력 관련 스탯 ---
@@ -130,7 +148,6 @@ public:
 	float AttackableDistance = 100.0f;
 
 // --- 벌목 관련 수치 ---
-public:
 
 // --- 채광 관련 수치 ---
 
@@ -153,8 +170,16 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Movement")
     float GetSpeedForState(EMobState State) const;
 
+public:
+    //UFUNCTION(BlueprintCallable, Category = "Stamina")
+    void ConsumeAttackStamina();
+    void ConsumeSkillStamina();
+    void ConsumeLoggingStamina();
+    void ConsumeMiningStamina();
+
 private:
     void ResetSpeed();
     void ApplySpeedModifier(float SpeedMultiplier, float Duration);
     void SetSpeed(float NewSpeed);
 };
+

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Characters/Core/AIControllerBase.h"
+#include "Characters/Core/AI/AIControllerBase.h"
 #include "Characters/Core/Component/CharacterStatComponent.h"
 
 #include "MobAIController.generated.h"
@@ -26,7 +26,7 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;
 
-/***** Stat *****/
+/***** Component *****/
 private:
 	UCharacterStatComponent* StatComponent;
 	UMovementControllerComponent* MovementControllerComponent;
@@ -42,8 +42,6 @@ public:
 
 private:
 	void InitializeBlackboardKeys();
-
-	UFUNCTION()
 	void OnMovementCompleted();
 
 /***** AI *****/
@@ -53,7 +51,7 @@ protected:
 };
 
 // --- 블랙보드 키값 스트링 캐싱 ---
-namespace BBKeys
+namespace MobBBKeys
 {
 	// 상태 수치
 	static const FName MobState(TEXT("MobState"));
@@ -69,7 +67,7 @@ namespace BBKeys
 
 	// 공격 관련 객체
 	static const FName AttackComponent(TEXT("AttackComponent"));
-	
+
 	// 거리 관련 수치
 	static const FName HomeLocation(TEXT("HomeLocation"));
 	static const FName RandomLocation(TEXT("RandomLocation"));

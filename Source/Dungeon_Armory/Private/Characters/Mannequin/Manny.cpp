@@ -60,7 +60,7 @@ AManny::AManny()
 
 	StatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("StatComponent"));
 
-	GatherComponent = CreateDefaultSubobject<UGatherComponent>(TEXT("ToolActionComponent"));
+	GatherComponent = CreateDefaultSubobject<UGatherComponent>(TEXT("GatherComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -92,8 +92,8 @@ void AManny::BeginPlay()
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(CoreContext, 1);
 			Subsystem->AddMappingContext(BattleContext, 0);
+			Subsystem->AddMappingContext(CoreContext, 1);
 		}
 	}
 }
@@ -120,7 +120,7 @@ void AManny::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AManny::Interact);
 
 		// Attack
-		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AManny::LeftClickInteract);
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AManny::LeftClickAction);
 	}
 }
 
@@ -178,7 +178,7 @@ void AManny::Interact(const FInputActionValue& Value)
 	}
 }
 
-void AManny::LeftClickInteract(const FInputActionValue& Value)
+void AManny::LeftClickAction(const FInputActionValue& Value)
 {
 	// 1. 라인 트레이스의 시작점과 끝점 계산
 	FVector Start, End;
@@ -196,14 +196,14 @@ void AManny::LeftClickInteract(const FInputActionValue& Value)
 		Hit,
 		Start,
 		End,
-		ECC_Visibility,
+		ECC_Pawn,
 		Params
 	);
 	AActor* HitActor = bHit ? Hit.GetActor() : nullptr;
 
 	// 4. 디버그용으로 시각화	
 #if WITH_EDITOR
-	DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Red : FColor::Green, false, 0.1f, 0, 1.0f);
+	// DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Red : FColor::Green, false, 0.1f, 0, 1.0f);
 #endif
 
 	auto MobBase = Cast<AMobBase>(HitActor);
@@ -211,12 +211,10 @@ void AManny::LeftClickInteract(const FInputActionValue& Value)
 
 	if (MobBase && AttackComponent)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AManny::LeftClickInteract"));
 		AttackComponent->StartAttack();
 	}
 	else if (GatherableActor && GatherComponent)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AManny::Attack()"));
 		GatherComponent->StartGather();
 	}
 }
@@ -226,5 +224,11 @@ void AManny::ReceiveDamage(const float DamageAmount)
 	if (StatComponent)
 	{
 		StatComponent->ApplyDamage(DamageAmount);
+
+		if (StatComponent->CurrentHealth <= 0.0f)
+		{
+			// 죽음 처리
+			Die();
+		}
 	}
 }

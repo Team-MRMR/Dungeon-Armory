@@ -61,11 +61,6 @@ void UMovementControllerComponent::PatrolAtBase(const FVector& Destination, cons
     MovementComponent->AddInputVector(Velocity, false);
 }
 
-void UMovementControllerComponent::ChaseToTarget()
-{
-
-}
-
 void UMovementControllerComponent::MoveToDestination(const FVector& Destination, const float AcceptableRadius)
 {
     if (!CharacterOwner || !MovementComponent)
@@ -83,6 +78,21 @@ void UMovementControllerComponent::MoveToDestination(const FVector& Destination,
 
     FVector Velocity = Direction * StatComponent->PatrolSpeedFactor;
     MovementComponent->AddInputVector(Velocity, false);
+}
+
+void UMovementControllerComponent::RotateToTarget(const FVector& TargetLocation, float DeltaTime, float RotationSpeed)
+{
+    const auto Owner = GetOwner();
+    if (!Owner)
+        return;
+
+    const FVector Direction = (TargetLocation - Owner->GetActorLocation()).GetSafeNormal2D();
+    const FRotator TargetRotation = Direction.Rotation();
+    const FRotator CurrentRotation = Owner->GetActorRotation();
+
+    const FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, RotationSpeed);
+
+    Owner->SetActorRotation(NewRotation);
 }
 
 void UMovementControllerComponent::StopMovement()

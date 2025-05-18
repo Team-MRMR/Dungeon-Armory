@@ -8,7 +8,7 @@
 #include "Characters/Core/Component/CharacterStatComponent.h"
 #include "Characters/Core/Component/MovementControllerComponent.h"
 
-#include "AI/Interface/IMovableTask.h"
+#include "Characters/Core/AI/Interface/IMovableTask.h"
 
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
@@ -101,9 +101,6 @@ void AMobAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-    if (!BlackboardComponent)
-        return;
-
     if (!DetectedPlayer)
         return;
 
@@ -114,15 +111,11 @@ void AMobAIController::Tick(float DeltaTime)
 
     if (Distance <= StatComponent->AttackableDistance)  // 공격 범위 내라면
     {
-        BlackboardComponent->SetValueAsEnum(MobStateKey, static_cast<uint8>(EMobState::Battle));
+		SetMobState(EMobState::Battle);
     }
     else if (Distance <= StatComponent->SightRadius)    // 추격 범위 내라면
     {
-        BlackboardComponent->SetValueAsEnum(MobStateKey, static_cast<uint8>(EMobState::Chase));
-    }
-    else    // 추격 범위 밖이라면
-    {
-        BlackboardComponent->SetValueAsEnum(MobStateKey, static_cast<uint8>(EMobState::Patrol));
+		SetMobState(EMobState::Chase);
     }
 }
 
@@ -143,20 +136,23 @@ void AMobAIController::SetMobState(EMobState NewState)
 
 void AMobAIController::InitializeBlackboardKeys()
 {
-	// --- 상태 관련 키값 ---
-    BlackboardComponent->SetValueAsEnum(BBKeys::MobState, static_cast<uint8>(EMobState::Patrol));
+	// --- 상태 관련 키값 ---S
+    BlackboardComponent->SetValueAsEnum(MobBBKeys::MobState, static_cast<uint8>(EMobState::Patrol));
 
 	// --- 컴포넌트 관련 키값 ---
-	BlackboardComponent->SetValueAsObject(BBKeys::Stat, StatComponent);
-	BlackboardComponent->SetValueAsObject(BBKeys::MovementController, MovementControllerComponent);
-	BlackboardComponent->SetValueAsObject(BBKeys::AttackComponent, MobAttackComponent);
+	BlackboardComponent->SetValueAsObject(MobBBKeys::Stat, StatComponent);
+	BlackboardComponent->SetValueAsObject(MobBBKeys::MovementController, MovementControllerComponent);
+	BlackboardComponent->SetValueAsObject(MobBBKeys::AttackComponent, MobAttackComponent);
 
     // --- 거리 관련 키값 ---
-    BlackboardComponent->SetValueAsVector(BBKeys::HomeLocation, GetPawn()->GetActorLocation());
+    BlackboardComponent->SetValueAsVector(MobBBKeys::HomeLocation, GetPawn()->GetActorLocation());
 }
 
 void AMobAIController::OnMovementCompleted()
 {
+    if (!BehaviorTreeComponent)
+        return;
+
     const UBTNode* ActiveNode = (BehaviorTreeComponent->GetActiveNode());
     if (ActiveNode)
     {
@@ -181,24 +177,23 @@ void AMobAIController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
     bool bDetectedTarget = Stimulus.WasSuccessfullySensed();
     if (bDetectedTarget)
     {
+        // 현재 실행 중인 BTTask 중단
+        BehaviorTreeComponent->RequestExecution(EBTNodeResult::Type::Aborted);
+        //OnMovementCompleted();
+
         // 플레이어가 감지됨
-		OnMovementCompleted();
         DetectedPlayer = Actor;
         BlackboardComponent->SetValueAsObject("Target", Actor);
-
     }
     else if(DetectedPlayer == Actor)
     {
+        // 현재 실행 중인 BTTask 중단
+        BehaviorTreeComponent->RequestExecution(EBTNodeResult::Type::Aborted);
+        //OnMovementCompleted();
+
         // 플레이어를 놓침
-        OnMovementCompleted();
         DetectedPlayer = nullptr;
         BlackboardComponent->SetValueAsObject("Target", nullptr);
-    }
-
-    StopMovement();
-    // 현재 실행 중인 BTTask 중단 (Patrol Task 중단)
-    if (BehaviorTreeComponent)
-    {
-        BehaviorTreeComponent->RequestExecution(EBTNodeResult::Type::Aborted);
+        SetMobState(EMobState::Patrol);
     }
 }

@@ -2,6 +2,7 @@
 
 
 #include "Characters/Mannequin/Component/GatherComponent.h"
+#include "Characters/Core/Component/CharacterStatComponent.h"
 #include "Characters/Mannequin/Interface/IToolEuipable.h"
 #include "Characters/Mannequin/Manny.h"
 
@@ -26,6 +27,7 @@ void UGatherComponent::BeginPlay()
     if (OwnerPlayerCharacter)
     {
         AnimInstance = OwnerPlayerCharacter->GetMesh()->GetAnimInstance();
+        Stat = OwnerPlayerCharacter->GetComponentByClass<UCharacterStatComponent>();
     }
 
 }
@@ -75,11 +77,11 @@ void UGatherComponent::OnGather()
 	EResourceType ResourceType = GatherableActor->GetResourceType();      // 자원 액터에서 ResourceType을 가져옴
     if (ToolType == EToolType::Axe && ResourceType == EResourceType::Tree)
     {
-        Logging(GatherableActor);
+        Logging();
     }
     else if(ToolType == EToolType::Pickaxe && ResourceType == EResourceType::Vein)
     {
-        Mining(GatherableActor);
+        Mining();
     }
 }
 
@@ -93,7 +95,6 @@ void UGatherComponent::OnGatherEnd()
         ProceedGather();
         bHasNextGather = false;
     }
-
 }
 
 void UGatherComponent::ReceiveInput()
@@ -150,12 +151,14 @@ void UGatherComponent::UpdateToolType()
     ToolType = IToolEuipable->Execute_GetToolType(OwnerActor);
 }
 
-void UGatherComponent::Logging(AGatherableActorBase* ResourceActor)
+void UGatherComponent::Logging()
 {
+    Stat->ConsumeLoggingStamina();
 }
 
-void UGatherComponent::Mining(AGatherableActorBase* ResourceActor)
+void UGatherComponent::Mining()
 {
+	Stat->ConsumeMiningStamina();
 }
 
 void UGatherComponent::ProceedGather()

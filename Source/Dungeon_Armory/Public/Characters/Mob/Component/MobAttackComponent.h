@@ -51,8 +51,10 @@ private:
 public:
 	void StartAttack() override;
 	bool GetCanAttack() const;
-
-private:
 	void OnAttack() override;
 	void OnAttackEnd() override;
+
+private:
+	virtual float CalculateDamage(UCharacterStatComponent* Attacker, UCharacterStatComponent* Defender);
+
 };

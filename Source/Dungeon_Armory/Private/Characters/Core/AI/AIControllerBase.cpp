@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Characters/Core/AIControllerBase.h"
+#include "Characters/Core/AI/AIControllerBase.h"
 #include "Characters/NPC/NPCBase.h"
 
 #include "BehaviorTree/BehaviorTree.h"
@@ -10,7 +10,7 @@
 
 #include "Manager/TeamManager.h"
 
-#include "AI/Team/TeamComponent.h"
+#include "Characters/Core/AI/Team/TeamComponent.h"
 
 AAIControllerBase::AAIControllerBase()
 {

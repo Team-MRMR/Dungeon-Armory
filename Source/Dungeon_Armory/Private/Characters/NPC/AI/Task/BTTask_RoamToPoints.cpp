@@ -1,12 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "AI/Tasks/BTTask_RoamToPoints.h"
-#include "AIController.h"
-#include "AITypes.h"                            // FAIRequestID, EPathFollowingRequestResult
-#include "Navigation/PathFollowingComponent.h"  // EPathFollowingResult
-#include "NavigationSystem.h"
-#include "Characters/Core/AIControllerBase.h"
+#include "Characters/NPC/AI/Task/BTTask_RoamToPoints.h"
 #include "Characters/NPC/NPCBase.h"
+
+#include "Characters/Core/AI/AIControllerBase.h"
+
 #include "BehaviorTree/BlackboardComponent.h"
 
 UBTTask_RoamToPoints::UBTTask_RoamToPoints()
@@ -35,7 +33,7 @@ EBTNodeResult::Type UBTTask_RoamToPoints::ExecuteTask(UBehaviorTreeComponent& Ow
     }
 
     // 이동 명령 실행
-    FVector MovePointLocation = NPC->GetNextMovePoint();
+    FVector MovePointLocation = NPC->GetNextPoint();
     NPCController->MoveToLocation(MovePointLocation);
 
     // 이동 완료 후 OnRoamToPointReached에서 처리, OnRoamingReached 호출
