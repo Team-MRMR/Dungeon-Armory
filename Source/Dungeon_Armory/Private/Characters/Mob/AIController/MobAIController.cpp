@@ -8,7 +8,7 @@
 #include "Characters/Core/Component/CharacterStatComponent.h"
 #include "Characters/Core/Component/MovementControllerComponent.h"
 
-#include "Characters/Core/AI/Interface/IMovableTask.h"
+#include "AI/Interface/IMovableTask.h"
 
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
@@ -136,23 +136,20 @@ void AMobAIController::SetMobState(EMobState NewState)
 
 void AMobAIController::InitializeBlackboardKeys()
 {
-	// --- 상태 관련 키값 ---S
-    BlackboardComponent->SetValueAsEnum(MobBBKeys::MobState, static_cast<uint8>(EMobState::Patrol));
+	// --- 상태 관련 키값 ---
+    BlackboardComponent->SetValueAsEnum(BBKeys::MobState, static_cast<uint8>(EMobState::Patrol));
 
 	// --- 컴포넌트 관련 키값 ---
-	BlackboardComponent->SetValueAsObject(MobBBKeys::Stat, StatComponent);
-	BlackboardComponent->SetValueAsObject(MobBBKeys::MovementController, MovementControllerComponent);
-	BlackboardComponent->SetValueAsObject(MobBBKeys::AttackComponent, MobAttackComponent);
+	BlackboardComponent->SetValueAsObject(BBKeys::Stat, StatComponent);
+	BlackboardComponent->SetValueAsObject(BBKeys::MovementController, MovementControllerComponent);
+	BlackboardComponent->SetValueAsObject(BBKeys::AttackComponent, MobAttackComponent);
 
     // --- 거리 관련 키값 ---
-    BlackboardComponent->SetValueAsVector(MobBBKeys::HomeLocation, GetPawn()->GetActorLocation());
+    BlackboardComponent->SetValueAsVector(BBKeys::HomeLocation, GetPawn()->GetActorLocation());
 }
 
 void AMobAIController::OnMovementCompleted()
 {
-    if (!BehaviorTreeComponent)
-        return;
-
     const UBTNode* ActiveNode = (BehaviorTreeComponent->GetActiveNode());
     if (ActiveNode)
     {

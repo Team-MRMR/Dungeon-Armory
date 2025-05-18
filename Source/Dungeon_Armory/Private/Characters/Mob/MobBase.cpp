@@ -8,7 +8,7 @@
 #include "Characters/Core/Component/MovementControllerComponent.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Characters/Core/AI/Team/TeamComponent.h"
+#include "AI/Team/TeamComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 #include "AIController.h"
@@ -24,14 +24,12 @@ AMobBase::AMobBase()
 	// 공격 컴포넌트 생성
 	AttackComponent = CreateDefaultSubobject<UMobAttackComponent>(TEXT("AttackComponent"));
 
+	// 이동 컨트롤러 컴포넌트 생성
+	MovementControllerComponent = CreateDefaultSubobject<UMovementControllerComponent>(TEXT("MovementControllerComponent"));
+
 	// 팀 컴포넌트 생성
 	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
-}
-
-// Called when the game starts or when spawned
-void AMobBase::BeginPlay()
-{
-	Super::BeginPlay();
+	TeamComponent->SetTeamType(ETeamType::Mob);
 
 	// (Pawn) 컨트롤러 회전 제어 해제
 	bUseControllerRotationPitch = false;
@@ -46,11 +44,16 @@ void AMobBase::BeginPlay()
 
 	// 회전 속도 설정 (원하는 속도로 조정)
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 480.f, 0.f);
-	GetCharacterMovement()->MaxWalkSpeed = StatComponent->BaseSpeed;
-	// GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
-	// GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
-	TeamComponent->SetTeamType(ETeamType::Mob);
+	GetCharacterMovement()->UseAccelerationForPathFollowing();
+}
+
+// Called when the game starts or when spawned
+void AMobBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GetCharacterMovement()->MaxWalkSpeed = StatComponent->BaseSpeed;
 }
 
 void AMobBase::Tick(float DeltaSeconds)
@@ -70,10 +73,12 @@ void AMobBase::ReceiveDamage(float DamageAmount)
 {
 	if (StatComponent)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("MobBase::ReceiveDamage()"));
 		StatComponent->ApplyDamage(DamageAmount);
 
 		if (StatComponent->CurrentHealth <= 0.0f)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("MobBase::ReceiveDamage() - IsDead()\nCurrentHealth: %.02f"), StatComponent->CurrentHealth);
 			// 죽음 처리
 			Die();
 		}
