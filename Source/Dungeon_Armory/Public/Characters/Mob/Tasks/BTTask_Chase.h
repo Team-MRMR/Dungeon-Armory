@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AI/Interface/IMovableTask.h"
+#include "Characters/Core/AI/Interface/IMovableTask.h"
 
 #include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
 #include "BTTask_Chase.generated.h"

@@ -7,7 +7,7 @@
 
 #include "Manager/ManagerBase.h"
 #include "GenericTeamAgentInterface.h"
-#include "AI/Team/TeamInfo.h"
+#include "Characters/Core/AI/Team/TeamInfo.h"
 
 #include "TeamManager.generated.h"
 

@@ -2,15 +2,12 @@
 
 
 #include "Characters/NPC/NPCBase.h"
-#include "Characters/NPC/MovePoint.h"
+#include "Characters/NPC/AI/LocationPoint.h"
 
-#include "Components/CapsuleComponent.h"
+#include "Characters/Core/Component/CharacterStatComponent.h"
+#include "Characters/Core/AI/Team/TeamComponent.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
-
-#include "AI/Team/TeamComponent.h"
-
-#include "Manager/InGameTimeManager.h"
 
 /*
 * Functions (Unreal)
@@ -20,26 +17,8 @@ ANPCBase::ANPCBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	// Set size for collision capsule
-	GetCapsuleComponent()->InitCapsuleSize(42.0f, 96.0f);
- 
-	// Don't rotate when the controller rotates. Let that just affect the camera.
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
-	bUseControllerRotationRoll = false;
-
-	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
-
-	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
-	// instead of recompiling to adjust them
-	GetCharacterMovement()->JumpZVelocity = 700.f;
-	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
-	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
-	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
-	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
+	// 스탯 컴포넌트 생성
+	StatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("StatComponent"));
 
 	// 팀 컴포넌트 생성
 	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
@@ -49,29 +28,28 @@ ANPCBase::ANPCBase()
 void ANPCBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
+
+	GetCharacterMovement()->MaxWalkSpeed = StatComponent->BaseSpeed;
+	//GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
+	//GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
+
+	TeamComponent->SetTeamType(ETeamType::Mob);
 }
 
-/*
-* Functions (Movement)
-*/
-
-void ANPCBase::ResetSpeed()
+void ANPCBase::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const
 {
-	//SetMovementSpeed(BaseSpeed);
-}
+	//OutLocation = GetMesh()->GetSocketLocation(FName("EyeSocket"));	// 머리 위치를 기준으로 시점 설정
+	//OutRotation = GetMesh()->GetSocketRotation(FName("EyeSocket"));	// 머리 위치를 기준으로 시점 설정
 
-void ANPCBase::ApplySpeedModifier(float SpeedMultiplier, float Duration)
-{
-	//float NewSpeed = BaseSpeed * SpeedMultiplier;
-	//SetMovementSpeed(NewSpeed);
-
-	//// 일정 시간이 지나면 원래 속도로 복귀
-	//GetWorldTimerManager().SetTimer(SpeedResetTimer, this, &ANPCCharacter::ResetSpeed, Duration, false);
-}
-
-void ANPCBase::SetMovementSpeed(float NewSpeed)
-{
-	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
+	OutLocation = GetActorLocation();
+	OutRotation = GetActorRotation();
 }
 
 /*
@@ -92,24 +70,24 @@ void ANPCBase::SetGenericTeamId(const FGenericTeamId& NewTeamID)
 * Functions (Behavior Tree)
 */
 
-FVector ANPCBase::GetNextMovePoint()
+FVector ANPCBase::GetNextPoint()
 {
-	if (MovePoints.Num() == 0)
+	if (LocationPoints.Num() == 0)
 	{
 		return GetActorLocation();
 	}
 
-	FVector NextPoint = MovePoints[CurrMovepPointIndex]->GetPointLocation();
-	CurrMovepPointIndex = (CurrMovepPointIndex + 1) % MovePoints.Num();
+	const FVector NextPoint = LocationPoints[CurrLocationPointIndex]->GetPointLocation();
+	CurrLocationPointIndex = (CurrLocationPointIndex + 1) % LocationPoints.Num();
 	return NextPoint;
 }
 
-FVector ANPCBase::GetStayPoint() const
+FVector ANPCBase::GetHomePoint() const
 {
-	if (!StayPoint)
+	if (!HomePoint)
 	{
 		return GetActorLocation();
 	}
 
-	return StayPoint->GetPointLocation();
+	return HomePoint->GetPointLocation();
 }

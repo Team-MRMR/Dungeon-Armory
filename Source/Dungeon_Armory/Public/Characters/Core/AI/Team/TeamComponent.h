@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 
-#include "AI/Team/TeamInfo.h"
+#include "Characters/Core/AI/Team/TeamInfo.h"
 #include "GenericTeamAgentInterface.h"
 
 #include "TeamComponent.generated.h"

@@ -21,7 +21,7 @@ public:
 	UBTTask_Stay();
 
 	UFUNCTION()
-	void OnStayingCompleted(UBehaviorTreeComponent* BehaviorTreeComponent);
+	void OnStayCompleted(UBehaviorTreeComponent* BehaviorTreeComponent);
 
 protected:
     /** 태스크 실행 */

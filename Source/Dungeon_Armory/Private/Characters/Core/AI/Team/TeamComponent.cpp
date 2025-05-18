@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AI/Team/TeamComponent.h"
+#include "Characters/Core/AI/Team/TeamComponent.h"
 #include "Manager/TeamManager.h"
 
 // Sets default values for this component's properties

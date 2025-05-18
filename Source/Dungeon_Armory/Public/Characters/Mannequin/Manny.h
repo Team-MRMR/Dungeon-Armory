@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 
-#include "AI/Team/TeamComponent.h"
+#include "Characters/Core/AI/Team/TeamComponent.h"
 #include "GenericTeamAgentInterface.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 
