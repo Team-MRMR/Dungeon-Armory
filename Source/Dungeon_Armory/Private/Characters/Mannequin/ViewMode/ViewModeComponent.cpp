@@ -83,7 +83,7 @@ void UViewModeComponent::UpdateViewMode(float DeltaTime)
         {
             if (InterpAlpha > FPSRenderOffTiming && TargetViewMode == EViewMode::FPS)
             {
-                Mesh->SetOwnerNoSee(true);
+                Mesh->SetOwnerNoSee(false);
             }
             else if (InterpAlpha > TPSRenderOffTiming && TargetViewMode == EViewMode::TPS)
             {
