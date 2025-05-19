@@ -21,6 +21,8 @@ class UBlackboardComponent;
 
 class AAIController;
 
+class USoundBase;
+
 UCLASS()
 class DUNGEON_ARMORY_API AMobBase : public ACharacter, public IGenericTeamAgentInterface, public IIDamageable
 {
@@ -39,17 +41,29 @@ protected:
 
 /***** Stat *****/
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UCharacterStatComponent* StatComponent;
 
 /***** Team *****/
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UTeamComponent* TeamComponent;
 
 /***** Attack *****/
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UMobAttackComponent* AttackComponent;
+
+/***** Movement *****/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
+	UMovementControllerComponent* MovementControllerComponent;
+
+protected:
+	// 피격 및 사망 시 재생할 사운드
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
+	USoundBase* HitSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
+	USoundBase* DieSound;
 
 public:
 	void ReceiveDamage(float DamageAmount) override;
@@ -57,5 +71,5 @@ public:
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Die")
 	void Die();
-	virtual void Die_Implementation();
+	virtual void Die_Implementation() { }
 };

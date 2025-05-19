@@ -28,6 +28,10 @@
 
 #include "Manager/TeamManager.h"
 
+// sound
+#include "Sound/SoundBase.h"
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 AManny::AManny()
 {
@@ -225,10 +229,14 @@ void AManny::ReceiveDamage(const float DamageAmount)
 	{
 		StatComponent->ApplyDamage(DamageAmount);
 
-		if (StatComponent->CurrentHealth <= 0.0f)
+		if (0.0f <= StatComponent->CurrentHealth)
 		{
-			// 죽음 처리
-			Die();
+			UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
+		}
+		else
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, DieSound, GetActorLocation());
+			Die();	// 죽음 처리
 		}
 	}
 }
