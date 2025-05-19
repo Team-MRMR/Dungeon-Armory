@@ -152,8 +152,6 @@ void UGatherComponent::UpdateToolType()
 
 void UGatherComponent::Logging()
 {
-    Stat->ConsumeLoggingStamina();
-
     if (bIsHit)
     {
         AActor* HitActor = HitResult.GetActor();
@@ -166,14 +164,15 @@ void UGatherComponent::Logging()
             IIDamageable* DamagedActor = Cast<IIDamageable>(GatherableActor);
             if (DamagedActor && Stat)
             {
-                const float ConsumptionStamina = Stat->AttackStamina.Consumption;
-                const float CurrentStamina = Stat->AttackStamina.GetCurrent();
-
                 const float DamageAmount = Stat->BaseAttackDamage;
                 DamagedActor->ReceiveDamage(DamageAmount);
 
+                const float ConsumptionStamina = Stat->Stamina.LoggingConsumption;
+                Stat->ConsumeStamina(ConsumptionStamina); // 스태미너 소비
+
                 OwnerPlayerCharacter->DecreaseDurability();  // 도구 내구도 감소
-                Stat->ConsumeAttackStamina(); // 스태미너 소비
+
+                PlayGatherMontage();
 
                 return;
             }
@@ -183,8 +182,6 @@ void UGatherComponent::Logging()
 
 void UGatherComponent::Mining()
 {
-	Stat->ConsumeMiningStamina();
-
     if (bIsHit)
     {
         AActor* HitActor = HitResult.GetActor();
@@ -197,14 +194,13 @@ void UGatherComponent::Mining()
             IIDamageable* DamagedActor = Cast<IIDamageable>(GatherableActor);
             if (DamagedActor && Stat)
             {
-                const float ConsumptionStamina = Stat->AttackStamina.Consumption;
-                const float CurrentStamina = Stat->AttackStamina.GetCurrent();
-
                 const float DamageAmount = Stat->BaseAttackDamage;
                 DamagedActor->ReceiveDamage(DamageAmount);
 
+                const float ConsumptionStamina = Stat->Stamina.MiningConsumption;
+                Stat->ConsumeStamina(ConsumptionStamina); // 스태미너 소비
+
                 OwnerPlayerCharacter->DecreaseDurability();  // 도구 내구도 감소
-                Stat->ConsumeAttackStamina(); // 스태미너 소비
 
                 return;
             }
@@ -232,18 +228,26 @@ void UGatherComponent::PlayGatherMontage()
     if (AnimInstance->Montage_IsPlaying(LoggingMontage) || AnimInstance->Montage_IsPlaying(MiningMontage))
         return;
 
-    switch (ToolType)
+    if (ToolType == EToolType::Axe)
     {
-    case EToolType::Axe:
+        const float ConsumptionStamina = Stat->Stamina.LoggingConsumption;
+        const float CurrentStamina = Stat->Stamina.GetCurrent();
+
+        // 현재 스태미너가 소비 스태미너보다 작으면 공격할 수 없음
+        if (CurrentStamina <= ConsumptionStamina)
+            return;
+
         AnimInstance->Montage_Play(LoggingMontage);
-        break;
+    }
+    else if (ToolType == EToolType::Pickaxe)
+    {
+        const float ConsumptionStamina = Stat->Stamina.MiningConsumption;
+        const float CurrentStamina = Stat->Stamina.GetCurrent();
 
-    case EToolType::Pickaxe:
+        // 현재 스태미너가 소비 스태미너보다 작으면 공격할 수 없음
+        if (CurrentStamina <= ConsumptionStamina)
+            return;
         AnimInstance->Montage_Play(MiningMontage);
-        break;
-
-    default:
-        break;
     }
     
     bIsMontageEnded = false;
