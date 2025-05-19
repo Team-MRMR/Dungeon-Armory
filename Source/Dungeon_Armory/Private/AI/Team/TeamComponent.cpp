@@ -20,20 +20,9 @@ void UTeamComponent::BeginPlay()
 
 ETeamAttitude::Type UTeamComponent::GetTeamAttitudeTowards(const AActor& Other) const
 {
-    ETeamType OwnTeamType = GetTeamType();
-    ETeamType OtherTeamType = Other.GetComponentByClass<UTeamComponent>()->GetTeamType();
+    
 
-    switch (UTeamManager::GetInstance()->GetRelation(OwnTeamType, OtherTeamType))
-    {
-    case ERelationType::Friendly:
-        return ETeamAttitude::Friendly;
-    case ERelationType::Hostile:
-        return ETeamAttitude::Hostile;
-    case ERelationType::Neutral:
-        return ETeamAttitude::Neutral;
-    }
-
-    return ETeamAttitude::Neutral;
+    return ETeamAttitude::Hostile;
 }
 
 ETeamType UTeamComponent::GetTeamType() const

@@ -122,7 +122,7 @@ void UMobAttackComponent::OnAttack()
 
 	FColor TraceColor = bHit ? FColor::Red : FColor::Green;
 
-	DrawDebugCapsule(
+	/*DrawDebugCapsule(
 		GetWorld(),
 		(Start + End) * 0.5f,
 		TraceDistance * 0.5f,
@@ -131,7 +131,7 @@ void UMobAttackComponent::OnAttack()
 		TraceColor,
 		false,
 		0.25f
-	);
+	);*/
 
 	if (bHit)
 	{
