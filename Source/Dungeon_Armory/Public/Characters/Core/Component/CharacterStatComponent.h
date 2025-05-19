@@ -67,16 +67,7 @@ public:
 // --- Stamina 관련 스탯 ---
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Stamina")
-    FStaminaStat AttackStamina;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Stamina")
-    FStaminaStat SkillStamina;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Stamina")
-    FStaminaStat LoggingStamina;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat | Stamina")
-    FStaminaStat MiningStamina;
+    FStaminaStat Stamina;
 
 // --- 플레이어 및 무기 속성 관련 스탯 ---
 public:
@@ -171,11 +162,8 @@ public:
     float GetSpeedForState(EMobState State) const;
 
 public:
-    //UFUNCTION(BlueprintCallable, Category = "Stamina")
-    void ConsumeAttackStamina();
-    void ConsumeSkillStamina();
-    void ConsumeLoggingStamina();
-    void ConsumeMiningStamina();
+    UFUNCTION(BlueprintCallable, Category = "Stamina")
+    void ConsumeStamina(const float ConsumptionStamina);
 
 private:
     void ResetSpeed();

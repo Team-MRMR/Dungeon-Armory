@@ -40,8 +40,8 @@ void UPlayerAttackComponent::BeginPlay()
 
 void UPlayerAttackComponent::StartAttack()
 {
-	const float ConsumptionStamina = Stat->AttackStamina.Consumption;
-	const float CurrentStamina = Stat->AttackStamina.GetCurrent();
+	const float ConsumptionStamina = Stat->Stamina.AttackConsumption;
+	const float CurrentStamina = Stat->Stamina.GetCurrent();
 	// 현재 스태미너가 소비 스태미너보다 작으면 공격할 수 없음
 	if (CurrentStamina <= ConsumptionStamina)
 		return;
@@ -181,14 +181,13 @@ void UPlayerAttackComponent::OnAttack()
 				IIDamageable* DamagedActor = Cast<IIDamageable>(HitActor);
 				if (DamagedActor && Stat)
 				{
-					const float ConsumptionStamina = Stat->AttackStamina.Consumption;
-					const float CurrentStamina = Stat->AttackStamina.GetCurrent();
-
 					const float DamageAmount = CalculateDamage(Stat, TargetStat);
 					DamagedActor->ReceiveDamage(DamageAmount);
 
 					OwnerPlayerCharacter->DecreaseDurability();  // 도구 내구도 감소
-					Stat->ConsumeAttackStamina(); // 스태미너 소비
+
+					const float ConsumptionStamina = Stat->Stamina.AttackConsumption;
+					Stat->ConsumeStamina(ConsumptionStamina); // 스태미너 소비
 
 					continue;
 				}

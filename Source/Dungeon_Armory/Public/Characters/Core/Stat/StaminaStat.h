@@ -13,7 +13,16 @@ struct DUNGEON_ARMORY_API FStaminaStat
     float Max = 100.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float Consumption = 5.f;
+    float AttackConsumption = 5.f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float SkillConsumption = 5.f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float LoggingConsumption = 5.f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float MiningConsumption = 5.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Regen")
     float Regen = 5.f;

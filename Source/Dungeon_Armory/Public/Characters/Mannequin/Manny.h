@@ -104,14 +104,15 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = "true"))
 	UGatherComponent* GatherComponent;
 
-protected:
-	// 피격 및 사망 시 재생할 사운드
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
-	USoundBase* HitSound;
+// ***** Animation *****/
+private:
+	UAnimInstance* AnimInstance;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
-	USoundBase* DieSound;
+	UPROPERTY(EditAnywhere, Category = "Hit", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* Hit1Montage;
 
+	UPROPERTY(EditAnywhere, Category = "Hit", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* Hit2Montage;
 
 /***** Unreal *****/
 public:
@@ -157,18 +158,19 @@ protected:
 /***** Damage*****/
 public:
 	// IIDamageable을(를) 통해 상속됨
-	void ReceiveDamage(float DamageAmount) override;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Hit & Die")
+	void ReceiveDamage(float DamageAmount);
+	virtual void ReceiveDamage_Implementation(float DamageAmount);
 
+public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Hit & Die")
+	void Die();
+	virtual void Die_Implementation() { }
 
 /***** Utilities *****/
-public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Die")
-	void Die();
-	virtual void Die_Implementation() { };
-
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Durability")
 	void DecreaseDurability();
-	virtual void DecreaseDurability_Implementation() { };
+	virtual void DecreaseDurability_Implementation() { }
 
 	virtual EToolType GetToolType_Implementation() const override { return EToolType::Other; }
 };

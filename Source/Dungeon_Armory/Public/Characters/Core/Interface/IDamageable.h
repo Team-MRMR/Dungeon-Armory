@@ -7,7 +7,7 @@
 #include "IDamageable.generated.h"
 
 // This class does not need to be modified.
-UINTERFACE(MinimalAPI)
+UINTERFACE(MinimalAPI, BlueprintType)
 class UIDamageable : public UInterface
 {
 	GENERATED_BODY()
