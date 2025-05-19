@@ -23,7 +23,7 @@ void UGatherComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-    auto OwnerPlayerCharacter = Cast<AManny>(GetOwner());
+    OwnerPlayerCharacter = Cast<AManny>(GetOwner());
     if (OwnerPlayerCharacter)
     {
         AnimInstance = OwnerPlayerCharacter->GetMesh()->GetAnimInstance();
@@ -56,7 +56,6 @@ void UGatherComponent::StartGather()
 
 void UGatherComponent::OnGather()
 {
-    FHitResult HitResult;
     DoLineTrace(HitResult);
 
     // 1. 라인 트레이스를 통해 감지한 대상 검사
@@ -102,7 +101,7 @@ void UGatherComponent::ReceiveInput()
     bCanReceiveInput = true;
 }
 
-void UGatherComponent::DoLineTrace(FHitResult& HitResult)
+void UGatherComponent::DoLineTrace(FHitResult& OutHitResult)
 {
     // 1. 플레이어 또는 컴포넌트 오너 얻기
     AActor* OwnerActor = GetOwner();
@@ -120,8 +119,8 @@ void UGatherComponent::DoLineTrace(FHitResult& HitResult)
     TraceParams.AddIgnoredActor(OwnerActor); // 자신은 무시
 
     // 4. 실제 라인 트레이스 수행
-    GetWorld()->LineTraceSingleByChannel(
-        HitResult,
+    bIsHit = GetWorld()->LineTraceSingleByChannel(
+        OutHitResult,
         Start,
         End,
         ECC_Visibility, // 또는 커스텀 채널: ECC_GameTraceChannel1 등
@@ -131,9 +130,9 @@ void UGatherComponent::DoLineTrace(FHitResult& HitResult)
     // 5. 디버그용 선 그리기 (테스트 시에만)
 #if WITH_EDITOR
     DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 0.1f);
-    if (HitResult.bBlockingHit)
+    if (OutHitResult.bBlockingHit)
     {
-        DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 5.0f, 12, FColor::Red, false, 0.1f);
+        DrawDebugSphere(GetWorld(), OutHitResult.ImpactPoint, 5.0f, 12, FColor::Red, false, 0.1f);
     }
 #endif
 }
@@ -154,11 +153,63 @@ void UGatherComponent::UpdateToolType()
 void UGatherComponent::Logging()
 {
     Stat->ConsumeLoggingStamina();
+
+    if (bIsHit)
+    {
+        AActor* HitActor = HitResult.GetActor();
+        if (!HitActor)
+            return;
+
+        auto GatherableActor = Cast<AGatherableActorBase>(HitActor);
+        if (GatherableActor)
+        {
+            IIDamageable* DamagedActor = Cast<IIDamageable>(GatherableActor);
+            if (DamagedActor && Stat)
+            {
+                const float ConsumptionStamina = Stat->AttackStamina.Consumption;
+                const float CurrentStamina = Stat->AttackStamina.GetCurrent();
+
+                const float DamageAmount = Stat->BaseAttackDamage;
+                DamagedActor->ReceiveDamage(DamageAmount);
+
+                OwnerPlayerCharacter->DecreaseDurability();  // 도구 내구도 감소
+                Stat->ConsumeAttackStamina(); // 스태미너 소비
+
+                return;
+            }
+        }
+    }
 }
 
 void UGatherComponent::Mining()
 {
 	Stat->ConsumeMiningStamina();
+
+    if (bIsHit)
+    {
+        AActor* HitActor = HitResult.GetActor();
+        if (!HitActor)
+            return;
+
+        auto GatherableActor = Cast<AGatherableActorBase>(HitActor);
+        if (GatherableActor)
+        {
+            IIDamageable* DamagedActor = Cast<IIDamageable>(GatherableActor);
+            if (DamagedActor && Stat)
+            {
+                const float ConsumptionStamina = Stat->AttackStamina.Consumption;
+                const float CurrentStamina = Stat->AttackStamina.GetCurrent();
+
+                const float DamageAmount = Stat->BaseAttackDamage;
+                DamagedActor->ReceiveDamage(DamageAmount);
+
+                OwnerPlayerCharacter->DecreaseDurability();  // 도구 내구도 감소
+                Stat->ConsumeAttackStamina(); // 스태미너 소비
+
+                return;
+            }
+        }
+    }
 }
 
 void UGatherComponent::ProceedGather()

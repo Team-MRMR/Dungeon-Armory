@@ -3,6 +3,10 @@
 
 #include "GatherableActor/GatherableActorBase.h"
 
+// sound
+#include "Sound/SoundBase.h"
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 AGatherableActorBase::AGatherableActorBase()
 {
@@ -27,9 +31,15 @@ void AGatherableActorBase::Tick(float DeltaTime)
 
 void AGatherableActorBase::ReceiveDamage(float DamageAmount)
 {
+
 	CurrentHealth -= DamageAmount;
-	if (CurrentHealth <= 0)
+	if (0 <= CurrentHealth)
 	{
+		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
+	}
+	else
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, DieSound, GetActorLocation());
 		Die();
 	}
 }

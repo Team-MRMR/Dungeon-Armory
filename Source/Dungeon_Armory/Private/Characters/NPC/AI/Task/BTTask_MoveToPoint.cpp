@@ -12,52 +12,48 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
+#include "NavigationSystem.h"
+#include "Navigation/PathFollowingComponent.h"
+
 
 UBTTask_MoveToPoint::UBTTask_MoveToPoint()
 {
+	bNotifyTick = false;
     NodeName = "NPC MoveToPoint"; // BT에서 보이는 이름
 }
 
 EBTNodeResult::Type UBTTask_MoveToPoint::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-    return EBTNodeResult::InProgress;
-}
-
-void UBTTask_MoveToPoint::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
-{
-	UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent();
-	if (!Blackboard)
+	AAIController* AIController = OwnerComp.GetAIOwner();
+	if (!AIController)
 	{
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-		return;
+		return EBTNodeResult::Failed;
 	}
 
-	AActor* TargetActor = Cast<AActor>(Blackboard->GetValueAsObject(NPCBBKeys::Target));
-	if (!TargetActor)
+	ANPCBase* NPC = Cast<ANPCBase>(AIController->GetPawn());
+	if (!NPC)
 	{
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-		return;
+		return EBTNodeResult::Failed;
 	}
 
-	auto MovementController = Cast<UMovementControllerComponent>(Blackboard->GetValueAsObject(NPCBBKeys::MovementController));
-	if (!MovementController)
+	const FVector TargetLocation = NPC->GetNextPoint();
+
+	FAIMoveRequest MoveRequest;
+	MoveRequest.SetGoalLocation(TargetLocation);
+	MoveRequest.SetAcceptanceRadius(50.f); // 허용 오차 거리 조정 가능
+
+	FNavPathSharedPtr NavPath;
+	FPathFollowingRequestResult Result = AIController->MoveTo(MoveRequest, &NavPath);
+
+	if (Result.Code == EPathFollowingRequestResult::Failed)
 	{
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-		return;
+		return EBTNodeResult::Failed;
 	}
 
-	auto* Stat = Cast<UCharacterStatComponent>(Blackboard->GetValueAsObject(NPCBBKeys::Stat));
-	if (!Stat)
+	if (Result.Code == EPathFollowingRequestResult::AlreadyAtGoal)
 	{
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-		return;
+		return EBTNodeResult::Succeeded;
 	}
 
-
-	MovementController->MoveToDestination(TargetActor->GetActorLocation(), Stat->AttackableDistance);
-}
-
-void UBTTask_MoveToPoint::OnMoveCompleted(UBehaviorTreeComponent* BTComp)
-{
-    FinishLatentTask(*BTComp, EBTNodeResult::Succeeded);
+	return EBTNodeResult::InProgress;
 }

@@ -8,6 +8,8 @@
 
 #include "Characters/Mannequin/Manny.h"
 
+#include "GatherableActor/GatherableActorBase.h"
+
 #include "GameFramework/Character.h"
 #include "Animation/AnimInstance.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -174,20 +176,22 @@ void UPlayerAttackComponent::OnAttack()
 				continue;
 
 			auto TargetStat = HitActor->FindComponentByClass<UCharacterStatComponent>();
-			if (!TargetStat)
-				continue;
-
-			IIDamageable* DamagedActor = Cast<IIDamageable>(HitActor);
-			if (DamagedActor && Stat)
+			if (TargetStat)
 			{
-				const float ConsumptionStamina = Stat->AttackStamina.Consumption;
-				const float CurrentStamina = Stat->AttackStamina.GetCurrent();
+				IIDamageable* DamagedActor = Cast<IIDamageable>(HitActor);
+				if (DamagedActor && Stat)
+				{
+					const float ConsumptionStamina = Stat->AttackStamina.Consumption;
+					const float CurrentStamina = Stat->AttackStamina.GetCurrent();
 
-				const float DamageAmount = CalculateDamage(Stat, TargetStat);
-				DamagedActor->ReceiveDamage(DamageAmount);
+					const float DamageAmount = CalculateDamage(Stat, TargetStat);
+					DamagedActor->ReceiveDamage(DamageAmount);
 
-				OwnerPlayerCharacter->DecreaseDurability();  // 도구 내구도 감소
-				Stat->ConsumeAttackStamina(); // 스태미너 소비
+					OwnerPlayerCharacter->DecreaseDurability();  // 도구 내구도 감소
+					Stat->ConsumeAttackStamina(); // 스태미너 소비
+
+					continue;
+				}
 			}
 		}
 	}
