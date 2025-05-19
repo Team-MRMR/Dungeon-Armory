@@ -17,6 +17,8 @@ UCharacterStatComponent::UCharacterStatComponent()
 	{
 		OwnerCharacter = Mob;
 	}
+
+	CurrentHealth = MaxHealth;
 }
 
 // Called when the game starts
@@ -29,6 +31,7 @@ void UCharacterStatComponent::BeginPlay()
 	{
 		Stamina.Initialize(World);
 	}
+
 
 	SetSpeed(BaseSpeed);
 	

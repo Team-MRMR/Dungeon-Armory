@@ -100,6 +100,8 @@ void AManny::BeginPlay()
 			Subsystem->AddMappingContext(CoreContext, 1);
 		}
 	}
+
+	AnimInstance = GetMesh()->GetAnimInstance();
 }
 
 // Called to bind functionality to input
@@ -223,7 +225,7 @@ void AManny::LeftClickAction(const FInputActionValue& Value)
 	}
 }
 
-void AManny::ReceiveDamage(const float DamageAmount)
+void AManny::ReceiveDamage_Implementation(const float DamageAmount)
 {
 	if (StatComponent)
 	{
@@ -231,11 +233,24 @@ void AManny::ReceiveDamage(const float DamageAmount)
 
 		if (0.0f <= StatComponent->CurrentHealth)
 		{
-			UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
+			if (!AnimInstance->Montage_IsPlaying(Hit1Montage) || !AnimInstance->Montage_IsPlaying(Hit2Montage))
+			{
+				const int motion = FMath::RandRange(0, 1);
+				switch (motion)
+				{
+				case 0:
+					AnimInstance->Montage_Play(Hit1Montage, 1.0f);
+					break;
+				case 1:
+					AnimInstance->Montage_Play(Hit2Montage, 1.0f);
+					break;
+				default:
+					break;
+				}
+			}
 		}
 		else
 		{
-			UGameplayStatics::PlaySoundAtLocation(this, DieSound, GetActorLocation());
 			Die();	// 죽음 처리
 		}
 	}
