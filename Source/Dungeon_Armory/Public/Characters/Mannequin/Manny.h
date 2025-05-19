@@ -104,6 +104,13 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = "true"))
 	UGatherComponent* GatherComponent;
 
+protected:
+	// 피격 및 사망 시 재생할 사운드
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
+	USoundBase* HitSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
+	USoundBase* DieSound;
 
 
 /***** Unreal *****/

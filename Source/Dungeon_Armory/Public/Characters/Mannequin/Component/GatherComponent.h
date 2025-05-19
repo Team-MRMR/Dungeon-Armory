@@ -10,6 +10,7 @@
 #include "GatherComponent.generated.h"
 
 class AGatherableActorBase;
+class AManny;
 class UAnimInstance;
 class UAnimMontage;
 class UCharacterStatComponent;
@@ -40,8 +41,11 @@ public:
 	UAnimMontage* MiningMontage;
 
 protected:
+	bool bIsHit;
+	FHitResult HitResult;
 	UAnimInstance* AnimInstance;
 	UCharacterStatComponent* Stat;
+	AManny* OwnerPlayerCharacter;
 
 // --- 도구 관련 ---
 public:

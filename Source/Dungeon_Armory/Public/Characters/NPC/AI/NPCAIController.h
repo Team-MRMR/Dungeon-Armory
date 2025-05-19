@@ -41,6 +41,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
+	virtual void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result) override;
 
 
 /***** Component *****/
@@ -54,7 +55,6 @@ public:
 
 private:
 	void InitializeBlackboardKeys();
-	void OnMovementCompleted();
 };
 
 namespace NPCBBKeys

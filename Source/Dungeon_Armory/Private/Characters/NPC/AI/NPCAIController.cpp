@@ -9,7 +9,10 @@
 #include "Characters/Core/Component/MovementControllerComponent.h"
 
 #include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BehaviorTreeTypes.h"
 #include "BehaviorTree/BlackboardComponent.h"
+
+#include "Navigation/PathFollowingComponent.h"
 
 ANPCAIController::ANPCAIController()
 {
@@ -34,7 +37,7 @@ void ANPCAIController::OnPossess(APawn* InPawn)
 			Stat = NPCBase->FindComponentByClass<UCharacterStatComponent>();
 
             MovementController = NPCBase->FindComponentByClass<UMovementControllerComponent>();
-            MovementController->OnMovementCompleted.AddDynamic(this, &ANPCAIController::OnMovementCompleted);
+            //MovementController->OnMovementCompleted.AddDynamic(this, &ANPCAIController::OnMovementCompleted);
         }
     }
 
@@ -86,7 +89,7 @@ void ANPCAIController::InitializeBlackboardKeys()
     BlackboardComponent->SetValueAsVector(NPCBBKeys::HomeLocation, GetPawn()->GetActorLocation());
 }
 
-void ANPCAIController::OnMovementCompleted()
+void ANPCAIController::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
 {
     if (!BehaviorTreeComponent)
         return;
@@ -98,7 +101,15 @@ void ANPCAIController::OnMovementCompleted()
         IIMovableTask* MovableTask = const_cast<IIMovableTask*>(Cast<IIMovableTask>(ActiveNode));
         if (MovableTask)
         {
-            MovableTask->OnMoveCompleted(BehaviorTreeComponent);
+            if (Result == EPathFollowingResult::Success)
+            {
+                MovableTask->OnMoveCompleted(BehaviorTreeComponent);    // 이동 완료 처리를 어떻게 할까. Result.Code의 완료와 실패에 대한 구분을 해야 함
+            }
+            else
+            {
+                MovableTask->OnMoveCompleted(BehaviorTreeComponent);
+                BehaviorTreeComponent->RestartTree();
+            }
         }
     }
 }

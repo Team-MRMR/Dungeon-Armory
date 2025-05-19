@@ -19,8 +19,8 @@ class DUNGEON_ARMORY_API UBTTask_RoamToPoints : public UBTTask_BlackboardBase
 public:
 	UBTTask_RoamToPoints();
 
-	UFUNCTION()
-	void OnRoamingReached(UBehaviorTreeComponent* BehaviorTreeComp);
+	//UFUNCTION()
+	//void OnRoamingReached(UBehaviorTreeComponent* BehaviorTreeComp);
 
 protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;

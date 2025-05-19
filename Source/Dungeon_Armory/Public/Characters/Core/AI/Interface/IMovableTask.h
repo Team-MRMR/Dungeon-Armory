@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+
 #include "IMovableTask.generated.h"
 
 class UBehaviorTreeComponent;
@@ -24,5 +25,5 @@ class DUNGEON_ARMORY_API IIMovableTask
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void OnMoveCompleted(UBehaviorTreeComponent* BTComp) = 0;
+	virtual void OnMoveCompleted(UBehaviorTreeComponent* OwnerComp) = 0;
 };

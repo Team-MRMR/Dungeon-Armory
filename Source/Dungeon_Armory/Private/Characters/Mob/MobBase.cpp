@@ -13,6 +13,10 @@
 
 #include "AIController.h"
 
+// sound
+#include "Sound/SoundBase.h"
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 AMobBase::AMobBase()
 {
@@ -26,6 +30,9 @@ AMobBase::AMobBase()
 
 	// 팀 컴포넌트 생성
 	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
+
+	// 이동 컨트롤러 컴포넌트 생성
+	MovementControllerComponent = CreateDefaultSubobject<UMovementControllerComponent>(TEXT("MovementControllerComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -72,15 +79,14 @@ void AMobBase::ReceiveDamage(float DamageAmount)
 	{
 		StatComponent->ApplyDamage(DamageAmount);
 
-		if (StatComponent->CurrentHealth <= 0.0f)
+		if (0.0f <= StatComponent->CurrentHealth)
 		{
-			// 죽음 처리
-			Die();
+			UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
+		}
+		else
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, DieSound, GetActorLocation());
+			Die();	// 죽음 처리
 		}
 	}
-}
-
-void AMobBase::Die_Implementation()
-{
-
 }

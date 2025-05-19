@@ -7,8 +7,11 @@
 
 #include "BehaviorTree/BlackboardComponent.h"
 
+#include "NavigationSystem.h"
+
 UBTTask_RoamToPoints::UBTTask_RoamToPoints()
 {
+    bNotifyTick = false;
     NodeName = "RoamToPoints"; // BT에서 보이는 이름
 }
 
@@ -26,12 +29,6 @@ EBTNodeResult::Type UBTTask_RoamToPoints::ExecuteTask(UBehaviorTreeComponent& Ow
 		return EBTNodeResult::Failed;
 	}
 
-    UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetCurrent(GetWorld());
-    if (!NavSystem)
-    {
-        return EBTNodeResult::Failed;
-    }
-
     // 이동 명령 실행
     FVector MovePointLocation = NPC->GetNextPoint();
     NPCController->MoveToLocation(MovePointLocation);
@@ -41,7 +38,7 @@ EBTNodeResult::Type UBTTask_RoamToPoints::ExecuteTask(UBehaviorTreeComponent& Ow
     return EBTNodeResult::InProgress;
 }
 
-void UBTTask_RoamToPoints::OnRoamingReached(UBehaviorTreeComponent* BehaviorTreeComp)
-{
-    FinishLatentTask(*BehaviorTreeComp, EBTNodeResult::Succeeded);
-}
+//void OnMoveCompleted(UBehaviorTreeComponent* OwnerComp, EBTNodeResult::Type Result = EBTNodeResult::Succeeded)
+//{
+//    FinishLatentTask(*OwnerComp, EBTNodeResult::Succeeded);
+//}
