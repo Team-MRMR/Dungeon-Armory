@@ -43,17 +43,17 @@ void UBTTask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	if (!Blackboard)
 		return;
 
-	auto MovementController = Cast<UMovementControllerComponent>(Blackboard->GetValueAsObject(BBKeys::MovementController));
+	auto MovementController = Cast<UMovementControllerComponent>(Blackboard->GetValueAsObject(MobBBKeys::MovementController));
 	if (MovementController)
 	{
-		auto Target = Cast<AActor>(Blackboard->GetValueAsObject(BBKeys::Target));
+		auto Target = Cast<AActor>(Blackboard->GetValueAsObject(MobBBKeys::Target));
 		if (Target)
 		{
 			MovementController->RotateToTarget(Target->GetActorLocation(), DeltaSeconds);
 		}
 	}
 
-	auto AttackComponent = Cast<UMobAttackComponent>(Blackboard->GetValueAsObject(BBKeys::AttackComponent));
+	auto AttackComponent = Cast<UMobAttackComponent>(Blackboard->GetValueAsObject(MobBBKeys::AttackComponent));
 	if (AttackComponent->GetCanAttack())
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
