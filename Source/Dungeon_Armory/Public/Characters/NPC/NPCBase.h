@@ -8,52 +8,55 @@
 
 #include "NPCBase.generated.h"
 
-class UCharacterStatComponent;
 class UTeamComponent;
-class UMovementControllerComponent;
-class ALocationPoint;
+
+class AMovePoint;
 
 UCLASS()
 class DUNGEON_ARMORY_API ANPCBase : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
-/***** Unreal *****/
+/***** Variables (Team) *****/
+public:	
+	/** Team Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
+	UTeamComponent* TeamComponent;
+
+/***** Variables (Behavior Tree) *****/
+private:
+	/** AI가 머물러 있는 포인트 */
+	UPROPERTY(EditAnywhere, Category = "Behavior Tree", meta = (AllowPrivateAccess = "true"))
+	AMovePoint* StayPoint;
+
+	/** AI가 경로를 순회할 때 사용할 이동 타겟 포인트 */
+	UPROPERTY(EditAnywhere, Category = "Behavior Tree", meta = (AllowPrivateAccess = "true"))
+	TArray<AMovePoint*> MovePoints;
+
+	/** 현재 이동 지점 인덱스 */
+	int32 CurrMovepPointIndex = 0;
+
+
+/***** Functions (Unreal) *****/
 public:
 	ANPCBase();
 
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const override;
+/***** Function (Movement) *****/
+public:
+	void ResetSpeed();
+	void ApplySpeedModifier(float SpeedMultiplier, float Duration);
+	void SetMovementSpeed(float NewSpeed);
 
-/***** Team Component *****/
-public:	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component | Stat")
-	UCharacterStatComponent* StatComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component | Team")
-	UTeamComponent* TeamComponent;
-
+/***** Functions (Team) *****/
 public:
 	virtual FGenericTeamId GetGenericTeamId() const override;
 	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
 
-/***** Behavior Tree *****/
-private:
-	/** AI가 머물러 있는 포인트 */
-	UPROPERTY(EditInstanceOnly, Category = "Behavior Tree", meta = (AllowPrivateAccess = "true"))
-	ALocationPoint* HomePoint;
-
-	/** AI가 경로를 순회할 때 사용할 이동 포인트 */
-	UPROPERTY(EditInstanceOnly, Category = "Behavior Tree", meta = (AllowPrivateAccess = "true"))
-	TArray<ALocationPoint*> LocationPoints;
-
-	/** 현재 이동 지점 인덱스 */
-	int32 CurrLocationPointIndex = 0;
-
+/***** Functions (Behavior Tree) *****/
 public:
-	FVector GetNextPoint();
-	FVector GetHomePoint() const;
-
+	FVector GetNextMovePoint();
+	FVector GetStayPoint() const;
 };

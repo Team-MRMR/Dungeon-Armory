@@ -18,13 +18,11 @@ enum class EResourceType : uint8
 	Vein     UMETA(DisplayName = "Vein")
 };
 
-class USoundBase;
-
 UCLASS()
 class DUNGEON_ARMORY_API AGatherableActorBase : public AActor, public IIDamageable
 {
 	GENERATED_BODY()
-
+	
 public:	
 	// Sets default values for this actor's properties
 	AGatherableActorBase();
@@ -39,8 +37,6 @@ public:
 
 public:
 	EResourceType GetResourceType() const { return ResourceType; }
-
-// --- GatherableActorBase ---
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
 	EResourceType ResourceType;
@@ -50,14 +46,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
 	float CurrentHealth;
-
-protected:
-	// 피격 및 사망 시 재생할 사운드
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
-	USoundBase* HitSound;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
-	USoundBase* DieSound;
 
 
 // IIDamageable을(를) 통해 상속됨

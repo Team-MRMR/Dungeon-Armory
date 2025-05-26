@@ -7,7 +7,6 @@
 #include "Characters/Core/Animation/AttackNotify.h"
 #include "Characters/Core/Animation/AttackEndNotify.h"
 
-
 // Sets default values for this component's properties
 UMobAttackComponent::UMobAttackComponent()
 {
@@ -23,8 +22,7 @@ UMobAttackComponent::UMobAttackComponent()
 // Called when the game starts
 void UMobAttackComponent::BeginPlay()
 {
-	// �ִ� �ν��Ͻ� ����
-	// ���� ������Ʈ ����
+	// AnimInstance, Stat 초기화
 	Super::BeginPlay();
 }
 
@@ -59,12 +57,11 @@ void UMobAttackComponent::StartAttack()
 	{
 		const float AttackRate = Stat->GetAttackPlayRate(CriticalAttackMontage->GetPlayLength());
 		
-		// ũ��Ƽ�� ���� ���
 		AnimInstance->Montage_Play(
 			CriticalAttackMontage,
 			AttackRate,
 			EMontagePlayReturnType::MontageLength,
-			0.0f,
+			0.0f, 
 			true
 		);	
 	}
@@ -72,7 +69,6 @@ void UMobAttackComponent::StartAttack()
 	{
 		const float AttackRate = Stat->GetAttackPlayRate(NormalAttackMontage->GetPlayLength());
 
-		// �Ϲ� ���� ���
 		AnimInstance->Montage_Play(
 			NormalAttackMontage,
 			AttackRate,
@@ -82,7 +78,6 @@ void UMobAttackComponent::StartAttack()
 		);
 	}
 	
-
 	ElapsedTime = 0.0f;
 	bIsStartedAttack = true;
 	bIsEndedAttack = false;
@@ -122,7 +117,7 @@ void UMobAttackComponent::OnAttack()
 
 	FColor TraceColor = bHit ? FColor::Red : FColor::Green;
 
-	DrawDebugCapsule(
+	/*DrawDebugCapsule(
 		GetWorld(),
 		(Start + End) * 0.5f,
 		TraceDistance * 0.5f,
@@ -131,7 +126,7 @@ void UMobAttackComponent::OnAttack()
 		TraceColor,
 		false,
 		0.25f
-	);
+	);*/
 
 	if (bHit)
 	{
@@ -148,18 +143,15 @@ void UMobAttackComponent::OnAttack()
 			);
 
 			AActor* HitActor = Hit.GetActor();
-			if (!HitActor)
-				return;
-
-			auto TargetStat = HitActor->FindComponentByClass<UCharacterStatComponent>();
-			if (!TargetStat)
-				return;
-
-			IIDamageable* DamagedActor = Cast<IIDamageable>(HitActor);
-			if (DamagedActor && Stat)
+			if (HitActor)
 			{
-				const float DamageAmount = CalculateDamage(Stat, TargetStat);
-				DamagedActor->ReceiveDamage(DamageAmount);
+				UE_LOG(LogTemp, Error, TEXT("Hit Actor: %s"), *HitActor->GetName());
+				IIDamageable* DamagedActor = Cast<IIDamageable>(HitActor);
+				if (DamagedActor && Stat)
+				{
+					const float DamageAmount = Stat->BaseAttackDamage;
+					DamagedActor->ReceiveDamage(DamageAmount);
+				}
 			}
 		}
 	}
@@ -168,10 +160,5 @@ void UMobAttackComponent::OnAttack()
 void UMobAttackComponent::OnAttackEnd()
 {
 	bIsEndedAttack = true;
-}
-
-float UMobAttackComponent::CalculateDamage(UCharacterStatComponent* Attacker, UCharacterStatComponent* Defender)
-{
-	return Super::CalculateDamage(Attacker, Defender);
 }
 

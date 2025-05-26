@@ -8,8 +8,6 @@
 
 #include "Characters/Mannequin/Manny.h"
 
-#include "GatherableActor/GatherableActorBase.h"
-
 #include "GameFramework/Character.h"
 #include "Animation/AnimInstance.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -34,18 +32,13 @@ void UPlayerAttackComponent::BeginPlay()
 	if (OwnerPlayerCharacter)
 	{
 		AnimInstance = OwnerPlayerCharacter->GetMesh()->GetAnimInstance();
-		Stat = OwnerPlayerCharacter->FindComponentByClass<UCharacterStatComponent>();
+		StatComponent = OwnerPlayerCharacter->FindComponentByClass<UCharacterStatComponent>();
 	}
 }
 
 void UPlayerAttackComponent::StartAttack()
 {
-	const float ConsumptionStamina = Stat->Stamina.AttackConsumption;
-	const float CurrentStamina = Stat->Stamina.GetCurrent();
-	// 현재 스태미너가 소비 스태미너보다 작으면 공격할 수 없음
-	if (CurrentStamina <= ConsumptionStamina)
-		return;
-
+	UE_LOG(LogTemp, Warning, TEXT("UPlayerAttackComponent::StartAttack()"));
 	if (bCanReceiveInput)
 	{
 		bNextCombo = true;
@@ -83,11 +76,6 @@ void UPlayerAttackComponent::PlayComboAttackMontage(int32 ComboIndex)
 	AnimInstance->Montage_JumpToSection(ComboAttackSections[ComboIndex], ComboAttackMontage);
 
 	bIsMontageEnded = false;
-}
-
-float UPlayerAttackComponent::CalculateDamage(UCharacterStatComponent* Attacker, UCharacterStatComponent* Defender)
-{
-	return Super::CalculateDamage(Attacker, Defender);
 }
 
 // AttackEndNotify에서 호출
@@ -172,26 +160,18 @@ void UPlayerAttackComponent::OnAttack()
 			);
 
 			AActor* HitActor = Hit.GetActor();
-			if (!HitActor)
-				continue;
-
-			auto TargetStat = HitActor->FindComponentByClass<UCharacterStatComponent>();
-			if (TargetStat)
+			if (HitActor)
 			{
+				UE_LOG(LogTemp, Error, TEXT("Hit Actor: %s"), *HitActor->GetName());
 				IIDamageable* DamagedActor = Cast<IIDamageable>(HitActor);
-				if (DamagedActor && Stat)
+				if (DamagedActor && StatComponent)
 				{
-					const float DamageAmount = CalculateDamage(Stat, TargetStat);
+					const float DamageAmount = StatComponent->BaseAttackDamage;
 					DamagedActor->ReceiveDamage(DamageAmount);
-
-					OwnerPlayerCharacter->DecreaseDurability();  // 도구 내구도 감소
-
-					const float ConsumptionStamina = Stat->Stamina.AttackConsumption;
-					Stat->ConsumeStamina(ConsumptionStamina); // 스태미너 소비
-
-					continue;
+					OwnerPlayerCharacter->DecreaseDurability();
 				}
 			}
+
 		}
 	}
 }

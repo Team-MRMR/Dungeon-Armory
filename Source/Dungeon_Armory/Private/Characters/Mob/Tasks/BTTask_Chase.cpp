@@ -3,12 +3,16 @@
 
 #include "Characters/Mob/Tasks/BTTask_Chase.h"
 #include "Characters/Mob/MobBase.h"
+#include "Characters/Core/Component/MovementControllerComponent.h"
+
 #include "Characters/Mob/AIController/MobAIController.h"
 
-#include "Characters/Core/Component/MovementControllerComponent.h"
+#include "GameFramework/Actor.h"
 
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
+
+#include "Navigation/PathFollowingComponent.h"
 
 UBTTask_Chase::UBTTask_Chase()
 {
@@ -35,21 +39,21 @@ void UBTTask_Chase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
         return;
     }
 
-	AActor* TargetActor = Cast<AActor>(Blackboard->GetValueAsObject(MobBBKeys::Target));
+	AActor* TargetActor = Cast<AActor>(Blackboard->GetValueAsObject(BBKeys::Target));
 	if (!TargetActor)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		return;
 	}
 
-	auto MovementController = Cast<UMovementControllerComponent>(Blackboard->GetValueAsObject(MobBBKeys::MovementController));
+	auto MovementController = Cast<UMovementControllerComponent>(Blackboard->GetValueAsObject(BBKeys::MovementController));
 	if (!MovementController)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		return;
 	}
 
-	auto* Stat = Cast<UCharacterStatComponent>(Blackboard->GetValueAsObject(MobBBKeys::Stat));
+	auto* Stat = Cast<UCharacterStatComponent>(Blackboard->GetValueAsObject(BBKeys::Stat));
 	if (!Stat)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);

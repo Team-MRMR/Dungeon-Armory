@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 
-#include "Characters/Core/AI/Team/TeamComponent.h"
+#include "AI/Team/TeamComponent.h"
 #include "GenericTeamAgentInterface.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 
@@ -60,6 +60,11 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* CoreContext;
 
+
+	/** MappingContext */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Gather", meta = (AllowPrivateAccess = "true"))
+	UInputMappingContext* GatherContext;
+
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Battle", meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* BattleContext;
@@ -79,6 +84,10 @@ private:
 	/** Interact Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Core", meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
+
+	/** Attack Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Gather", meta = (AllowPrivateAccess = "true"))
+	UInputAction* GatherAction;
 
 	/** Attack Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input | Battle", meta = (AllowPrivateAccess = "true"))
@@ -102,17 +111,9 @@ private:
 /***** Tool Stat *****/
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = "true"))
-	UGatherComponent* GatherComponent_;
+	UGatherComponent* GatherComponent;
 
-// ***** Animation *****/
-private:
-	UAnimInstance* AnimInstance;
 
-	UPROPERTY(EditAnywhere, Category = "Hit", meta = (AllowPrivateAccess = "true"))
-	UAnimMontage* Hit1Montage;
-
-	UPROPERTY(EditAnywhere, Category = "Hit", meta = (AllowPrivateAccess = "true"))
-	UAnimMontage* Hit2Montage;
 
 /***** Unreal *****/
 public:
@@ -153,24 +154,26 @@ protected:
 	void Interact(const FInputActionValue& Value);
 
 	/** Called for Attacking input */
-	void LeftClickAction(const FInputActionValue& Value);
+	void Attack(const FInputActionValue& Value);
+
+	/** Called for Gathering input */
+	void Gather(const FInputActionValue& Value);
 
 /***** Damage*****/
 public:
 	// IIDamageable을(를) 통해 상속됨
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Hit & Die")
-	void ReceiveDamage(float DamageAmount);
-	virtual void ReceiveDamage_Implementation(float DamageAmount);
+	void ReceiveDamage(float DamageAmount) override;
 
-public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Hit & Die")
-	void Die();
-	virtual void Die_Implementation() { }
 
 /***** Utilities *****/
+public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Die")
+	void Die();
+	virtual void Die_Implementation() { };
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Durability")
 	void DecreaseDurability();
-	virtual void DecreaseDurability_Implementation() { }
+	virtual void DecreaseDurability_Implementation() { };
 
 	virtual EToolType GetToolType_Implementation() const override { return EToolType::Other; }
 };

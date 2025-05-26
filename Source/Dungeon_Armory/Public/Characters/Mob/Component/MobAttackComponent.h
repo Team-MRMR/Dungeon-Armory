@@ -41,6 +41,7 @@ private:
 	float ElapsedTime;
 	bool bCanAttack;
 	bool bIsStartedAttack;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
 	bool bIsEndedAttack;
 
@@ -51,10 +52,8 @@ private:
 public:
 	void StartAttack() override;
 	bool GetCanAttack() const;
-	void OnAttack() override;
-	void OnAttackEnd() override;
 
 private:
-	virtual float CalculateDamage(UCharacterStatComponent* Attacker, UCharacterStatComponent* Defender);
-
+	void OnAttack() override;
+	void OnAttackEnd() override;
 };

@@ -28,10 +28,6 @@
 
 #include "Manager/TeamManager.h"
 
-// sound
-#include "Sound/SoundBase.h"
-#include "Kismet/GameplayStatics.h"
-
 // Sets default values
 AManny::AManny()
 {
@@ -64,7 +60,7 @@ AManny::AManny()
 
 	StatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("StatComponent"));
 
-	GatherComponent_ = CreateDefaultSubobject<UGatherComponent>(TEXT("GatherComponent_"));
+	GatherComponent = CreateDefaultSubobject<UGatherComponent>(TEXT("ToolActionComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -84,7 +80,7 @@ void AManny::BeginPlay()
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
 	// instead of recompiling to adjust them
-	GetCharacterMovement()->JumpZVelocity = 700.f;
+	GetCharacterMovement()->JumpZVelocity = 400.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = StatComponent->BaseSpeed;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
@@ -96,12 +92,11 @@ void AManny::BeginPlay()
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(BattleContext, 0);
-			Subsystem->AddMappingContext(CoreContext, 1);
+			Subsystem->AddMappingContext(BattleContext, 80);
+			Subsystem->AddMappingContext(GatherContext, 90);
+			Subsystem->AddMappingContext(CoreContext, 100);
 		}
 	}
-
-	AnimInstance = GetMesh()->GetAnimInstance();
 }
 
 // Called to bind functionality to input
@@ -126,7 +121,12 @@ void AManny::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AManny::Interact);
 
 		// Attack
-		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AManny::LeftClickAction);
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &AManny::Attack);
+
+		// Gather
+		//EnhancedInputComponent->BindAction(GatherAction, ETriggerEvent::Started, this, &AManny::Gather);
+		EnhancedInputComponent->BindAction(GatherAction, ETriggerEvent::Triggered, this, &AManny::Gather);
+		//EnhancedInputComponent->BindAction(GatherAction, ETriggerEvent::Completed, this, &AManny::Gather);
 	}
 }
 
@@ -184,8 +184,19 @@ void AManny::Interact(const FInputActionValue& Value)
 	}
 }
 
-void AManny::LeftClickAction(const FInputActionValue& Value)
+void AManny::Attack(const FInputActionValue& Value)
 {
+	if (AttackComponent)
+	{
+		AttackComponent->StartAttack();
+	}
+}
+
+void AManny::Gather(const FInputActionValue& Value)
+{
+	if (!StatComponent || !GatherComponent)
+		return;
+
 	// 1. 라인 트레이스의 시작점과 끝점 계산
 	FVector Start, End;
 	FRotator ViewRot;
@@ -209,49 +220,20 @@ void AManny::LeftClickAction(const FInputActionValue& Value)
 
 	// 4. 디버그용으로 시각화	
 #if WITH_EDITOR
-	// DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Red : FColor::Green, false, 0.1f, 0, 1.0f);
+	DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Red : FColor::Green, false, 0.1f, 0, 1.0f);
 #endif
 
-	auto MobBase = Cast<AMobBase>(HitActor);
 	auto GatherableActor = Cast<AGatherableActorBase>(HitActor);
+	if (!GatherableActor)
+		return;
 
-	if (MobBase && AttackComponent)
-	{
-		AttackComponent->StartAttack();
-	}
-	else if (GatherableActor && GatherComponent_)
-	{
-		GatherComponent_->StartGather();
-	}
+	GatherComponent->StartGather();
 }
 
-void AManny::ReceiveDamage_Implementation(const float DamageAmount)
+void AManny::ReceiveDamage(const float DamageAmount)
 {
 	if (StatComponent)
 	{
 		StatComponent->ApplyDamage(DamageAmount);
-
-		if (0.0f <= StatComponent->CurrentHealth)
-		{
-			if (!AnimInstance->Montage_IsPlaying(Hit1Montage) || !AnimInstance->Montage_IsPlaying(Hit2Montage))
-			{
-				const int motion = FMath::RandRange(0, 1);
-				switch (motion)
-				{
-				case 0:
-					AnimInstance->Montage_Play(Hit1Montage, 1.0f);
-					break;
-				case 1:
-					AnimInstance->Montage_Play(Hit2Montage, 1.0f);
-					break;
-				default:
-					break;
-				}
-			}
-		}
-		else
-		{
-			Die();	// 죽음 처리
-		}
 	}
 }

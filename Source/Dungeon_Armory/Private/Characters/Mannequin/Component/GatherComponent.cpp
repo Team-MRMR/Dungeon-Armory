@@ -2,7 +2,6 @@
 
 
 #include "Characters/Mannequin/Component/GatherComponent.h"
-#include "Characters/Core/Component/CharacterStatComponent.h"
 #include "Characters/Mannequin/Interface/IToolEuipable.h"
 #include "Characters/Mannequin/Manny.h"
 
@@ -23,11 +22,10 @@ void UGatherComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-    OwnerPlayerCharacter = Cast<AManny>(GetOwner());
+    auto OwnerPlayerCharacter = Cast<AManny>(GetOwner());
     if (OwnerPlayerCharacter)
     {
         AnimInstance = OwnerPlayerCharacter->GetMesh()->GetAnimInstance();
-        Stat = OwnerPlayerCharacter->GetComponentByClass<UCharacterStatComponent>();
     }
 
 }
@@ -56,6 +54,7 @@ void UGatherComponent::StartGather()
 
 void UGatherComponent::OnGather()
 {
+    FHitResult HitResult;
     DoLineTrace(HitResult);
 
     // 1. 라인 트레이스를 통해 감지한 대상 검사
@@ -76,11 +75,11 @@ void UGatherComponent::OnGather()
 	EResourceType ResourceType = GatherableActor->GetResourceType();      // 자원 액터에서 ResourceType을 가져옴
     if (ToolType == EToolType::Axe && ResourceType == EResourceType::Tree)
     {
-        Logging();
+        Logging(GatherableActor);
     }
     else if(ToolType == EToolType::Pickaxe && ResourceType == EResourceType::Vein)
     {
-        Mining();
+        Mining(GatherableActor);
     }
 }
 
@@ -94,6 +93,7 @@ void UGatherComponent::OnGatherEnd()
         ProceedGather();
         bHasNextGather = false;
     }
+
 }
 
 void UGatherComponent::ReceiveInput()
@@ -101,7 +101,7 @@ void UGatherComponent::ReceiveInput()
     bCanReceiveInput = true;
 }
 
-void UGatherComponent::DoLineTrace(FHitResult& OutHitResult)
+void UGatherComponent::DoLineTrace(FHitResult& HitResult)
 {
     // 1. 플레이어 또는 컴포넌트 오너 얻기
     AActor* OwnerActor = GetOwner();
@@ -119,8 +119,8 @@ void UGatherComponent::DoLineTrace(FHitResult& OutHitResult)
     TraceParams.AddIgnoredActor(OwnerActor); // 자신은 무시
 
     // 4. 실제 라인 트레이스 수행
-    bIsHit = GetWorld()->LineTraceSingleByChannel(
-        OutHitResult,
+    GetWorld()->LineTraceSingleByChannel(
+        HitResult,
         Start,
         End,
         ECC_Visibility, // 또는 커스텀 채널: ECC_GameTraceChannel1 등
@@ -130,9 +130,9 @@ void UGatherComponent::DoLineTrace(FHitResult& OutHitResult)
     // 5. 디버그용 선 그리기 (테스트 시에만)
 #if WITH_EDITOR
     DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 0.1f);
-    if (OutHitResult.bBlockingHit)
+    if (HitResult.bBlockingHit)
     {
-        DrawDebugSphere(GetWorld(), OutHitResult.ImpactPoint, 5.0f, 12, FColor::Red, false, 0.1f);
+        DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 5.0f, 12, FColor::Red, false, 0.1f);
     }
 #endif
 }
@@ -150,62 +150,12 @@ void UGatherComponent::UpdateToolType()
     ToolType = IToolEuipable->Execute_GetToolType(OwnerActor);
 }
 
-void UGatherComponent::Logging()
+void UGatherComponent::Logging(AGatherableActorBase* ResourceActor)
 {
-    if (bIsHit)
-    {
-        AActor* HitActor = HitResult.GetActor();
-        if (!HitActor)
-            return;
-
-        auto GatherableActor = Cast<AGatherableActorBase>(HitActor);
-        if (GatherableActor)
-        {
-            IIDamageable* DamagedActor = Cast<IIDamageable>(GatherableActor);
-            if (DamagedActor && Stat)
-            {
-                const float DamageAmount = Stat->BaseAttackDamage;
-                DamagedActor->ReceiveDamage(DamageAmount);
-
-                const float ConsumptionStamina = Stat->Stamina.LoggingConsumption;
-                Stat->ConsumeStamina(ConsumptionStamina); // 스태미너 소비
-
-                OwnerPlayerCharacter->DecreaseDurability();  // 도구 내구도 감소
-
-                PlayGatherMontage();
-
-                return;
-            }
-        }
-    }
 }
 
-void UGatherComponent::Mining()
+void UGatherComponent::Mining(AGatherableActorBase* ResourceActor)
 {
-    if (bIsHit)
-    {
-        AActor* HitActor = HitResult.GetActor();
-        if (!HitActor)
-            return;
-
-        auto GatherableActor = Cast<AGatherableActorBase>(HitActor);
-        if (GatherableActor)
-        {
-            IIDamageable* DamagedActor = Cast<IIDamageable>(GatherableActor);
-            if (DamagedActor && Stat)
-            {
-                const float DamageAmount = Stat->BaseAttackDamage;
-                DamagedActor->ReceiveDamage(DamageAmount);
-
-                const float ConsumptionStamina = Stat->Stamina.MiningConsumption;
-                Stat->ConsumeStamina(ConsumptionStamina); // 스태미너 소비
-
-                OwnerPlayerCharacter->DecreaseDurability();  // 도구 내구도 감소
-
-                return;
-            }
-        }
-    }
 }
 
 void UGatherComponent::ProceedGather()
@@ -228,26 +178,18 @@ void UGatherComponent::PlayGatherMontage()
     if (AnimInstance->Montage_IsPlaying(LoggingMontage) || AnimInstance->Montage_IsPlaying(MiningMontage))
         return;
 
-    if (ToolType == EToolType::Axe)
+    switch (ToolType)
     {
-        const float ConsumptionStamina = Stat->Stamina.LoggingConsumption;
-        const float CurrentStamina = Stat->Stamina.GetCurrent();
-
-        // 현재 스태미너가 소비 스태미너보다 작으면 공격할 수 없음
-        if (CurrentStamina <= ConsumptionStamina)
-            return;
-
+    case EToolType::Axe:
         AnimInstance->Montage_Play(LoggingMontage);
-    }
-    else if (ToolType == EToolType::Pickaxe)
-    {
-        const float ConsumptionStamina = Stat->Stamina.MiningConsumption;
-        const float CurrentStamina = Stat->Stamina.GetCurrent();
+        break;
 
-        // 현재 스태미너가 소비 스태미너보다 작으면 공격할 수 없음
-        if (CurrentStamina <= ConsumptionStamina)
-            return;
+    case EToolType::Pickaxe:
         AnimInstance->Montage_Play(MiningMontage);
+        break;
+
+    default:
+        break;
     }
     
     bIsMontageEnded = false;

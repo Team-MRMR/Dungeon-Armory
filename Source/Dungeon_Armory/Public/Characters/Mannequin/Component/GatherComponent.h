@@ -10,10 +10,6 @@
 #include "GatherComponent.generated.h"
 
 class AGatherableActorBase;
-class AManny;
-class UAnimInstance;
-class UAnimMontage;
-class UCharacterStatComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DUNGEON_ARMORY_API UGatherComponent : public UActorComponent
@@ -41,11 +37,7 @@ public:
 	UAnimMontage* MiningMontage;
 
 protected:
-	bool bIsHit;
-	FHitResult HitResult;
 	UAnimInstance* AnimInstance;
-	UCharacterStatComponent* Stat;
-	AManny* OwnerPlayerCharacter;
 
 // --- 도구 관련 ---
 public:
@@ -89,8 +81,8 @@ private:
 	void DoLineTrace(FHitResult& HitResult);
 	void UpdateToolType();
 
-	void Logging();
-	void Mining();
+	void Logging(AGatherableActorBase* ResourceActor);
+	void Mining(AGatherableActorBase* ResourceActor);
 
 	void ProceedGather();
 	void PlayGatherMontage();

@@ -8,14 +8,12 @@
 #include "Characters/Core/Component/MovementControllerComponent.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Characters/Core/AI/Team/TeamComponent.h"
+#include "AI/Team/TeamComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 #include "AIController.h"
 
-// sound
-#include "Sound/SoundBase.h"
-#include "Kismet/GameplayStatics.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 AMobBase::AMobBase()
@@ -28,17 +26,12 @@ AMobBase::AMobBase()
 	// 공격 컴포넌트 생성
 	AttackComponent = CreateDefaultSubobject<UMobAttackComponent>(TEXT("AttackComponent"));
 
-	// 팀 컴포넌트 생성
-	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
-
 	// 이동 컨트롤러 컴포넌트 생성
 	MovementControllerComponent = CreateDefaultSubobject<UMovementControllerComponent>(TEXT("MovementControllerComponent"));
-}
 
-// Called when the game starts or when spawned
-void AMobBase::BeginPlay()
-{
-	Super::BeginPlay();
+	// 팀 컴포넌트 생성
+	TeamComponent = CreateDefaultSubobject<UTeamComponent>(TEXT("TeamComponent"));
+	TeamComponent->SetTeamType(ETeamType::Mob);
 
 	// (Pawn) 컨트롤러 회전 제어 해제
 	bUseControllerRotationPitch = false;
@@ -53,11 +46,16 @@ void AMobBase::BeginPlay()
 
 	// 회전 속도 설정 (원하는 속도로 조정)
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 480.f, 0.f);
-	GetCharacterMovement()->MaxWalkSpeed = StatComponent->BaseSpeed;
-	// GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
-	// GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
-	TeamComponent->SetTeamType(ETeamType::Mob);
+	GetCharacterMovement()->UseAccelerationForPathFollowing();
+}
+
+// Called when the game starts or when spawned
+void AMobBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GetCharacterMovement()->MaxWalkSpeed = StatComponent->BaseSpeed;
 }
 
 void AMobBase::Tick(float DeltaSeconds)
@@ -75,18 +73,48 @@ void AMobBase::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation
 
 void AMobBase::ReceiveDamage(float DamageAmount)
 {
-	if (StatComponent)
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (!StatComponent || !AnimInstance)
+		return;
+
+	if (0.0f <= StatComponent->CurrentHealth)
 	{
 		StatComponent->ApplyDamage(DamageAmount);
 
-		if (0.0f <= StatComponent->CurrentHealth)
-		{
-			UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
-		}
-		else
-		{
-			UGameplayStatics::PlaySoundAtLocation(this, DieSound, GetActorLocation());
-			Die();	// 죽음 처리
-		}
+		AnimInstance->Montage_Play(
+			DamagedMontage,
+			1.0f,
+			EMontagePlayReturnType::MontageLength,
+			0.1f,
+			false
+		);
+	}
+	else
+	{
+		Die_Implementation();
+		Die();
+
+		AnimInstance->Montage_Play(
+			DieMontage,
+			1.0f,
+			EMontagePlayReturnType::MontageLength,
+			0.0f,
+			false
+		);
+	}
+}
+
+void AMobBase::Die_Implementation()
+{
+	// 콜리전 비활성화
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// AI 비활성화
+	AAIController* AIController = Cast<AAIController>(GetController());
+	if (AIController)
+	{
+		AIController->StopMovement();
+		AIController->UnPossess();
 	}
 }

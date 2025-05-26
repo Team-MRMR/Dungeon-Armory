@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "IDamageable.generated.h"
+#include "IMovableTask.generated.h"
 
+class UBehaviorTreeComponent;
+	
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UIDamageable : public UInterface
+class UIMovableTask : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,13 +18,11 @@ class UIDamageable : public UInterface
 /**
  * 
  */
-class DUNGEON_ARMORY_API IIDamageable
+class DUNGEON_ARMORY_API IIMovableTask
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void ReceiveDamage(float DamageAmount) = 0;
-
-	virtual void Die() = 0;
+	virtual void OnMoveCompleted(UBehaviorTreeComponent* BTComp) = 0;
 };

@@ -17,8 +17,6 @@ UCharacterStatComponent::UCharacterStatComponent()
 	{
 		OwnerCharacter = Mob;
 	}
-
-	CurrentHealth = MaxHealth;
 }
 
 // Called when the game starts
@@ -26,13 +24,8 @@ void UCharacterStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	auto World = GetWorld();
-	if (World)
-	{
-		Stamina.Initialize(World);
-	}
 
-
+	CurrentHealth = MaxHealth;
 	SetSpeed(BaseSpeed);
 	
 }
@@ -78,11 +71,6 @@ float UCharacterStatComponent::GetSpeedForState(EMobState State) const
 	default:
 		return BaseSpeed;
 	}
-}
-
-void UCharacterStatComponent::ConsumeStamina(const float ConsumptionStamina)
-{
-	Stamina.Consume(ConsumptionStamina);
 }
 
 void UCharacterStatComponent::SetSpeedForState(EMobState State)
